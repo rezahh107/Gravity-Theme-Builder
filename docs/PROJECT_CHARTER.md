@@ -22,18 +22,57 @@ SRWF is intentionally the first proving ground. It must not be used to justify s
 
 ## 3. Authority model
 
-For a theme implementation, authority is ordered as follows:
+Authority in this repository is **domain-scoped**. Visual intent, repository engineering rules, and implementation facts are different authority domains. They must not be collapsed into one total precedence list or allowed to override one another outside their domain.
 
-1. Explicit current owner decision.
-2. Approved visual/UX contract and reference artifacts for that theme.
-3. This Project Charter.
-4. `docs/THEME_AUTHORING_CONTRACT.md`.
-5. `docs/ARCHITECTURE.md`.
-6. Theme-specific implementation documentation.
-7. Current official Gravity Forms documentation and inspected runtime behavior for implementation facts.
-8. General engineering knowledge.
+### 3.1 Owner decisions
 
-Visual references determine **what the theme should look like**. Gravity Forms documentation/runtime determines **how the host can safely express it**. Neither source substitutes for the other.
+Explicit current owner decisions govern authorized project and design decisions.
+
+Where this Charter requires a direct amendment for a governed decision, the owner decision authorizes that change but does not silently rewrite the Charter; the Charter must be updated explicitly under Section 14.
+
+### 3.2 Visual authority / WHAT
+
+Approved visual/UX contracts and approved reference artifacts for a theme determine the intended presentation: **what the theme should look like and which visual states are required**.
+
+Visual authority does not by itself authorize changes to Gravity Forms behavior, validation, lifecycle, accessibility semantics, persistence, Foundation mechanics, project non-goals, or other repository engineering boundaries.
+
+A visual reference therefore cannot override this Charter outside the visual-intent domain.
+
+### 3.3 Repository normative authority
+
+For repository engineering rules, implementation boundaries, and authoring requirements, precedence is:
+
+1. This `docs/PROJECT_CHARTER.md`.
+2. `docs/THEME_AUTHORING_CONTRACT.md`.
+3. `docs/ARCHITECTURE.md`.
+4. Theme-specific implementation documentation.
+
+This ordering applies to **normative repository instructions**. It does not make repository documentation authoritative for external runtime facts merely because that documentation is higher or lower in this list.
+
+### 3.4 Implementation-fact evidence / HOW
+
+Current official Gravity Forms documentation/source and inspected behavior in the supported runtime determine factual host capabilities, consumers, cascade behavior, markup, and other implementation facts.
+
+Repository and theme-local documentation may record those facts, but they must not override contradictory current official documentation or inspected supported-runtime evidence. When a contradiction appears, surface it and reconcile the local documentation; treat the contradictory local factual claim as stale or not proven until reconciled.
+
+Implementation-fact evidence does not authorize product or design decisions. It constrains **how** an authorized visual requirement can safely be implemented; it does not redefine **what** the approved design or repository boundaries should be.
+
+### 3.5 General engineering knowledge
+
+General engineering knowledge is a fallback only where higher-authority normative instructions, approved visual authority, or current factual evidence do not answer the question.
+
+### 3.6 Cross-domain conflict rule
+
+Do not resolve a cross-domain conflict by applying one flat precedence ranking.
+
+Instead:
+
+- use visual authority for visual intent;
+- use repository normative authority for project/engineering rules;
+- use current official documentation and inspected runtime behavior for implementation facts;
+- use explicit owner decisions for authorized project/design decisions within the change-control rules above.
+
+If a factual host constraint prevents an approved visual requirement from being implemented as expected, preserve the visual requirement as the target, report the factual constraint, and choose or request the smallest authorized reconciliation. Do not silently weaken the design and do not falsify host behavior.
 
 ## 4. Core architectural position
 
