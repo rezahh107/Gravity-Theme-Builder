@@ -1,0 +1,34 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Logs / temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Node / JS tooling
+node_modules/
+coverage/
+playwright-report/
+test-results/
+
+# PHP tooling
+vendor/
+.phpunit.result.cache
+
+# Build / generated output
+dist/
+build/
+.tmp/
+
+# Environment / local secrets
+.env
+.env.*
+!.env.example
+
+# Local runtime artifacts
+artifacts/
