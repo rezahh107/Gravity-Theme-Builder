@@ -4,14 +4,29 @@ Repository instructions for coding agents working on **Gravity Theme Builder**.
 
 ## 1. Read this first
 
-Before changing code or documentation, read in this order:
+Before changing code or documentation, read:
 
 1. `docs/PROJECT_CHARTER.md`
 2. `docs/THEME_AUTHORING_CONTRACT.md`
 3. `docs/ARCHITECTURE.md`
-4. The target theme's own README and reference artifacts
+4. The target theme's own README and approved reference artifacts
 
-If instructions conflict, use the highest item in that list unless the repository owner explicitly overrides it.
+Do **not** interpret this reading order as one flat authority ranking across every kind of question.
+
+For **normative repository instructions**, use this precedence:
+
+1. `docs/PROJECT_CHARTER.md`
+2. `docs/THEME_AUTHORING_CONTRACT.md`
+3. `docs/ARCHITECTURE.md`
+4. Theme-specific implementation documentation
+
+For **visual intent / WHAT**, use the approved visual/UX contract and approved reference artifacts for the target theme. Visual authority controls presentation only; it does not authorize takeover of Gravity Forms behavior or override repository non-goals and engineering boundaries.
+
+For **implementation facts / HOW**, use current official Gravity Forms documentation/source plus inspected behavior in the supported runtime. Theme-local or repository documentation may record implementation facts, but a stale local factual claim must not override contradictory current official documentation or inspected runtime evidence. Surface and reconcile the contradiction instead.
+
+Explicit current owner decisions govern authorized project/design decisions, subject to any Charter change-control requirement that requires the Charter itself to be amended.
+
+If a conflict crosses authority domains, classify the question first and apply the authority for that domain rather than forcing a cross-domain precedence comparison.
 
 ## 2. Core mission
 
@@ -44,6 +59,8 @@ Distinguish clearly between:
 A CSS custom property appearing in documentation does not prove where it is consumed in every add-on or custom field. Inspect computed styles/runtime when consumer identity matters.
 
 Before relying on version-sensitive APIs, verify them against the actual supported Gravity Forms version and current official documentation.
+
+Repository documentation does not become factual runtime authority merely because it is normative for repository behavior. When local factual documentation conflicts with current official Gravity Forms documentation/source or inspected supported-runtime behavior, mark the local claim stale or `NOT_PROVEN` until reconciled.
 
 ## 5. Theme implementation workflow
 
