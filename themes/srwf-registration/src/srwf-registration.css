@@ -72,7 +72,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
 
 /*
  * Owner runtime: the real GF 3.x submit matches a framework declaration that resolves
- * inline-size from --gf-local-width:auto. Reuse the already-proven framework sentinel
+ * inline-size from the host local-width value resolving to auto. Reuse the already-proven framework sentinel
  * enforcement boundary so this direct SRWF-only rule wins without priority escalation or IDs.
  */
 head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gform-footer .gform_button,
