@@ -5,6 +5,7 @@ import re
 import subprocess
 import tempfile
 import unittest
+from collections import Counter
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
@@ -13,7 +14,9 @@ CSS = THEME / "src" / "srwf-registration.css"
 PHP = THEME / "src" / "srwf-registration-theme.php"
 MAP = THEME / "IMPLEMENTATION_MAP.md"
 REFERENCE = THEME / "reference" / "materialize_reference.sh"
-SCOPE = ".gform-theme--framework.srwf-registration-theme_wrapper"
+NARROW_SCOPE = ".gform-theme--framework.srwf-registration-theme_wrapper"
+ACTIVATION_CLASS = ".srwf-registration-theme_wrapper"
+HOSTILE_ORBITAL_SELECTOR = '#gform_wrapper_1[data-form-index="0"].gform-theme'
 REFERENCE_SHA256 = "436307d4cd6d896e0f280e502901269240dc310ec2e5927e30e1c29643483000"
 
 REVIEWED_GF_API = {
@@ -56,6 +59,201 @@ def strip_comments(css: str) -> str:
     return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
 
 
+def css_blocks(css: str) -> list[tuple[str, str]]:
+    clean = strip_comments(css)
+    return [
+        (match.group(1).strip(), match.group(2))
+        for match in re.finditer(r"([^{}]+)\{([^{}]*)\}", clean, flags=re.S)
+    ]
+
+
+def gf_token_declarations(body: str) -> list[tuple[str, str]]:
+    return re.findall(
+        r"(?m)^\s*(--gf-[a-z0-9-]+)\s*:\s*([^;]+);",
+        body,
+    )
+
+
+def gf_token_blocks(css: str) -> list[tuple[str, str]]:
+    return [
+        (selectors, body)
+        for selectors, body in css_blocks(css)
+        if gf_token_declarations(body)
+    ]
+
+
+def split_selector_list(selector_list: str) -> list[str]:
+    parts: list[str] = []
+    start = 0
+    paren_depth = 0
+    bracket_depth = 0
+    quote: str | None = None
+    escaped = False
+
+    for index, char in enumerate(selector_list):
+        if escaped:
+            escaped = False
+            continue
+        if char == "\\":
+            escaped = True
+            continue
+        if quote is not None:
+            if char == quote:
+                quote = None
+            continue
+        if char in {'"', "'"}:
+            quote = char
+            continue
+        if char == "(":
+            paren_depth += 1
+        elif char == ")":
+            paren_depth -= 1
+        elif char == "[":
+            bracket_depth += 1
+        elif char == "]":
+            bracket_depth -= 1
+        elif char == "," and paren_depth == 0 and bracket_depth == 0:
+            parts.append(selector_list[start:index].strip())
+            start = index + 1
+
+    parts.append(selector_list[start:].strip())
+    return [part for part in parts if part]
+
+
+def consume_identifier(selector: str, index: int) -> int:
+    while index < len(selector):
+        char = selector[index]
+        if char == "\\" and index + 1 < len(selector):
+            index += 2
+            continue
+        if char.isalnum() or char in "_-":
+            index += 1
+            continue
+        break
+    return index
+
+
+def consume_balanced(
+    selector: str,
+    index: int,
+    opener: str,
+    closer: str,
+) -> tuple[int, str]:
+    if selector[index] != opener:
+        raise ValueError(f"expected {opener!r} at offset {index}")
+
+    depth = 1
+    quote: str | None = None
+    escaped = False
+    cursor = index + 1
+
+    while cursor < len(selector):
+        char = selector[cursor]
+        if escaped:
+            escaped = False
+        elif char == "\\":
+            escaped = True
+        elif quote is not None:
+            if char == quote:
+                quote = None
+        elif char in {'"', "'"}:
+            quote = char
+        elif char == opener:
+            depth += 1
+        elif char == closer:
+            depth -= 1
+            if depth == 0:
+                return cursor + 1, selector[index + 1 : cursor]
+        cursor += 1
+
+    raise ValueError(f"unbalanced {opener}{closer} in selector: {selector}")
+
+
+def selector_specificity(selector: str) -> tuple[int, int, int]:
+    """Calculate specificity for the selector forms used by this theme.
+
+    Selectors Level 4 functional pseudo-classes :is(), :not(), and :has()
+    contribute the maximum specificity of their argument selector list;
+    :where() contributes zero.
+    """
+
+    ids = classes = types = 0
+    index = 0
+
+    while index < len(selector):
+        char = selector[index]
+
+        if char.isspace() or char in ">+~,":
+            index += 1
+            continue
+
+        if char == "#":
+            ids += 1
+            index = consume_identifier(selector, index + 1)
+            continue
+
+        if char == ".":
+            classes += 1
+            index = consume_identifier(selector, index + 1)
+            continue
+
+        if char == "[":
+            classes += 1
+            index, _ = consume_balanced(selector, index, "[", "]")
+            continue
+
+        if char == ":":
+            if index + 1 < len(selector) and selector[index + 1] == ":":
+                types += 1
+                index = consume_identifier(selector, index + 2)
+                if index < len(selector) and selector[index] == "(":
+                    index, _ = consume_balanced(selector, index, "(", ")")
+                continue
+
+            name_start = index + 1
+            name_end = consume_identifier(selector, name_start)
+            name = selector[name_start:name_end].lower()
+            index = name_end
+
+            if index < len(selector) and selector[index] == "(":
+                index, arguments = consume_balanced(selector, index, "(", ")")
+                if name in {"is", "not", "has"}:
+                    argument_specificities = [
+                        selector_specificity(argument)
+                        for argument in split_selector_list(arguments)
+                    ]
+                    arg_ids, arg_classes, arg_types = max(
+                        argument_specificities,
+                        default=(0, 0, 0),
+                    )
+                    ids += arg_ids
+                    classes += arg_classes
+                    types += arg_types
+                elif name != "where":
+                    classes += 1
+                continue
+
+            classes += 1
+            continue
+
+        if char == "*":
+            index += 1
+            continue
+
+        if char == "|":
+            index += 1
+            continue
+
+        if char.isalpha() or char in "_-":
+            types += 1
+            index = consume_identifier(selector, index)
+            continue
+
+        raise ValueError(f"unsupported selector token {char!r} at offset {index}: {selector}")
+
+    return ids, classes, types
+
+
 class SrwfRegistrationStaticTests(unittest.TestCase):
     def test_reference_materializes_to_admitted_hash(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -69,17 +267,87 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         used = set(re.findall(r"--gf-[a-z0-9-]+", css))
         self.assertEqual(REVIEWED_GF_API, used)
 
-    def test_every_css_selector_is_under_the_opt_in_framework_scope(self) -> None:
-        css = strip_comments(CSS.read_text(encoding="utf-8"))
-        for match in re.finditer(r"([^{}]+)\{", css):
-            selector_group = match.group(1).strip()
-            if selector_group.startswith("@"):
+    def test_token_enforcement_specificity_outranks_orbital_per_form_scope(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        token_blocks = gf_token_blocks(css)
+        self.assertEqual(1, len(token_blocks), "expected one SRWF --gf-* enforcement block")
+
+        selector_group, _ = token_blocks[0]
+        selectors = split_selector_list(selector_group)
+        self.assertEqual(1, len(selectors), "token enforcement should not need parallel selector paths")
+
+        host_specificity = selector_specificity(HOSTILE_ORBITAL_SELECTOR)
+        enforcement_specificity = selector_specificity(selectors[0])
+
+        self.assertEqual((1, 2, 0), host_specificity)
+        self.assertGreater(
+            enforcement_specificity,
+            host_specificity,
+            f"{selectors[0]} does not outrank {HOSTILE_ORBITAL_SELECTOR}",
+        )
+
+    def test_token_enforcement_boundary_is_documented_theme_framework_scope(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        token_blocks = gf_token_blocks(css)
+        self.assertEqual(1, len(token_blocks))
+
+        for selector in split_selector_list(token_blocks[0][0]):
+            self.assertIn("head:has(#gravity_forms_theme_framework-css)", selector)
+            self.assertIn(".gform-theme--framework", selector)
+            self.assertIn(".gform-theme", selector)
+            self.assertIn(ACTIVATION_CLASS, selector)
+            self.assertNotRegex(selector, r"#gform_wrapper_\d+")
+
+    def test_unrelated_form_is_excluded_from_token_enforcement_structurally(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        token_blocks = gf_token_blocks(css)
+        self.assertEqual(
+            1,
+            len(token_blocks),
+            "an alternate --gf-* block could bypass opt-in isolation",
+        )
+
+        selectors = split_selector_list(token_blocks[0][0])
+        self.assertTrue(selectors)
+        for selector in selectors:
+            self.assertIn(
+                ACTIVATION_CLASS,
+                selector,
+                f"token selector does not require SRWF opt-in: {selector}",
+            )
+
+    def test_every_reviewed_gf_token_is_under_the_repaired_boundary(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        token_blocks = gf_token_blocks(css)
+        self.assertEqual(1, len(token_blocks))
+
+        declarations = gf_token_declarations(token_blocks[0][1])
+        self.assertEqual(REVIEWED_GF_API, {name for name, _ in declarations})
+
+    def test_gf_token_values_have_single_implementation_source(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        declarations = [
+            name
+            for _, body in css_blocks(css)
+            for name, _ in gf_token_declarations(body)
+        ]
+        counts = Counter(declarations)
+
+        self.assertEqual(REVIEWED_GF_API, set(counts))
+        self.assertTrue(
+            all(count == 1 for count in counts.values()),
+            f"duplicate --gf-* declarations found: {counts}",
+        )
+
+    def test_non_token_selectors_remain_under_the_narrow_opt_in_scope(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        for selector_group, body in css_blocks(css):
+            if gf_token_declarations(body):
                 continue
-            for selector in selector_group.split(","):
-                selector = selector.strip()
+            for selector in split_selector_list(selector_group):
                 self.assertTrue(
-                    selector.startswith(SCOPE),
-                    f"unscoped selector: {selector}",
+                    selector.startswith(NARROW_SCOPE),
+                    f"non-token selector escaped narrow SRWF scope: {selector}",
                 )
 
     def test_unresolved_values_are_not_promoted(self) -> None:
@@ -92,6 +360,8 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertNotIn("--gf-ctrl-outline-width-focus", css)
         self.assertNotIn("--gf-ctrl-outline-color-focus", css)
         self.assertNotRegex(css, r"\.gform_title\s*\{")
+        self.assertNotRegex(css, r"#gform_wrapper_\d+")
+        self.assertNotIn("[data-parent-form]", css)
 
     def test_activation_is_explicit_class_scoped_and_form_id_free(self) -> None:
         php = PHP.read_text(encoding="utf-8")

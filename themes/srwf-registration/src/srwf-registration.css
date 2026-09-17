@@ -9,13 +9,7 @@
  * focus-ring geometry/alpha, desktop shadow, or add-on-specific selectors.
  */
 
-.gform-theme--framework.srwf-registration-theme_wrapper {
-    direction: rtl;
-    max-inline-size: 840px;
-    margin-inline: auto;
-    color: #172033;
-    font-family: "Vazirmatn", system-ui, sans-serif;
-
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper {
     --gf-font-family-base: "Vazirmatn", system-ui, sans-serif;
 
     --gf-color-primary: #1D4ED8;
@@ -53,6 +47,14 @@
     --gf-ctrl-file-zone-radius: 12px;
     --gf-field-section-border-color: #E4E7EC;
     --gf-form-validation-heading-color: #B42318;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper {
+    direction: rtl;
+    max-inline-size: 840px;
+    margin-inline: auto;
+    color: #172033;
+    font-family: "Vazirmatn", system-ui, sans-serif;
 }
 
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section .gsection_title {
