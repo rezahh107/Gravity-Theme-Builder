@@ -24,8 +24,9 @@ class SrwfRuntimeStabilizationTests(unittest.TestCase):
 
     def test_submit_rule_still_matches_runtime_element_shape_without_form_id(self) -> None:
         css = CSS.read_text(encoding='utf-8')
-        self.assertIn('.gform-theme--framework.srwf-registration-theme_wrapper .gform-footer .gform_button', css)
-        self.assertIn('.gform-theme--framework.srwf-registration-theme_wrapper .gform_footer .gform_button', css)
+        enforced = 'head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper'
+        self.assertIn(enforced + ' .gform-footer .gform_button', css)
+        self.assertIn(enforced + ' .gform_footer .gform_button', css)
         self.assertIn('inline-size: 100%;', css)
         self.assertNotRegex(css, r'#gform_submit_button_\d+')
 
