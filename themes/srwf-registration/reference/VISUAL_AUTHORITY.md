@@ -54,11 +54,9 @@ The job is to reproduce the approved SRWF Registration presentation as faithfull
 
 ## 3. Visual Contract relationship
 
-The owner-approved visual contract remains the authority for exact canonical visual rules and explicit resolution states:
+The owner-approved SRWF Public Registration Visual/UX Contract remains the authority for exact canonical visual rules and explicit resolution states.
 
-`SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.0.md`
-
-Provenance source:
+Its exact admitted provenance is:
 
 ```text
 repository: rezahh107/Gravity-Presentation-Profiles
@@ -67,6 +65,8 @@ source_blob_sha: 7400b7d0f97f245f090fd84893deb62c3ec83956
 status: OWNER_APPROVED_VISUAL_AUTHORITY__EXPLICIT_RESOLUTION_STATES__RUNTIME_VALIDATION_REQUIRED
 ```
 
+This file records the exact source identity; it does **not** claim that the legacy GPP repository architecture governs Gravity Theme Builder. In this repository, `docs/PROJECT_CHARTER.md` remains the normative repository authority and the contract is used only in its visual-intent / WHAT domain.
+
 If the HTML artifact and the Visual/UX Contract differ on an exact canonical value or an explicit `NOT_PROVEN` / `NON_NORMATIVE_REFERENCE` item, **the Visual/UX Contract governs that visual rule**. The HTML remains the approved composition/state reference; it does not turn approximate mockup values into production authority.
 
 Do not use this relationship to weaken the owner's exact-design intent. It exists to prevent prototype values, demo behavior, or unresolved measurements from being silently promoted into production facts.
@@ -74,7 +74,7 @@ Do not use this relationship to weaken the owner's exact-design intent. It exist
 ## 4. WHAT vs HOW
 
 ```text
-Approved SRWF visual artifact + Visual/UX Contract
+Approved SRWF visual artifact + owner-approved Visual/UX Contract
         ↓
 WHAT must be reproduced
 
