@@ -46,6 +46,23 @@ Explicit current owner decisions govern authorized project/design decisions, sub
 
 If a conflict crosses authority domains, classify the question first and apply the authority for that domain rather than forcing a cross-domain precedence comparison.
 
+### 1.1 Current project-goal discovery
+
+When determining or reporting the repository's **current goals, current milestone, or first deliverable**, do not stop after the Project Charter or root README.
+
+For the current first implementation, also read:
+
+1. `themes/srwf-registration/README.md`
+2. `themes/srwf-registration/reference/VISUAL_AUTHORITY.md`
+
+If the task involves implementation planning, visual analysis, styling, or review of that target, also follow `themes/srwf-registration/AGENTS.md` and inspect the verified admitted artifact as required there.
+
+Any summary of the current first deliverable must preserve this fact:
+
+> The first concrete output is the faithful implementation of the exact admitted SRWF Registration design on real Gravity Forms — not a new, improved, modernized, simplified, or merely SRWF-inspired design.
+
+This rule improves discovery of the current milestone. It does not change the repository authority model or elevate theme-local documentation above the Project Charter outside its proper domain.
+
 ## 2. Core mission
 
 Implement approved visual designs on the Gravity Forms Theme Framework with the smallest safe amount of custom code.
