@@ -14,6 +14,24 @@ The first reference implementation is:
 
 SRWF is the first proving ground for the system, not a special case that defines every future theme.
 
+## Current first implementation target
+
+The current first concrete deliverable is **not merely an SRWF-inspired theme**. It is the faithful implementation of the exact owner-approved SRWF Registration design admitted under:
+
+`themes/srwf-registration/reference/`
+
+For the authoritative interpretation of this current target, read:
+
+1. `themes/srwf-registration/README.md`
+2. `themes/srwf-registration/reference/VISUAL_AUTHORITY.md`
+3. `themes/srwf-registration/AGENTS.md` before implementation or visual-analysis work
+
+The admitted `OWNER_REFERENCE_new_7.html` design is the implementation target itself. Do not redesign, reinterpret, modernize, simplify, embellish, or substitute it.
+
+Gravity Forms Theme Framework and inspected runtime evidence determine **HOW** that approved design is implemented; they do not redefine **WHAT** the first deliverable should look like.
+
+Any summary of the repository's **current goals, first milestone, or first deliverable** should preserve this fact.
+
 ## Core approach
 
 Gravity Theme Builder follows this preference order:
