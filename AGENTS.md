@@ -2,15 +2,42 @@
 
 Repository instructions for coding agents working on **Gravity Theme Builder**.
 
-## 0. Mandatory first source read
+## 0. Mandatory canonical-source preflight
 
-Before any code, technical design, implementation planning, or review work in this repository, read this source **first**:
+The repository has a canonical local Gravity Forms Theme Framework implementation-fact source at this exact path:
 
-1. `PROJECT_SOURCES/00_GRAVITY_FORMS_THEME_FRAMEWORK_CANONICAL_REFERENCE.md`
+`PROJECT_SOURCES/00_GRAVITY_FORMS_THEME_FRAMEWORK_CANONICAL_REFERENCE.md`
 
-Then read `PROJECT_SOURCES/SOURCE_REGISTRY.md` for the snapshot status, admission metadata, and any supplemental ambiguity discovered after the source snapshot was created.
+Before beginning **any code change, technical design, implementation planning, debugging, refactoring, technical review, or Theme Framework implementation-fact analysis** for the current task, read that source **first**.
 
-This is a **read-order requirement**, not a flat cross-domain authority ranking.
+Do not begin that technical work until the canonical source has actually been retrieved and read for the current task. Do not claim or imply that this preflight occurred if it did not.
+
+Then read:
+
+`PROJECT_SOURCES/SOURCE_REGISTRY.md`
+
+for the source's current admission/canonical status, snapshot metadata, update rules, and recorded supplemental ambiguity.
+
+### Canonical-source preflight gate
+
+The preflight is satisfied only when all of the following are true:
+
+1. `PROJECT_SOURCES/00_GRAVITY_FORMS_THEME_FRAMEWORK_CANONICAL_REFERENCE.md` exists and is readable.
+2. It has been read for the current task before technical implementation/review decisions are made.
+3. `PROJECT_SOURCES/SOURCE_REGISTRY.md` has been checked for the source's current status and maintenance notes.
+4. Any relevant ambiguity, staleness warning, or source limitation is carried into the task rather than silently ignored.
+
+If the canonical source is missing or unreadable, stop Theme Framework technical work and report:
+
+`CANONICAL_SOURCE_UNAVAILABLE`
+
+Do not substitute model memory, naming-pattern inference, an older copied snapshot, or guessed Gravity Forms behavior for the missing source.
+
+If the registry marks the source as suspended, stale, candidate-only, or otherwise non-canonical, still use it as the required first local lookup, but do not treat it as current factual authority; revalidate the relevant implementation facts against current official Gravity Forms documentation/source and supported-runtime evidence before relying on them.
+
+The existence and path of the canonical source are repository invariants for normal work. Do not bypass, rename, replace, remove, or relocate it as part of unrelated implementation work. Any intentional source replacement, path migration, or canonical-status change must be an explicit source-maintenance change with corresponding registry reconciliation.
+
+This is a **mandatory read-order/preflight rule**, not a flat cross-domain authority ranking.
 
 For Theme Framework implementation facts:
 
