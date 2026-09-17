@@ -7,38 +7,42 @@ This directory contains the visual authority package for the first Gravity Theme
 ## Mandatory read order for SRWF visual work
 
 1. `VISUAL_AUTHORITY.md` — exact-target interpretation and deviation gate.
-2. `OWNER_REFERENCE_new_7.html.gz` — lossless repository copy of the approved HTML design artifact.
-3. The owner-approved Visual/UX Contract identified below when an exact canonical value, resolution state, or visual-rule conflict must be resolved.
+2. `materialize_reference.sh` — reconstructs and verifies the exact approved artifact.
+3. Inspect the materialized `OWNER_REFERENCE_new_7.html` before implementation decisions.
+4. Consult the owner-approved Visual/UX Contract identified below when an exact canonical value, resolution state, or visual-rule conflict must be resolved.
 
 Do not begin SRWF visual implementation from memory, screenshots in another conversation, or a newly invented visual specification.
 
 ## Exact approved artifact
 
-Stored artifact:
+The approved HTML is stored as an exact, connector-safe Base64 payload split across:
 
-`OWNER_REFERENCE_new_7.html.gz`
+```text
+OWNER_REFERENCE_new_7.html.gz.b64.part01
+OWNER_REFERENCE_new_7.html.gz.b64.part02
+OWNER_REFERENCE_new_7.html.gz.b64.part03
+```
 
-It is a lossless, timestamp-neutral gzip copy of the approved source file:
-
-`OWNER_REFERENCE_new_7.html`
-
-Materialize it locally with:
+These parts concatenate to the Base64 encoding of a deterministic `gzip -n` archive of the approved HTML. Reconstruct it with:
 
 ```bash
-gzip -dc themes/srwf-registration/reference/OWNER_REFERENCE_new_7.html.gz > /tmp/OWNER_REFERENCE_new_7.html
+bash themes/srwf-registration/reference/materialize_reference.sh
 ```
+
+The script verifies both payload stages.
 
 Identity:
 
 ```text
 source_filename: OWNER_REFERENCE_new_7.html
 source_sha256: 436307d4cd6d896e0f280e502901269240dc310ec2e5927e30e1c29643483000
-stored_gzip_sha256: 696bc8466aa9503e782fee48f484a34c1a85d4c30210bcc645ecc7e8171c9340
+gzip_sha256: 696bc8466aa9503e782fee48f484a34c1a85d4c30210bcc645ecc7e8171c9340
+base64_part_lengths: 8000, 8000, 7360
 html_title: SRWF Student Registration — Final Contract-Corrected Mockup Set (v1.2)
 visual_state: CLOSED
 ```
 
-The compressed storage format does **not** alter the design artifact. Decompression reproduces the exact admitted HTML bytes identified by the source SHA-256 above.
+The split storage format does **not** alter the design artifact. Successful materialization reproduces the exact admitted HTML bytes identified by the source SHA-256 above.
 
 ## Visual/UX Contract provenance
 
