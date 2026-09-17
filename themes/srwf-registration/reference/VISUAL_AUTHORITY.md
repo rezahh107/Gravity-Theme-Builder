@@ -8,17 +8,25 @@ This document locks the visual target for the **first reference theme** of Gravi
 
 The first theme is not a redesign exercise and is not a new design derived from SRWF.
 
-The implementation target is the approved SRWF Registration design artifact admitted in this directory:
+The implementation target is the approved SRWF Registration design artifact admitted in this directory as a connector-safe, lossless base64-split payload:
 
-`OWNER_REFERENCE_new_7.html.gz`
-
-The gzip file is a lossless repository copy of the approved HTML artifact. Materialize it before visual analysis or implementation:
-
-```bash
-gzip -dc themes/srwf-registration/reference/OWNER_REFERENCE_new_7.html.gz > /tmp/OWNER_REFERENCE_new_7.html
+```text
+OWNER_REFERENCE_new_7.html.gz.b64.part01
+OWNER_REFERENCE_new_7.html.gz.b64.part02
+OWNER_REFERENCE_new_7.html.gz.b64.part03
 ```
 
-Identity of the decompressed approved source artifact:
+The three files are the exact Base64 encoding of a deterministic `gzip -n` archive of the approved HTML artifact. They are storage/transport parts, not separate visual references.
+
+Materialize and verify the approved artifact before visual analysis or implementation:
+
+```bash
+bash themes/srwf-registration/reference/materialize_reference.sh
+```
+
+The materializer verifies both the reconstructed gzip payload and the decompressed HTML before returning the output path.
+
+Identity of the approved source artifact:
 
 ```text
 filename: OWNER_REFERENCE_new_7.html
@@ -27,11 +35,20 @@ html_title: SRWF Student Registration — Final Contract-Corrected Mockup Set (v
 artifact_marker: Final Correction Pass — v1.2 · Visual Design CLOSED
 ```
 
-Identity of the stored gzip artifact:
+Identity of the deterministic compressed payload represented by the three Base64 parts:
 
 ```text
-sha256: 696bc8466aa9503e782fee48f484a34c1a85d4c30210bcc645ecc7e8171c9340
+gzip_sha256: 696bc8466aa9503e782fee48f484a34c1a85d4c30210bcc645ecc7e8171c9340
 compression: gzip -n (lossless; timestamp-neutral)
+base64_part_lengths: 8000, 8000, 7360
+```
+
+Repository blob identities for the exact Base64 parts:
+
+```text
+part01: c26472d1641514f6550948630feef882a0d409cd
+part02: 1e8a00ff68ad3ae812b1dd5470a173425249f1ca
+part03: f93e7fb191746ade608229e43891c079731c92c2
 ```
 
 ## 2. Required interpretation
