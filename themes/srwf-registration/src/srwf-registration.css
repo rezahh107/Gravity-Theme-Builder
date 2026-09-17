@@ -6,7 +6,8 @@
  * Gravity Forms renders that as .srwf-registration-theme_wrapper.
  *
  * This file intentionally does not encode unresolved breakpoints, spacing rhythm,
- * focus-ring geometry/alpha, desktop shadow, or add-on-specific selectors.
+ * focus-ring geometry/alpha, desktop shadow, or desktop field-pairing decisions.
+ * Consumer-specific rules below exist only for Owner-runtime-proven gaps.
  */
 
 head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper {
@@ -57,16 +58,31 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     font-family: "Vazirmatn", system-ui, sans-serif;
 }
 
+/* Gravity Forms reset intentionally excludes heading descendants on these host surfaces. */
+.gform-theme--framework.srwf-registration-theme_wrapper .gform_title {
+    font-family: "Vazirmatn", system-ui, sans-serif;
+}
+
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section .gsection_title {
     color: #172033;
-    font-family: inherit;
+    font-family: "Vazirmatn", system-ui, sans-serif;
     font-size: 18px;
     font-weight: 700;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gform-footer .gform_button,
-.gform-theme--framework.srwf-registration-theme_wrapper .gform_footer .gform_button {
+/*
+ * Owner runtime: the real GF 3.x submit matches a framework declaration that resolves
+ * inline-size from --gf-local-width:auto. Reuse the already-proven framework sentinel
+ * enforcement boundary so this direct SRWF-only rule wins without !important or IDs.
+ */
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gform-footer .gform_button,
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gform_footer .gform_button {
     inline-size: 100%;
+}
+
+/* GP Advanced Select / Tom Select: Owner runtime proves .ts-wrapper > .ts-control. */
+.gform-theme--framework.srwf-registration-theme_wrapper .ts-wrapper .ts-control {
+    min-block-size: var(--gf-ctrl-size);
 }
 
 .gform-theme--framework.srwf-registration-theme_wrapper input[type="tel"],
