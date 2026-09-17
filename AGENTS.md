@@ -2,9 +2,27 @@
 
 Repository instructions for coding agents working on **Gravity Theme Builder**.
 
-## 1. Read this first
+## 0. Mandatory first source read
 
-Before changing code or documentation, read:
+Before any code, technical design, implementation planning, or review work in this repository, read this source **first**:
+
+1. `PROJECT_SOURCES/00_GRAVITY_FORMS_THEME_FRAMEWORK_CANONICAL_REFERENCE.md`
+
+Then read `PROJECT_SOURCES/SOURCE_REGISTRY.md` for the snapshot status, admission metadata, and any supplemental ambiguity discovered after the source snapshot was created.
+
+This is a **read-order requirement**, not a flat cross-domain authority ranking.
+
+For Theme Framework implementation facts:
+
+- use the canonical local reference as the first lookup;
+- never invent a `--gf-*` property, wrapper class, selector, framework layer, or host behavior from naming patterns;
+- if required information is absent, classify it as `UNKNOWN_FROM_LOCAL_REFERENCE` and consult current official Gravity Forms documentation/source;
+- if current official Gravity Forms documentation/source or inspected supported-runtime behavior conflicts with the local snapshot, the current evidence wins for that factual question and the local source must be reconciled/updated;
+- do not let this source override owner decisions, approved visual intent, Charter non-goals, or other normative repository boundaries outside the implementation-fact domain.
+
+## 1. Read governing and theme documents
+
+After the mandatory source preflight, read:
 
 1. `docs/PROJECT_CHARTER.md`
 2. `docs/THEME_AUTHORING_CONTRACT.md`
@@ -22,7 +40,7 @@ For **normative repository instructions**, use this precedence:
 
 For **visual intent / WHAT**, use the approved visual/UX contract and approved reference artifacts for the target theme. Visual authority controls presentation only; it does not authorize takeover of Gravity Forms behavior or override repository non-goals and engineering boundaries.
 
-For **implementation facts / HOW**, use current official Gravity Forms documentation/source plus inspected behavior in the supported runtime. Theme-local or repository documentation may record implementation facts, but a stale local factual claim must not override contradictory current official documentation or inspected runtime evidence. Surface and reconcile the contradiction instead.
+For **implementation facts / HOW**, consult `PROJECT_SOURCES/00_GRAVITY_FORMS_THEME_FRAMEWORK_CANONICAL_REFERENCE.md` first, then use current official Gravity Forms documentation/source plus inspected behavior in the supported runtime where the local snapshot is absent, ambiguous, version-sensitive, or contradictory. Theme-local or repository documentation may record implementation facts, but a stale local factual claim must not override contradictory current official documentation or inspected runtime evidence. Surface and reconcile the contradiction instead.
 
 Explicit current owner decisions govern authorized project/design decisions, subject to any Charter change-control requirement that requires the Charter itself to be amended.
 
@@ -68,11 +86,12 @@ For each visual requirement:
 
 1. Identify the visual authority and exact requirement.
 2. Classify responsibility: typography, spacing, control, layout, optical detail, responsive behavior, media, state, or host behavior.
-3. Search the official Theme Framework/CSS API for the narrowest supported mechanism.
-4. If an official mechanism exists, use it.
-5. If it does not, add the smallest scoped adapter and record the gap.
-6. Validate the result in real runtime conditions.
-7. Record only proven reusable patterns as candidates for promotion into `src/`.
+3. Search `PROJECT_SOURCES/00_GRAVITY_FORMS_THEME_FRAMEWORK_CANONICAL_REFERENCE.md` for the narrowest documented mechanism.
+4. If the local source is absent, ambiguous, or contradicted, check the current official Theme Framework/CSS API documentation and supported runtime.
+5. If an official mechanism exists, use it.
+6. If it does not, add the smallest scoped adapter and record the gap.
+7. Validate the result in real runtime conditions.
+8. Record only proven reusable patterns as candidates for promotion into `src/`.
 
 ## 6. Validation expectations
 
