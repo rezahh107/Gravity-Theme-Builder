@@ -1,14 +1,51 @@
 # SRWF Registration Theme
 
-Status: **First reference implementation / not production-qualified yet**
+Status: **First reference implementation / exact visual target admitted / not production-qualified yet**
 
 This directory is the first real theme built with Gravity Theme Builder.
 
-## Mission
+## Mission lock
 
-Implement the approved SRWF public registration visual design on the Gravity Forms Theme Framework while preserving Gravity Forms behavior and using the official CSS API before direct CSS.
+The first deliverable is **not a new SRWF-inspired design**.
 
-This theme is intentionally independent from Gravity Flow Inbox, Entry Detail, and Print work. Those surfaces are outside this theme's scope.
+It is the faithful implementation of the exact approved SRWF Registration design admitted under:
+
+`reference/`
+
+Before implementation planning, technical design, styling, or visual review for this theme, read:
+
+1. `reference/VISUAL_AUTHORITY.md`
+2. `reference/README.md`
+3. materialize and inspect `reference/OWNER_REFERENCE_new_7.html.gz`
+
+The approved artifact is the implementation target itself. Do not redesign, reinterpret, modernize, simplify, embellish, or substitute it.
+
+Gravity Forms Theme Framework and inspected runtime evidence determine **HOW** the approved design is implemented. They do not redefine **WHAT** the design should be.
+
+## Visual authority
+
+The admitted HTML artifact defines the approved composition and visual/state target.
+
+The owner-approved `SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.0.md`, identified by exact provenance in `reference/VISUAL_AUTHORITY.md`, governs exact canonical visual rules and explicit resolution states when the mockup contains approximate, demo-only, `NOT_PROVEN`, or `NON_NORMATIVE_REFERENCE` material.
+
+Do not infer production values for unresolved items from screenshots or prototype CSS.
+
+## Runtime boundary
+
+The visual reference does not own Gravity Forms behavior.
+
+Preserve Gravity Forms and applicable add-on ownership of:
+
+- form markup and lifecycle;
+- validation and submission;
+- conditional logic;
+- accessibility semantics and state;
+- persistence;
+- enhanced-select behavior;
+- upload/crop behavior;
+- Persian/Iranian field behavior where applicable.
+
+Mockup scripts are state demonstrations, not production implementation authority.
 
 ## Scope
 
@@ -17,12 +54,14 @@ Expected responsibilities include:
 - public registration form presentation;
 - RTL / Persian typography and layout;
 - field/control styling;
-- field and section rhythm;
+- field and section composition;
 - responsive behavior;
 - validation/error presentation;
 - keyboard/focus presentation;
-- required custom/add-on field integration;
+- required custom/add-on field visual integration;
 - host isolation.
+
+This theme is intentionally independent from Gravity Flow Inbox, Entry Detail, and Print work. Those surfaces are outside this theme's scope.
 
 ## Out of scope
 
@@ -41,44 +80,64 @@ Unless explicitly added later:
 
 ```text
 srwf-registration/
+├── AGENTS.md          # Theme-local exact-target execution rules
 ├── README.md
-├── reference/        # Approved visual authority
-├── src/              # Theme-local implementation
-├── adapters/         # Only proven host/add-on gaps
-└── tests/            # Theme-specific validation
+├── reference/         # Admitted visual target and authority lock
+├── src/               # Theme-local implementation
+├── adapters/          # Only proven host/add-on gaps
+└── tests/             # Theme-specific validation
 ```
 
-Directories should gain code only when the implementation requires it; empty architecture should not be manufactured for appearance.
+Directories should gain code only when implementation requires it; empty architecture should not be manufactured for appearance.
 
 ## Implementation priority
 
-For each requirement:
+For each approved visual requirement:
 
-1. Gravity Forms Theme Framework / CSS API.
-2. Supported Gravity Forms host mechanism.
-3. Small theme-scoped direct CSS rule.
-4. Bounded adapter after real runtime inspection.
+1. Identify the exact requirement from the admitted visual authority.
+2. Consult the repository canonical Gravity Forms Theme Framework source.
+3. Use the narrowest supported Theme Framework / CSS API mechanism that can faithfully express the requirement.
+4. Use a supported Gravity Forms host mechanism when appropriate.
+5. Add the smallest theme-scoped direct CSS rule for a demonstrated API gap.
+6. Add a bounded adapter only after real runtime inspection proves a consumer-specific need.
+7. Never change the approved visual target merely to make implementation easier.
 
 ## First implementation map
 
-Before substantial styling, create a theme-local `IMPLEMENTATION_MAP.md` that maps approved visual requirements to actual Gravity Forms mechanisms and labels each mapping with its evidence state.
+Before substantial styling, create a theme-local `IMPLEMENTATION_MAP.md` that maps each implementation-driving visual requirement to the actual Gravity Forms mechanism and labels its evidence state.
 
-Do not create a mapping from memory when the property is version-sensitive.
+The map must start from the admitted artifacts in `reference/`; it must not reconstruct visual intent from memory.
+
+Do not create a mapping from memory when a property or runtime consumer is version-sensitive.
+
+## Deviation rule
+
+A difference from the approved design must never be silent.
+
+A deviation is admissible for consideration only when the visual authority is genuinely ambiguous on the affected point or inspected host/runtime evidence proves exact reproduction infeasible or incompatible with a binding host/accessibility constraint.
+
+Record the constraint and use the smallest authorized reconciliation. `NOT_PROVEN` and `NON_NORMATIVE_REFERENCE` values remain unresolved rather than guessed.
 
 ## Acceptance expectations
 
-Production qualification will require real runtime evidence for the supported environment, including as applicable:
+The visual acceptance question for this first theme is intentionally simple:
 
-- approved desktop visual reference;
-- approved mobile visual reference;
+> Does the real Gravity Forms SRWF Registration surface reproduce the same approved design admitted in `reference/`, subject only to explicitly documented and authorized runtime reconciliations?
+
+Production qualification additionally requires real runtime evidence for the supported environment, including as applicable:
+
+- approved desktop/mobile composition;
+- 320 CSS px reflow;
 - RTL / Persian content;
 - long labels and values;
-- validation/error state;
+- validation/error states;
 - keyboard focus;
-- text enlargement and narrow reflow;
+- text enlargement;
 - required PersianGravity / selected add-ons or custom fields;
 - host/theme isolation;
 - no submission or validation regression.
+
+Static HTML similarity alone does not prove runtime qualification.
 
 ## Reuse rule
 
