@@ -15,6 +15,7 @@ PHP = THEME / "src" / "srwf-registration-theme.php"
 MAP = THEME / "IMPLEMENTATION_MAP.md"
 REFERENCE = THEME / "reference" / "materialize_reference.sh"
 NARROW_SCOPE = ".gform-theme--framework.srwf-registration-theme_wrapper"
+ENFORCED_SCOPE = "head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper"
 ACTIVATION_CLASS = ".srwf-registration-theme_wrapper"
 HOSTILE_ORBITAL_SELECTOR = '#gform_wrapper_1[data-form-index="0"].gform-theme'
 REFERENCE_SHA256 = "436307d4cd6d896e0f280e502901269240dc310ec2e5927e30e1c29643483000"
