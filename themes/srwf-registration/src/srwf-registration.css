@@ -1,0 +1,79 @@
+/**
+ * SRWF Registration — first production presentation layer.
+ *
+ * Activation boundary:
+ * Form Settings -> Form Layout -> CSS Class Name: srwf-registration-theme
+ * Gravity Forms renders that as .srwf-registration-theme_wrapper.
+ *
+ * This file intentionally does not encode unresolved breakpoints, spacing rhythm,
+ * focus-ring geometry/alpha, desktop shadow, or add-on-specific selectors.
+ */
+
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper {
+    --gf-font-family-base: "Vazirmatn", system-ui, sans-serif;
+
+    --gf-color-primary: #1D4ED8;
+    --gf-color-primary-rgb: 29, 78, 216;
+    --gf-color-danger: #B42318;
+    --gf-color-danger-rgb: 180, 35, 24;
+    --gf-color-success: #18794E;
+    --gf-color-success-rgb: 24, 121, 78;
+
+    --gf-ctrl-bg-color: #FFFFFF;
+    --gf-ctrl-color: #172033;
+    --gf-ctrl-border-color: #8690A1;
+    --gf-ctrl-border-color-focus: #1D4ED8;
+    --gf-ctrl-border-color-error: #B42318;
+    --gf-ctrl-radius: 10px;
+    --gf-ctrl-size: 52px;
+    --gf-ctrl-font-size: 16px;
+    --gf-ctrl-font-weight: 400;
+
+    --gf-ctrl-label-color-primary: #172033;
+    --gf-ctrl-label-font-size-primary: 15px;
+    --gf-ctrl-label-font-weight-primary: 600;
+    --gf-ctrl-desc-color: #667085;
+    --gf-ctrl-desc-color-error: #B42318;
+
+    --gf-ctrl-btn-bg-color-primary: #1D4ED8;
+    --gf-ctrl-btn-bg-color-hover-primary: #1E40AF;
+    --gf-ctrl-btn-bg-color-focus-primary: #1D4ED8;
+    --gf-ctrl-btn-color-primary: #FFFFFF;
+    --gf-ctrl-btn-radius: 10px;
+    --gf-ctrl-btn-size: 56px;
+    --gf-ctrl-btn-font-size: 16px;
+    --gf-ctrl-btn-font-weight: 700;
+
+    --gf-ctrl-file-zone-radius: 12px;
+    --gf-field-section-border-color: #E4E7EC;
+    --gf-form-validation-heading-color: #B42318;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper {
+    direction: rtl;
+    max-inline-size: 840px;
+    margin-inline: auto;
+    color: #172033;
+    font-family: "Vazirmatn", system-ui, sans-serif;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section .gsection_title {
+    color: #172033;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gform-footer .gform_button,
+.gform-theme--framework.srwf-registration-theme_wrapper .gform_footer .gform_button {
+    inline-size: 100%;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper input[type="tel"],
+.gform-theme--framework.srwf-registration-theme_wrapper input[type="number"],
+.gform-theme--framework.srwf-registration-theme_wrapper input[inputmode="numeric"],
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-ltr-value input,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-ltr-value textarea {
+    direction: ltr;
+    text-align: start;
+}

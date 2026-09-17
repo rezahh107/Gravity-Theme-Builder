@@ -1,0 +1,32 @@
+name: SRWF Registration Static Qualification
+
+on:
+  push:
+    branches:
+      - feat/srwf-registration-first-implementation
+    paths:
+      - 'themes/srwf-registration/**'
+      - '.github/workflows/srwf-registration-static.yml'
+  pull_request:
+    paths:
+      - 'themes/srwf-registration/**'
+      - '.github/workflows/srwf-registration-static.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  static-qualification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify admitted visual reference
+        run: bash themes/srwf-registration/reference/materialize_reference.sh "$RUNNER_TEMP/OWNER_REFERENCE_new_7.html"
+
+      - name: Run theme-local deterministic tests
+        run: python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
+
+      - name: Check PHP syntax
+        run: php -l themes/srwf-registration/src/srwf-registration-theme.php
