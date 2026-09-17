@@ -55,7 +55,10 @@ class SrwfRuntimeStabilizationTests(unittest.TestCase):
         for token in prohibited:
             self.assertNotIn(token, js, f'prohibited diagnostic access: {token}')
         self.assertIn("schemaVersion: SCHEMA_VERSION", js)
-        self.assertIn("SCHEMA_VERSION = 'v0.3'", js)\n        self.assertIn("DIAGNOSTIC_VERSION = '0.3.0'", js)\n        self.assertIn("دانلود گزارش GTB", js)\n        self.assertNotIn('gtb_srwf_diag', js)
+        self.assertIn("SCHEMA_VERSION = 'v0.3'", js)
+        self.assertIn("DIAGNOSTIC_VERSION = '0.3.0'", js)
+        self.assertIn("دانلود گزارش GTB", js)
+        self.assertNotIn('gtb_srwf_diag', js)
 
     def test_diagnostic_fixture_proves_bounded_large_select_path(self) -> None:
         completed = subprocess.run(
