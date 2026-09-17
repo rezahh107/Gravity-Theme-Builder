@@ -10,23 +10,30 @@ Before any SRWF Registration implementation planning, styling, technical design,
 
 1. `reference/VISUAL_AUTHORITY.md`
 2. `reference/README.md`
-3. the exact approved visual artifact in `reference/OWNER_REFERENCE_new_7.html.gz`
+3. materialize and inspect the exact approved visual artifact using `reference/materialize_reference.sh`
 
-Materialize the artifact losslessly before visual analysis:
+Materialize and verify the artifact before visual analysis:
 
 ```bash
-gzip -dc themes/srwf-registration/reference/OWNER_REFERENCE_new_7.html.gz > /tmp/OWNER_REFERENCE_new_7.html
+bash themes/srwf-registration/reference/materialize_reference.sh
 ```
 
-Verify the decompressed source identity when artifact fidelity matters:
+The source identity that must pass verification is:
 
 ```text
+OWNER_REFERENCE_new_7.html
 SHA-256: 436307d4cd6d896e0f280e502901269240dc310ec2e5927e30e1c29643483000
 ```
 
-Do not claim this preflight occurred if the artifact and authority lock were not actually inspected for the current task.
+The materializer also verifies the deterministic compressed payload SHA-256:
 
-If the exact visual artifact or `VISUAL_AUTHORITY.md` is missing, unreadable, or does not match its recorded identity, stop visual implementation work and report:
+```text
+696bc8466aa9503e782fee48f484a34c1a85d4c30210bcc645ecc7e8171c9340
+```
+
+Do not claim this preflight occurred if the authority lock and the materialized artifact were not actually inspected for the current task.
+
+If `VISUAL_AUTHORITY.md`, any payload part, or the materializer is missing/unreadable, or either hash verification fails, stop visual implementation work and report:
 
 `SRWF_VISUAL_TARGET_UNAVAILABLE`
 
