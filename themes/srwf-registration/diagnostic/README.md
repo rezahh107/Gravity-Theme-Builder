@@ -1,21 +1,43 @@
-# SRWF Runtime Diagnostic v0.2
+# SRWF Runtime Diagnostic v0.3
 
-This is the first repository-managed copy of the Owner runtime diagnostic. The earlier v0.1 used in Owner testing was not present in the required repository base, so v0.2 preserves the intended diagnostic role while replacing the proven generic traversal failure with bounded semantic collectors.
+This repository-managed diagnostic is the Owner test companion for the SRWF Registration theme. It incorporates the semantic runtime evidence needed by the desktop fidelity pass without turning the diagnostic into a DOM dump or transport service.
 
-## Activation
+## Owner path
 
-Install the diagnostic as a separate WordPress plugin. It loads only when all three conditions are true:
+Install it as a separate WordPress plugin. When an administrator renders an explicitly opted-in SRWF form, the plugin loads automatically and shows:
 
-- the current user has `manage_options`;
-- the rendered form explicitly has the SRWF `srwf-registration-theme` class;
-- the page request includes `?gtb_srwf_diag=v0.2`.
+`دانلود گزارش GTB`
 
-The diagnostic has no server endpoint and no remote transport. Results are exposed in the browser as `window.GTB_SRWF_RUNTIME_DIAGNOSTIC_V02` and logged to the developer console.
+No URL query flag is required. The control remains separate from the form and the diagnostic has no server endpoint or remote transport. The download is created locally in the browser as JSON.
 
-## Privacy boundary
+## Collection model
 
-The collector records structural classes/approved structural IDs, bounding rectangles, state attributes, selected computed presentation properties, canonical SRWF custom properties, and stylesheet paths/order. It does not collect form/control content, option content, submission payloads, cookies, authentication data, or arbitrary displayed text.
+The report uses independent bounded collectors for:
 
-Selects are captured as a structural source plus aggregate `optionCount`; option descendants are never traversed. Tom Select discovery is a separate bounded collector and therefore cannot be starved by a large option collection. Generic Gravity Forms upload structure is captured structurally; GP File Upload Pro and PersianGravity remain `NOT_PROVEN` unless a later real runtime supplies identifying evidence.
+- stylesheet order and the SRWF stylesheet version query when available;
+- target wrapper/form and canonical `--gf-*` properties;
+- ordinary controls;
+- Submit, footer/ancestors, relevant matched cascade branches, and resolved local width variables;
+- form title and section-heading consumers;
+- Tom Select source/wrapper/control/dropdown structure;
+- generic upload structure;
+- proven GP File Upload Pro `.gpfup` roots and `.gpfup__droparea` presentation;
+- validation/error state and current focus owner;
+- field structural signatures;
+- unrelated Gravity Forms wrapper evidence.
 
-Static/unit PASS for this diagnostic proves only bounded/privacy-safe behavior against repository fixtures. It does not prove that the next Owner site's Tom Select, upload, PersianGravity, validation, focus, or narrow-layout runtime has been captured successfully.
+A collector failure is isolated and recorded without disabling later collectors or hiding the Owner download control.
+
+## Privacy and boundedness
+
+The collector never serializes user-entered control content, textarea content, selected option identity, option text/values, file names, arbitrary label/description/message text, cookies, authentication/profile data, submissions, raw payloads, or generic displayed text.
+
+Large selects are represented only by aggregate option count plus safe structure. Their option descendants are not traversed, so a roughly 950-option school selector cannot starve Tom Select or later collectors.
+
+GPFUP existence is now runtime-detectable only through the exact observed class family (`.gpfup`, `.gpfup--strict`, `.gpfup__droparea`). The diagnostic does not infer crop configuration, file rules, or upload behavior.
+
+PersianGravity-specific consumers remain `NOT_PROVEN` until an identifying runtime consumer is actually observed; no plugin-name-derived selector is invented.
+
+## Evidence boundary
+
+A v0.3 repository test PASS proves collector isolation, boundedness, privacy guardrails, and deterministic structural targeting. It does not prove the Owner browser's computed Submit width, Tom Select behavior, GPFUP lifecycle, validation/focus behavior, or unrelated-form isolation. Those remain Owner-runtime checks.
