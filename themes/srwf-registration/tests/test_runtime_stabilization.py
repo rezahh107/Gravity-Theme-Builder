@@ -55,16 +55,16 @@ class SrwfRuntimeStabilizationTests(unittest.TestCase):
         for token in prohibited:
             self.assertNotIn(token, js, f'prohibited diagnostic access: {token}')
         self.assertIn("schemaVersion: SCHEMA_VERSION", js)
-        self.assertIn("SCHEMA_VERSION = 'v0.2'", js)
+        self.assertIn("SCHEMA_VERSION = 'v0.3'", js)\n        self.assertIn("DIAGNOSTIC_VERSION = '0.3.0'", js)\n        self.assertIn("دانلود گزارش GTB", js)\n        self.assertNotIn('gtb_srwf_diag', js)
 
     def test_diagnostic_fixture_proves_bounded_large_select_path(self) -> None:
         completed = subprocess.run(
-            ['node', str(THEME / 'tests' / 'test_diagnostic_v02.js')],
+            ['node', str(THEME / 'tests' / 'test_diagnostic_v03.js')],
             check=True,
             capture_output=True,
             text=True,
         )
-        self.assertIn('PASS: diagnostic v0.2 bounded/privacy-safe fixture', completed.stdout)
+        self.assertIn('PASS: diagnostic v0.3 bounded/privacy-safe/runtime-consumer fixture', completed.stdout)
 
     def test_main_push_ci_is_restored(self) -> None:
         workflow = WORKFLOW.read_text(encoding='utf-8')
