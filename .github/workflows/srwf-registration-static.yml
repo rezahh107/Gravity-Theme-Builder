@@ -3,7 +3,7 @@ name: SRWF Registration Static Qualification
 on:
   push:
     branches:
-      - feat/srwf-registration-first-implementation
+      - main
     paths:
       - 'themes/srwf-registration/**'
       - '.github/workflows/srwf-registration-static.yml'
@@ -28,5 +28,13 @@ jobs:
       - name: Run theme-local deterministic tests
         run: python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
 
+      - name: Check production delivery contract
+        run: php themes/srwf-registration/tests/test_delivery.php
+
+      - name: Check diagnostic delivery contract
+        run: php themes/srwf-registration/tests/test_diagnostic_delivery.php
+
       - name: Check PHP syntax
-        run: php -l themes/srwf-registration/src/srwf-registration-theme.php
+        run: |
+          php -l themes/srwf-registration/src/srwf-registration-theme.php
+          php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
