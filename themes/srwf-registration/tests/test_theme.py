@@ -397,19 +397,19 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
     def test_tom_select_adapter_is_runtime_proven_scoped_and_reuses_control_size(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         adapter = re.search(
-            r"\\.gform-theme--framework\\.srwf-registration-theme_wrapper \\.ts-wrapper \\.ts-control\\s*\\{([^}]*)\\}",
+            r"\.gform-theme--framework\.srwf-registration-theme_wrapper \.ts-wrapper \.ts-control\s*\{([^}]*)\}",
             css,
             re.S,
         )
         self.assertIsNotNone(adapter)
         self.assertIn("min-block-size: var(--gf-ctrl-size);", adapter.group(1))
-        self.assertNotRegex(css, r"(?m)^\\s*\\.ts-control\\s*\\{")
+        self.assertNotRegex(css, r"(?m)^\s*\.ts-control\s*\{")
         self.assertEqual([], list((THEME / "src").glob("**/*.js")))
 
     def test_heading_family_projection_does_not_resolve_title_metrics(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         section = re.search(
-            r"\\.gfield--type-section \\.gsection_title\\s*\\{([^}]*)\\}",
+            r"\.gfield--type-section \.gsection_title\s*\{([^}]*)\}",
             css,
             re.S,
         )
