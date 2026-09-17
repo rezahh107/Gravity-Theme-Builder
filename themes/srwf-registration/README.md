@@ -16,7 +16,7 @@ Before implementation planning, technical design, styling, or visual review for 
 
 1. `reference/VISUAL_AUTHORITY.md`
 2. `reference/README.md`
-3. materialize and inspect `reference/OWNER_REFERENCE_new_7.html.gz`
+3. run `reference/materialize_reference.sh` and inspect the verified materialized `OWNER_REFERENCE_new_7.html`
 
 The approved artifact is the implementation target itself. Do not redesign, reinterpret, modernize, simplify, embellish, or substitute it.
 
@@ -26,7 +26,7 @@ Gravity Forms Theme Framework and inspected runtime evidence determine **HOW** t
 
 The admitted HTML artifact defines the approved composition and visual/state target.
 
-The owner-approved `SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.0.md`, identified by exact provenance in `reference/VISUAL_AUTHORITY.md`, governs exact canonical visual rules and explicit resolution states when the mockup contains approximate, demo-only, `NOT_PROVEN`, or `NON_NORMATIVE_REFERENCE` material.
+The owner-approved SRWF Public Registration Visual/UX Contract, identified by exact provenance in `reference/VISUAL_AUTHORITY.md`, governs exact canonical visual rules and explicit resolution states when the mockup contains approximate, demo-only, `NOT_PROVEN`, or `NON_NORMATIVE_REFERENCE` material.
 
 Do not infer production values for unresolved items from screenshots or prototype CSS.
 
