@@ -407,7 +407,7 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertIn('font-family: "Vazirmatn", system-ui, sans-serif;', section.group(1))
         self.assertIn("font-size: 18px;", section.group(1))
         self.assertIn("font-weight: 700;", section.group(1))
-\n    def test_activation_is_explicit_class_scoped_and_form_id_free(self) -> None:
+\n    def test_gpfup_is_diagnostic_only_until_presentation_mapping_is_proven(self) -> None:\n        css = CSS.read_text(encoding=\"utf-8\")\n        implementation_map = MAP.read_text(encoding=\"utf-8\")\n        self.assertNotIn(\".gpfup\", css)\n        self.assertIn(\".gpfup__droparea\", implementation_map)\n        self.assertIn(\"no production styling in this batch\", implementation_map)\n\n    def test_activation_is_explicit_class_scoped_and_form_id_free(self) -> None:
         php = PHP.read_text(encoding="utf-8")
         self.assertIn("srwf-registration-theme", php)
         self.assertIn("gform_form_theme_slug", php)
