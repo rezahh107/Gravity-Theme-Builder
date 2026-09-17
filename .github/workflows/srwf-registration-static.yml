@@ -1,0 +1,25 @@
+name: SRWF Registration static qualification
+
+on:
+  pull_request:
+    paths:
+      - "themes/srwf-registration/**"
+      - ".github/workflows/srwf-registration-static.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "themes/srwf-registration/**"
+      - ".github/workflows/srwf-registration-static.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  static-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Run deterministic SRWF checks
+        run: bash themes/srwf-registration/tests/run.sh
