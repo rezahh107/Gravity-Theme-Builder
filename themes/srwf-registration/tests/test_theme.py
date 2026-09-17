@@ -361,7 +361,16 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertNotIn("grid-template-columns", css)
         self.assertNotIn("--gf-ctrl-outline-width-focus", css)
         self.assertNotIn("--gf-ctrl-outline-color-focus", css)
-        self.assertNotRegex(css, r"\.gform_title\s*\{")
+        title = re.search(
+            r"\.gform-theme--framework\.srwf-registration-theme_wrapper \.gform_title\s*\{([^}]*)\}",
+            css,
+            re.S,
+        )
+        self.assertIsNotNone(title)
+        title_body = title.group(1)
+        self.assertIn('font-family: "Vazirmatn", system-ui, sans-serif;', title_body)
+        for unresolved in ("font-size", "line-height", "margin", "padding"):
+            self.assertNotIn(unresolved, title_body)
         self.assertNotRegex(css, r"#gform_wrapper_\d+")
         self.assertNotIn("[data-parent-form]", css)
 
@@ -407,7 +416,15 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertIn('font-family: "Vazirmatn", system-ui, sans-serif;', section.group(1))
         self.assertIn("font-size: 18px;", section.group(1))
         self.assertIn("font-weight: 700;", section.group(1))
-\n    def test_gpfup_is_diagnostic_only_until_presentation_mapping_is_proven(self) -> None:\n        css = CSS.read_text(encoding=\"utf-8\")\n        implementation_map = MAP.read_text(encoding=\"utf-8\")\n        self.assertNotIn(\".gpfup\", css)\n        self.assertIn(\".gpfup__droparea\", implementation_map)\n        self.assertIn(\"no production styling in this batch\", implementation_map)\n\n    def test_activation_is_explicit_class_scoped_and_form_id_free(self) -> None:
+
+    def test_gpfup_is_diagnostic_only_until_presentation_mapping_is_proven(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        implementation_map = MAP.read_text(encoding="utf-8")
+        self.assertNotIn(".gpfup", css)
+        self.assertIn(".gpfup__droparea", implementation_map)
+        self.assertIn("no production styling in this batch", implementation_map)
+
+    def test_activation_is_explicit_class_scoped_and_form_id_free(self) -> None:
         php = PHP.read_text(encoding="utf-8")
         self.assertIn("srwf-registration-theme", php)
         self.assertIn("gform_form_theme_slug", php)
