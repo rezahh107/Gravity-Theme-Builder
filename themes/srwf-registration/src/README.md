@@ -2,13 +2,33 @@
 
 The first real presentation implementation is theme-local under `src/`. It is not production-qualified until the required Gravity Forms runtime checks are completed.
 
+### Install-required source tree
+
+The production CSS has local runtime dependencies. Install/copy the **complete `src/` tree as one WordPress plugin directory**, not only the PHP and CSS files:
+
+```text
+src/
+├── srwf-registration-theme.php
+├── srwf-registration.css
+└── icons/
+    ├── report-card-file.svg
+    ├── section-contact.svg
+    ├── section-education.svg
+    ├── section-identity.svg
+    ├── section-school-documents.svg
+    └── section-student-photo.svg
+```
+
+The relative `url("icons/...")` references in `srwf-registration.css` resolve from the stylesheet location. Omitting or relocating any referenced SVG breaks that production presentation dependency. The deterministic test suite enumerates local CSS URL dependencies and fails when a referenced local asset does not resolve inside this installable tree.
+
 ### Activation
 
 The implementation uses Gravity Forms' own supported extension points rather than registering a parallel renderer:
 
-1. install/activate `src/srwf-registration-theme.php` with `src/srwf-registration.css` adjacent to it as one small WordPress plugin directory;
+1. install/activate the complete `src/` tree described above;
 2. on the intended SRWF form only, set **Form Settings → Form Layout → CSS Class Name** to `srwf-registration-theme`;
-3. keep **Description Placement** and **Validation Message Placement** below inputs and enable the authentic Gravity Forms **Validation Summary** per the approved visual contract.
+3. configure the documented semantic field/section Custom CSS Classes from `../IMPLEMENTATION_MAP.md` on the intended real fields/Section Breaks;
+4. keep **Description Placement** and **Validation Message Placement** below inputs and enable the authentic Gravity Forms **Validation Summary** per the approved visual contract.
 
 For that opted-in form, the integration selects the `orbital` form theme through `gform_form_theme_slug` and enqueues the stylesheet through `gform_enqueue_scripts`. Other forms are left untouched. Non-token layout, direction, and presentation adapters remain under `.gform-theme--framework.srwf-registration-theme_wrapper`. The SRWF `--gf-*` CSS API values use the documented Theme Framework stylesheet-sentinel scope plus `.gform-theme--framework.gform-theme.srwf-registration-theme_wrapper`, so the opted-in values can outrank per-form Orbital style settings without `!important` or form-ID identity.
 
@@ -30,9 +50,18 @@ The hook priority remains `20`; stylesheet order correctness no longer depends o
 
 Vazirmatn delivery remains owned by the embedding SRWF environment; this package does not fetch fonts from a third-party CDN.
 
+### Runtime-proven / bounded add-on adapters
+
+The production tree currently contains two narrow, evidence-backed add-on presentation integrations:
+
+- GP Advanced Select / Tom Select: the runtime-proven `.ts-wrapper > .ts-control` consumer receives the SRWF minimum control height. Search/open/keyboard behavior remains add-on-owned.
+- GP File Upload Pro — **Report Card only**: the explicit `srwf-role-report-card-upload` field role styles the authentic initial `.gpfup` drop area while `:not(.gpfup--has-files)` is true. Upload rules, upload lifecycle, uploaded file rows and delete behavior remain GPFUP-owned.
+
+Student Photo post-upload / preview / crop / re-crop / delete presentation is still **`RUNTIME_REQUIRED / NOT_IMPLEMENTED`** because its authentic post-upload DOM/state has not been captured. The Report Card adapter must not be generalized to Student Photo by type, label, DOM position or numeric field ID.
+
 ### Deliberately unresolved
 
-The production breakpoint, desktop short-field pairings, desktop shadow, exact focus-ring geometry/alpha, form-title sizing/line-height, helper/error font sizes, and exact field/section rhythm remain unresolved exactly as the admitted contract requires. GP Advanced Select, PersianGravity Jalali UI, and GP File Upload Pro/crop selectors are not authored until their real runtime consumers are inspected.
+The production breakpoint, desktop short-field pairings, desktop shadow, exact focus-ring geometry/alpha, form-title sizing/line-height, helper/error font sizes, and exact field/section rhythm remain unresolved exactly as the admitted contract requires. PersianGravity Jalali UI and Student Photo post-upload/crop presentation remain unresolved until their authentic runtime consumers are inspected.
 
 Run deterministic checks with:
 
