@@ -38,3 +38,51 @@ jobs:
         run: |
           php -l themes/srwf-registration/src/srwf-registration-theme.php
           php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
+
+  exact-head-qualification:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR Head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - name: Assert exact Head identity
+        run: test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+
+      - name: Verify admitted visual reference
+        run: bash themes/srwf-registration/reference/materialize_reference.sh "$RUNNER_TEMP/OWNER_REFERENCE_new_7.html"
+
+      - name: Run full theme-local deterministic tests
+        run: python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
+
+      - name: Run explicit diagnostic JavaScript fixtures
+        run: |
+          node themes/srwf-registration/tests/test_diagnostic_v03.js
+          node themes/srwf-registration/tests/test_admission_diagnostic_v031.js
+
+      - name: Check production and diagnostic delivery
+        run: |
+          php themes/srwf-registration/tests/test_delivery.php
+          php themes/srwf-registration/tests/test_diagnostic_delivery.php
+
+      - name: Check PHP syntax
+        run: |
+          php -l themes/srwf-registration/src/srwf-registration-theme.php
+          php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
+
+      - name: Build and smoke-check exact-Head Owner packages
+        run: python3 themes/srwf-registration/tests/build_owner_test_packages.py "$RUNNER_TEMP/gtb-owner-test-packages"
+
+      - name: Upload exact-Head Owner packages
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: gtb-srwf-owner-test-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/gtb-owner-test-packages/gtb-srwf-registration-owner-test-*.zip
+            ${{ runner.temp }}/gtb-owner-test-packages/gtb-srwf-runtime-diagnostic-v*.zip
+            ${{ runner.temp }}/gtb-owner-test-packages/GTB_SRWF_OWNER_TEST_PACKAGES_SHA256.txt
+          if-no-files-found: error
+          retention-days: 30
