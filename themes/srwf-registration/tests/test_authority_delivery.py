@@ -103,14 +103,14 @@ def svg_child_geometry(source: str) -> list[tuple[str, tuple[tuple[str, str], ..
 
 def artifact_section_svg(html: str, heading: str) -> str:
     pattern = re.compile(
-        r'<div class="group-heading">\s*<span class="g-icon">\s*(<svg.*?</svg>)\s*</span>\s*'
-        + re.escape(heading),
+        r'<div class="group-heading">\s*<span class="g-icon">\s*'
+        r'(<svg.*?</svg>)\s*</span>\s*([^<]+?)\s*</div>',
         re.S,
     )
-    match = pattern.search(html)
-    if not match:
-        raise AssertionError(f"admitted artifact does not contain section icon for {heading}")
-    return match.group(1)
+    for match in pattern.finditer(html):
+        if match.group(2).strip() == heading:
+            return match.group(1)
+    raise AssertionError(f"admitted artifact does not contain section icon for {heading}")
 
 
 def artifact_report_file_svg(html: str) -> str:
