@@ -82,6 +82,7 @@ Unless explicitly added later:
 srwf-registration/
 ├── AGENTS.md          # Theme-local exact-target execution rules
 ├── README.md
+├── evidence/          # Owner runtime evidence records; never visual authority
 ├── reference/         # Admitted visual target and authority lock
 ├── src/               # Theme-local implementation
 ├── adapters/          # Only proven host/add-on gaps
@@ -109,6 +110,18 @@ Before substantial styling, create a theme-local `IMPLEMENTATION_MAP.md` that ma
 The map must start from the admitted artifacts in `reference/`; it must not reconstruct visual intent from memory.
 
 Do not create a mapping from memory when a property or runtime consumer is version-sensitive.
+
+## Owner runtime evidence
+
+Owner-supplied runtime evidence is recorded under `evidence/` separately from visual authority.
+
+The 2026-09-18 GTB configuration pass is recorded in:
+
+`evidence/OWNER_RUNTIME_GTB_CONFIGURATION_2026-09-18.md`
+
+That evidence closes the real-host **per-form GTB configuration / Save / persistence / token-projection / Registration-admission** path for the supplied Owner form: the native GTB Theme settings page was reachable after the Gravity Forms permission-resolver repair, Save succeeded, all eight semantic mappings reported `READY`, the runtime diagnostic saw the activation class plus all expected owned role tokens, and the `0.1.6` Registration stylesheet was admitted on the Registration surface.
+
+It does **not** by itself close Entry Detail exclusion on this new pass, complete visual equivalence, validation/focus/mobile/text-enlargement coverage, conditional Graduation interaction, Student Photo post-upload/crop presentation, or other explicitly unresolved visual-contract items. Overall production qualification remains open.
 
 ## Deviation rule
 
