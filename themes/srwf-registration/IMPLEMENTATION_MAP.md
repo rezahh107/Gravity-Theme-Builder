@@ -16,7 +16,7 @@ Registered immutable/exact IDs remain defined in `reference/VISUAL_AUTHORITY.md`
 
 `OWNER:SRWF-2026-09-19`, recorded in `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md`, is implementation-driving for the resolved destination. It has no immutable upstream Drive revision/hash claim. `VA:VC-1.0.1` remains inherited historical authority only where not superseded.
 
-Historical labels such as `RUNTIME_REQUIRED`, `NOT_PROVEN`, `NON_NORMATIVE_REFERENCE`, and `DEFER_NOT_PROVEN` remain provenance rather than current destination truth where the reconciliation resolves them. In particular, historical **Desktop short-field pairings** and **Desktop shadow** are superseded: pairings are now `HOST_OWNED / OWNER_CONFIGURABLE`, and the authorized desktop card has no shadow.
+Historical labels such as `RUNTIME_REQUIRED`, `NOT_PROVEN`, `NON_NORMATIVE_REFERENCE`, and `DEFER_NOT_PROVEN` remain provenance rather than current destination truth where the reconciliation resolves them. In particular, historical **Desktop short-field pairings** and **Desktop shadow** are superseded: pairings are now `HOST_OWNED / OWNER_CONFIGURABLE`, and the authorized desktop card has no shadow. The old below-input choice superseded by the current reconciliation is retained only as history.
 
 ## Implementation traceability
 
@@ -50,6 +50,19 @@ Historical labels such as `RUNTIME_REQUIRED`, `NOT_PROVEN`, `NON_NORMATIVE_REFER
 | PersianGravity / Jalali | style only authentic consumer if admitted | no selector/adapter invented | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` presentation |
 | Desktop short-field pairings | Gravity Forms configuration remains authoritative | no GTB pair map | `HOST_OWNED / OWNER_CONFIGURABLE` |
 | 320px/200%/text spacing/contrast | resilient intrinsic layout required | logical sizing/wrapping + host responsive mechanics | `OWNER_RUNTIME_REQUIRED` |
+
+## Visual-role authority traceability
+
+These exact rows preserve the retrievable v1.0.1/artifact authority path while the 2026-09-19 reconciliation supplies the final dimensions and acceptance values.
+
+| Requirement | Authority path | Implementation | Current disposition |
+|---|---|---|---|
+| Gender binary card role | `VA:VC-1.0.1` §27 `gender_binary_choice` + `VA:ARTIFACT` + `OWNER:SRWF-2026-09-19` | explicit `srwf-role-binary-choice`; native radio state | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
+| Graduation Status binary card role | `VA:VC-1.0.1` §27 `graduation_status_binary_choice` + `VA:ARTIFACT` + `OWNER:SRWF-2026-09-19` | explicit `srwf-role-binary-choice`; conditional visibility host-owned | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
+| Section iconography | `VA:VC-1.0.1` §27 `section_heading_iconography` + `VA:ARTIFACT` + `OWNER:SRWF-2026-09-19` | explicit mapped Section Break tokens + local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
+| Report Card initial GPFUP | `VA:VC-1.0.1` §27 `report_card_upload_initial` + `VA:ARTIFACT` + `OWNER:SRWF-2026-09-19` | explicit `srwf-role-report-card-upload` + authentic initial GPFUP state | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
+| Report Card `.gpfup--has-files` | `VA:VC-1.0.1` §§19,27 + host-owned GPFUP lifecycle | initial rules stop at authentic `.gpfup--has-files` state | `HOST_OWNED`; runtime recheck pending |
+| Student Photo post-upload | `VA:VC-1.0.1` §27 `student_photo_uploaded_state` + `VA:ARTIFACT` + `OWNER:SRWF-2026-09-19` | none until authentic Photo state/DOM is captured | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN`; crop config `HOST_OWNED` |
 
 ## Gravity Forms Form Presentation Readiness
 
