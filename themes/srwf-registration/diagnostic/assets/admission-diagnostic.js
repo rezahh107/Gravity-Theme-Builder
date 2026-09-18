@@ -7,20 +7,22 @@
         module.exports = api;
     }
 
+    function capture(documentObject) {
+        var report = api.buildReport(root.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS, documentObject);
+        root.GTB_SRWF_RUNTIME_ADMISSION_DIAGNOSTIC_V032 = report;
+        return report;
+    }
+
     function startBrowser() {
         if (!root || !root.document) {
             return;
         }
 
-        var report = api.buildReport(root.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS);
-        root.GTB_SRWF_RUNTIME_ADMISSION_DIAGNOSTIC_V031 = report;
-
+        capture(root.document);
         var button = api.ensureDownloadControl(root.document);
         if (button && typeof button.addEventListener === 'function') {
             button.addEventListener('click', function () {
-                var current = api.buildReport(root.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS);
-                root.GTB_SRWF_RUNTIME_ADMISSION_DIAGNOSTIC_V031 = current;
-                api.downloadJson(root.document, root, current);
+                api.downloadJson(root.document, root, capture(root.document));
             });
         }
     }
@@ -35,13 +37,16 @@
 }(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this), function () {
     'use strict';
 
-    var SCHEMA_VERSION = 'v0.1';
-    var DIAGNOSTIC_VERSION = '0.3.1';
+    var SCHEMA_VERSION = 'v0.2';
+    var DIAGNOSTIC_VERSION = '0.3.2';
     var DOWNLOAD_CONTROL_ID = 'gtb-srwf-download-admission-report';
+    var PRODUCTION_STYLESHEET_ID = 'srwf-registration-theme-css';
     var MAX_DECISIONS = 8;
-    var CONTEXTS = Object.freeze({
-        registration: true,
-        gravity_flow_entry_detail: true,
+    var CONTEXTS = Object.freeze({ registration: true, gravity_flow_entry_detail: true, unknown: true });
+    var EVIDENCE = Object.freeze({
+        registration_default: true,
+        gravity_flow_early_enqueue: true,
+        gravity_flow_content_bracket: true,
         unknown: true
     });
     var REASONS = Object.freeze({
@@ -53,13 +58,13 @@
     function safeDecision(input) {
         input = input && typeof input === 'object' ? input : {};
         var context = typeof input.renderingContext === 'string' && CONTEXTS[input.renderingContext]
-            ? input.renderingContext
-            : 'unknown';
+            ? input.renderingContext : 'unknown';
+        var evidence = typeof input.contextEvidence === 'string' && EVIDENCE[input.contextEvidence]
+            ? input.contextEvidence : 'unknown';
         var reason = input.exclusionReason === null
             ? null
             : (typeof input.exclusionReason === 'string' && REASONS[input.exclusionReason]
-                ? input.exclusionReason
-                : null);
+                ? input.exclusionReason : null);
         var admitted = input.presentationAdmitted === true
             ? true
             : (input.presentationAdmitted === false ? false : null);
@@ -68,17 +73,27 @@
             formIdentityMatched: input.formIdentityMatched === true,
             presentationAdmitted: admitted,
             renderingContext: context,
+            contextEvidence: evidence,
             exclusionReason: reason
         };
     }
 
-    function buildReport(decisions) {
+    function stylesheetPresent(documentObject) {
+        return Boolean(
+            documentObject &&
+            typeof documentObject.getElementById === 'function' &&
+            documentObject.getElementById(PRODUCTION_STYLESHEET_ID)
+        );
+    }
+
+    function buildReport(decisions, documentObject) {
         var source = Array.isArray(decisions) ? decisions.slice(0, MAX_DECISIONS) : [];
         return {
             schemaVersion: SCHEMA_VERSION,
             diagnosticVersion: DIAGNOSTIC_VERSION,
             diagnosticMode: 'admin-gated-read-only-context-admission',
             admissionDecisions: source.map(safeDecision),
+            srwfStylesheetPresent: stylesheetPresent(documentObject),
             truncated: Array.isArray(decisions) && decisions.length > MAX_DECISIONS
         };
     }
@@ -121,7 +136,7 @@
         var blob = new view.Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
         var url = view.URL.createObjectURL(blob);
         anchor.href = url;
-        anchor.download = 'gtb-srwf-admission-diagnostic-v0.3.1.json';
+        anchor.download = 'gtb-srwf-admission-diagnostic-v0.3.2.json';
         if (documentObject.body && typeof documentObject.body.appendChild === 'function') {
             documentObject.body.appendChild(anchor);
         }
@@ -142,6 +157,7 @@
         DIAGNOSTIC_VERSION: DIAGNOSTIC_VERSION,
         MAX_DECISIONS: MAX_DECISIONS,
         safeDecision: safeDecision,
+        stylesheetPresent: stylesheetPresent,
         buildReport: buildReport,
         ensureDownloadControl: ensureDownloadControl,
         downloadJson: downloadJson
