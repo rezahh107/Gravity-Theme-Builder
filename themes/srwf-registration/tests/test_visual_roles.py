@@ -65,16 +65,22 @@ class SrwfVisualRoleTests(unittest.TestCase):
         for selector in binary_selectors:
             self.assertIn(f".gfield.{BINARY_ROLE}", selector)
         self.assertNotRegex(self.css, r"\.gfield--type-radio\s+\.gfield_radio\s*\{")
+        self.assertNotRegex(self.css, r"\.gfield--choice-align-vertical\s+\.gfield_radio\s*\{")
 
     def test_binary_fixtures_preserve_authentic_radio_label_structure(self) -> None:
-        self.assertIn(
-            'class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio srwf-role-binary-choice"',
-            self.fixtures,
+        binary_class = (
+            'class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio '
+            'gfield--width-half srwf-role-binary-choice gfield--choice-align-vertical"'
         )
+        self.assertEqual(2, self.fixtures.count(binary_class))
+        self.assertIn('class="ginput_container ginput_container_radio"', self.fixtures)
         self.assertIn('class="gfield-choice-input" type="radio"', self.fixtures)
-        self.assertIn('<label for="fixture_choice_a"></label>', self.fixtures)
-        self.assertIn('<label for="fixture_choice_b"></label>', self.fixtures)
-        self.assertIn('name="fixture_choice" value="b" checked', self.fixtures)
+        self.assertIn('<label for="fixture_gender_choice_a"></label>', self.fixtures)
+        self.assertIn('<label for="fixture_gender_choice_b"></label>', self.fixtures)
+        self.assertIn('name="fixture_gender_choice" value="b" checked', self.fixtures)
+        self.assertIn('<label for="fixture_graduation_choice_a"></label>', self.fixtures)
+        self.assertIn('<label for="fixture_graduation_choice_b"></label>', self.fixtures)
+        self.assertIn('name="fixture_graduation_choice" value="b" checked', self.fixtures)
         ordinary = 'class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio gfield--choice-align-vertical"'
         self.assertIn(ordinary, self.fixtures)
         self.assertNotIn(BINARY_ROLE, ordinary)
@@ -103,7 +109,7 @@ class SrwfVisualRoleTests(unittest.TestCase):
             "selected card must retain a non-color cue",
         )
 
-    def test_binary_cards_use_intrinsic_two_equal_tracks_without_new_breakpoint(self) -> None:
+    def test_binary_cards_override_authentic_vertical_modifier_with_equal_row_tracks(self) -> None:
         choice = next(
             body
             for selector, body in blocks(self.css)
@@ -114,12 +120,49 @@ class SrwfVisualRoleTests(unittest.TestCase):
             for selector, body in blocks(self.css)
             if selector.endswith(f".gfield.{BINARY_ROLE} .gfield_radio")
         )
+        label = next(
+            body
+            for selector, body in blocks(self.css)
+            if selector.endswith(f".gfield.{BINARY_ROLE} .gchoice label")
+        )
         self.assertIn("display: flex;", row)
+        self.assertIn("flex-direction: row;", row)
         self.assertIn("gap: 12px;", row)
         self.assertIn("flex: 1 1 0;", choice)
         self.assertIn("min-inline-size: 0;", choice)
+        self.assertIn("display: flex;", label)
         self.assertNotIn("@media", self.css)
         self.assertNotIn("grid-template-columns", self.css)
+
+    def test_ordinary_vertical_radio_remains_host_owned(self) -> None:
+        ordinary = (
+            '<fieldset class="gfield gfield--type-radio gfield--type-choice '
+            'gfield--input-type-radio gfield--choice-align-vertical">'
+        )
+        self.assertIn(ordinary, self.fixtures)
+        ordinary_selectors = [
+            selector
+            for selector, _ in blocks(self.css)
+            if ".gfield--type-radio" in selector or ".gfield--choice-align-vertical" in selector
+        ]
+        self.assertEqual([], ordinary_selectors)
+        self.assertNotRegex(self.css, r"(?m)^\s*\.gfield_radio\s*\{")
+        self.assertNotRegex(self.css, r"(?m)^\s*\.gchoice\s*\{")
+
+    def test_binary_role_supports_both_consumers_without_numeric_identity(self) -> None:
+        self.assertEqual(2, self.fixtures.count("srwf-role-binary-choice gfield--choice-align-vertical"))
+        self.assertIn("fixture_gender_choice", self.fixtures)
+        self.assertIn("fixture_graduation_choice", self.fixtures)
+        self.assertNotRegex(self.css, r"#(?:field|input|choice|label|gform_wrapper|gform)_\d+")
+        self.assertNotIn(":nth-child", self.css)
+        self.assertNotIn(":nth-of-type", self.css)
+
+    def test_binary_runtime_shape_uses_native_radios_not_fake_buttons(self) -> None:
+        binary_sections = self.fixtures.split("## Ordinary radio field", 1)[0]
+        self.assertGreaterEqual(binary_sections.count('type="radio"'), 4)
+        self.assertNotIn("<button", binary_sections)
+        self.assertNotIn("role=\"radio\"", binary_sections)
+        self.assertEqual([], list((THEME / "src").glob("**/*.js")))
 
     def test_semantic_binding_never_uses_labels_or_numeric_form_field_ids(self) -> None:
         for label in ("جنسیت", "وضعیت فارغ‌التحصیلی", "بارگذاری کارنامه", "هویت دانش‌آموز"):

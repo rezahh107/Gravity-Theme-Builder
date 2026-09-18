@@ -2,13 +2,14 @@
 /**
  * Plugin Name: GTB SRWF Runtime Diagnostic
  * Description: Admin-gated privacy-safe structural/presentation diagnostic for SRWF Registration.
- * Version: 0.3.2
+ * Version: 0.3.3
  */
 
 defined( 'ABSPATH' ) || exit;
 
-const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.2';
+const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.3';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_COLLECTOR_VERSION = '0.3.0';
+const GTB_SRWF_RUNTIME_DIAGNOSTIC_ADMISSION_VERSION = '0.3.2';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_THEME_CLASS = 'srwf-registration-theme';
 
 /**
@@ -104,10 +105,18 @@ function gtb_srwf_runtime_diagnostic_enqueue( $form, $is_ajax ) { // phpcs:ignor
     );
 
     wp_enqueue_script(
+        'gtb-srwf-binary-choice-geometry-v033',
+        plugins_url( 'assets/binary-choice-geometry.js', __FILE__ ),
+        array( 'gtb-srwf-runtime-diagnostic-v03' ),
+        GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION,
+        true
+    );
+
+    wp_enqueue_script(
         'gtb-srwf-admission-diagnostic-v032',
         plugins_url( 'assets/admission-diagnostic.js', __FILE__ ),
         array(),
-        GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION,
+        GTB_SRWF_RUNTIME_DIAGNOSTIC_ADMISSION_VERSION,
         true
     );
 

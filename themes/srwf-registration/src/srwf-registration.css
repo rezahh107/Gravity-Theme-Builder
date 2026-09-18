@@ -98,9 +98,12 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
  * Owner-approved semantic binary-choice role.
  * Configure this class only on Gender and Graduation Status. The real GF radio remains
  * the selection authority; CSS derives presentation exclusively from :checked/:focus-visible.
+ * Owner runtime proves the authentic fields also carry gfield--choice-align-vertical,
+ * so this role must explicitly establish the approved horizontal choice row.
  */
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield_radio {
     display: flex;
+    flex-direction: row;
     gap: 12px;
 }
 

@@ -2,20 +2,42 @@
 
 These fixtures record only the structural classes needed by the static qualification suite. They intentionally omit user-entered values and labels as selector authority.
 
-## Binary choice field
+## Binary choice field — Gender runtime shape
 
 ```html
-<fieldset class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio srwf-role-binary-choice">
+<fieldset class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio gfield--width-half srwf-role-binary-choice gfield--choice-align-vertical">
   <legend class="gfield_label gform-field-label gfield_label_before_complex"></legend>
   <div class="ginput_container ginput_container_radio">
     <div class="gfield_radio">
       <div class="gchoice">
-        <input class="gfield-choice-input" type="radio" id="fixture_choice_a" name="fixture_choice" value="a">
-        <label for="fixture_choice_a"></label>
+        <input class="gfield-choice-input" type="radio" id="fixture_gender_choice_a" name="fixture_gender_choice" value="a">
+        <label for="fixture_gender_choice_a"></label>
       </div>
       <div class="gchoice">
-        <input class="gfield-choice-input" type="radio" id="fixture_choice_b" name="fixture_choice" value="b" checked>
-        <label for="fixture_choice_b"></label>
+        <input class="gfield-choice-input" type="radio" id="fixture_gender_choice_b" name="fixture_gender_choice" value="b" checked>
+        <label for="fixture_gender_choice_b"></label>
+      </div>
+    </div>
+  </div>
+</fieldset>
+```
+
+## Binary choice field — conditionally rendered Graduation Status shape
+
+Gravity Forms owns whether this field is present/visible. When it is rendered, GTB sees the same authentic choice structure and semantic role.
+
+```html
+<fieldset class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio gfield--width-half srwf-role-binary-choice gfield--choice-align-vertical">
+  <legend class="gfield_label gform-field-label gfield_label_before_complex"></legend>
+  <div class="ginput_container ginput_container_radio">
+    <div class="gfield_radio">
+      <div class="gchoice">
+        <input class="gfield-choice-input" type="radio" id="fixture_graduation_choice_a" name="fixture_graduation_choice" value="a">
+        <label for="fixture_graduation_choice_a"></label>
+      </div>
+      <div class="gchoice">
+        <input class="gfield-choice-input" type="radio" id="fixture_graduation_choice_b" name="fixture_graduation_choice" value="b" checked>
+        <label for="fixture_graduation_choice_b"></label>
       </div>
     </div>
   </div>
@@ -26,7 +48,19 @@ These fixtures record only the structural classes needed by the static qualifica
 
 ```html
 <fieldset class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio gfield--choice-align-vertical">
-  <div class="gfield_radio"><div class="gchoice"></div></div>
+  <legend class="gfield_label gform-field-label gfield_label_before_complex"></legend>
+  <div class="ginput_container ginput_container_radio">
+    <div class="gfield_radio">
+      <div class="gchoice">
+        <input class="gfield-choice-input" type="radio" id="fixture_ordinary_choice_a" name="fixture_ordinary_choice" value="a">
+        <label for="fixture_ordinary_choice_a"></label>
+      </div>
+      <div class="gchoice">
+        <input class="gfield-choice-input" type="radio" id="fixture_ordinary_choice_b" name="fixture_ordinary_choice" value="b">
+        <label for="fixture_ordinary_choice_b"></label>
+      </div>
+    </div>
+  </div>
 </fieldset>
 ```
 

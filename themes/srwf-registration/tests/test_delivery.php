@@ -9,7 +9,7 @@ function wp_enqueue_style( $handle, $src, $deps, $ver ) { global $styles; $style
 function check( $condition, $message ) { if ( ! $condition ) { fwrite( STDERR, "FAIL: $message\n" ); exit( 1 ); } }
 require __DIR__ . '/../src/srwf-registration-theme.php';
 
-check( SRWF_REGISTRATION_THEME_VERSION === '0.1.5', 'unexpected SRWF test package version' );
+check( SRWF_REGISTRATION_THEME_VERSION === '0.1.7', 'unexpected SRWF test package version' );
 check( SRWF_REGISTRATION_GRAVITY_FORMS_ORBITAL_STYLE_HANDLE === 'gravity_forms_orbital_theme', 'verified Orbital handle changed' );
 
 $target = array( 'cssClass' => 'host-class srwf-registration-theme gpp-enabled gpp-profile-srwf-registration' );
@@ -40,7 +40,7 @@ srwf_registration_theme_enqueue_styles( $target, false );
 check( count( $styles ) === 1, 'normal target did not enqueue exactly once' );
 check( $styles[0]['deps'] === array( 'gravity_forms_orbital_theme' ), 'SRWF is not dependent on Orbital handle' );
 check( $styles[0]['handle'] === 'srwf-registration-theme', 'unexpected SRWF style handle' );
-check( $styles[0]['ver'] === '0.1.5', 'stylesheet package version not propagated' );
+check( $styles[0]['ver'] === '0.1.7', 'stylesheet package version not propagated' );
 
 // A validation rerender has the same target identity and no Entry Detail context.
 check( srwf_registration_theme_force_orbital( 'gravity-theme', $target ) === 'orbital', 'validation-style rerender lost Orbital admission' );
