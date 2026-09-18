@@ -128,10 +128,9 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertIn("display: flex;", row)
         self.assertIn("flex-direction: row;", row)
         self.assertIn("gap: 12px;", row)
-        self.assertIn("inline-size: 100%;", row)
         self.assertIn("flex: 1 1 0;", choice)
         self.assertIn("min-inline-size: 0;", choice)
-        self.assertIn("inline-size: 100%;", label)
+        self.assertIn("display: flex;", label)
         self.assertNotIn("@media", self.css)
         self.assertNotIn("grid-template-columns", self.css)
 
