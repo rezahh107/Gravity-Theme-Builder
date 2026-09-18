@@ -78,6 +78,8 @@ If Gravity Flow is absent, the early predicate fails closed and normal Registrat
 
 #### Host-source qualification retained from the current main line
 
+PR #12 is retained in the evidence chronology because Owner runtime disproved its assumption that the later content bracket alone covered Gravity Flow's early form enqueue. The follow-up source-qualified repair inspected exact Gravity Flow `3.1.0` and Gravity Forms `3.1.1.1` behavior and established the order from `wp_enqueue_scripts` → Gravity Flow `enqueue_frontend_scripts()` → `enqueue_form_scripts()` → Gravity Forms `gform_enqueue_scripts` / `gform_form_theme_slug`, before `gravityflow_entry_detail_content_before`. The exact reconciled branch remains `OWNER_RUNTIME_REQUIRED`; static/source proof does not convert this new package into a fresh Owner runtime result.
+
 Evidence state:
 
 - official Gravity Flow documentation describes `gravityflow_entry_detail_content_before` and `gravityflow_entry_detail_content_after`: `DOCUMENTED`;
