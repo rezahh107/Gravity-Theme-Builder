@@ -21,8 +21,9 @@ function srwf_registration_theme_get_admission_decision( $form ) { global $produ
 function check( $condition, $message ) { if ( ! $condition ) { fwrite( STDERR, "FAIL: $message\n" ); exit( 1 ); } }
 require __DIR__ . '/../diagnostic/srwf-runtime-diagnostic.php';
 
-check( GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION === '0.3.2', 'unexpected diagnostic package version' );
+check( GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION === '0.3.3', 'unexpected diagnostic package version' );
 check( GTB_SRWF_RUNTIME_DIAGNOSTIC_COLLECTOR_VERSION === '0.3.0', 'existing structural collector version changed' );
+check( GTB_SRWF_RUNTIME_DIAGNOSTIC_ADMISSION_VERSION === '0.3.2', 'existing admission collector version changed' );
 
 $form = array( 'cssClass' => 'srwf-registration-theme gpp-enabled gpp-profile-srwf-registration' );
 $is_admin_user = false;
@@ -41,11 +42,15 @@ $production_decision = array(
     'exclusionReason' => null,
 );
 gtb_srwf_runtime_diagnostic_enqueue( $form, false );
-check( count( $scripts ) === 2, 'normal target did not load both diagnostic collectors' );
+check( count( $scripts ) === 3, 'normal target did not load all diagnostic collectors' );
 check( $scripts[0]['handle'] === 'gtb-srwf-runtime-diagnostic-v03', 'wrong structural diagnostic handle' );
 check( $scripts[0]['ver'] === '0.3.0' && $scripts[0]['footer'] === true, 'wrong structural diagnostic metadata' );
-check( $scripts[1]['handle'] === 'gtb-srwf-admission-diagnostic-v032', 'wrong admission diagnostic handle' );
-check( $scripts[1]['ver'] === '0.3.2' && $scripts[1]['footer'] === true, 'wrong admission diagnostic metadata' );
+check( $scripts[1]['handle'] === 'gtb-srwf-binary-choice-geometry-v033', 'wrong binary geometry diagnostic handle' );
+check( $scripts[1]['src'] === 'https://example.test/plugins/diag/assets/binary-choice-geometry.js', 'binary geometry diagnostic asset path changed' );
+check( $scripts[1]['deps'] === array( 'gtb-srwf-runtime-diagnostic-v03' ), 'binary geometry collector must load after the structural diagnostic' );
+check( $scripts[1]['ver'] === '0.3.3' && $scripts[1]['footer'] === true, 'wrong binary geometry diagnostic metadata' );
+check( $scripts[2]['handle'] === 'gtb-srwf-admission-diagnostic-v032', 'wrong admission diagnostic handle' );
+check( $scripts[2]['ver'] === '0.3.2' && $scripts[2]['footer'] === true, 'wrong admission diagnostic metadata' );
 check( count( $inline_scripts ) === 1, 'normal target missing bounded admission payload' );
 check( $inline_scripts[0]['handle'] === 'gtb-srwf-admission-diagnostic-v032' && $inline_scripts[0]['position'] === 'before', 'admission payload attached to wrong script' );
 check( strpos( $inline_scripts[0]['data'], '"presentationAdmitted":true' ) !== false, 'normal admission fact missing' );
@@ -62,7 +67,7 @@ $production_decision = array(
     'exclusionReason' => 'gravity_flow_entry_detail',
 );
 gtb_srwf_runtime_diagnostic_enqueue( $form, false );
-check( count( $scripts ) === 2, 'context-excluded target lost admin diagnostic observability' );
+check( count( $scripts ) === 3, 'context-excluded target lost admin diagnostic observability' );
 check( count( $inline_scripts ) === 1, 'context-excluded target missing admission payload' );
 check( strpos( $inline_scripts[0]['data'], '"formIdentityMatched":true' ) !== false, 'excluded target identity fact missing' );
 check( strpos( $inline_scripts[0]['data'], '"presentationAdmitted":false' ) !== false, 'excluded presentation fact missing' );
@@ -71,4 +76,4 @@ check( strpos( $inline_scripts[0]['data'], '"contextEvidence":"gravity_flow_earl
 check( strpos( $inline_scripts[0]['data'], '"exclusionReason":"gravity_flow_entry_detail"' ) !== false, 'Entry Detail exclusion reason missing' );
 
 check( array_filter( $hooks, fn( $h ) => $h[0] === 'gform_enqueue_scripts' && $h[1] === 'gtb_srwf_runtime_diagnostic_enqueue' && $h[2] === 30 && $h[3] === 2 ) !== array(), 'diagnostic delivery hook missing' );
-echo "PASS: diagnostic delivery and earliest-context observability contract\n";
+echo "PASS: diagnostic delivery and binary geometry observability contract\n";
