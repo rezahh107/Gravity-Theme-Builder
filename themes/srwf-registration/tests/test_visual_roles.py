@@ -59,12 +59,15 @@ class SrwfVisualRoleTests(unittest.TestCase):
         binary_selectors = [
             selector
             for selector, body in blocks(self.css)
-            if BINARY_ROLE in selector or BINARY_ROLE in body
+            if f".gfield.{BINARY_ROLE}" in selector or BINARY_ROLE in body
         ]
         self.assertTrue(binary_selectors)
         for selector in binary_selectors:
             self.assertIn(f".gfield.{BINARY_ROLE}", selector)
-        self.assertNotRegex(self.css, r"\.gfield--type-radio\s+\.gfield_radio\s*\{")
+
+        ordinary_exclusion = f".gfield--type-radio:not(.{BINARY_ROLE})"
+        self.assertIn(f"{ordinary_exclusion} .gfield_radio", self.css)
+        self.assertNotIn(f".gfield.{BINARY_ROLE}", ordinary_exclusion)
 
     def test_binary_fixtures_preserve_authentic_radio_label_structure(self) -> None:
         self.assertIn(
@@ -115,8 +118,11 @@ class SrwfVisualRoleTests(unittest.TestCase):
             if selector.endswith(f".gfield.{BINARY_ROLE} .gfield_radio")
         )
         self.assertIn("display: flex;", row)
+        self.assertIn("flex-direction: row;", row)
         self.assertIn("gap: 12px;", row)
+        self.assertIn("inline-size: 100%;", row)
         self.assertIn("flex: 1 1 0;", choice)
+        self.assertIn("inline-size: 0;", choice)
         self.assertIn("min-inline-size: 0;", choice)
         self.assertNotIn("@media", self.css)
         self.assertNotIn("grid-template-columns", self.css)
