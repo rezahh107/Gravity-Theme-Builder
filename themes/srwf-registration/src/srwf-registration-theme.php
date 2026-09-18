@@ -2,14 +2,14 @@
 /**
  * Plugin Name: SRWF Registration Gravity Forms Theme
  * Description: Theme-local SRWF Registration presentation for opt-in Gravity Forms.
- * Version: 0.1.8
+ * Version: 0.1.9
  * Text Domain: gravity-theme-builder
  */
 
 defined( 'ABSPATH' ) || exit;
 
 const SRWF_REGISTRATION_THEME_CLASS = 'srwf-registration-theme';
-const SRWF_REGISTRATION_THEME_VERSION = '0.1.8';
+const SRWF_REGISTRATION_THEME_VERSION = '0.1.9';
 const SRWF_REGISTRATION_GRAVITY_FORMS_ORBITAL_STYLE_HANDLE = 'gravity_forms_orbital_theme';
 const SRWF_REGISTRATION_CONTEXT_REGISTRATION = 'registration';
 const SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL = 'gravity_flow_entry_detail';
@@ -147,21 +147,13 @@ function srwf_registration_theme_rendering_context_decision() {
     );
 }
 
-/**
- * Return the current rendering-context classification.
- *
- * @return string
- */
+/** Return the current rendering-context classification. */
 function srwf_registration_theme_rendering_context() {
     $decision = srwf_registration_theme_rendering_context_decision();
     return $decision['renderingContext'];
 }
 
-/**
- * Return whether Registration presentation owns the current render context.
- *
- * @return bool
- */
+/** Return whether Registration presentation owns the current render context. */
 function srwf_registration_theme_is_registration_context_permitted() {
     return SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL !== srwf_registration_theme_rendering_context();
 }
@@ -194,12 +186,7 @@ function srwf_registration_theme_get_admission_decision( $form ) {
     );
 }
 
-/**
- * Return whether the current form and render context admit SRWF presentation.
- *
- * @param array<string,mixed> $form Gravity Forms form object.
- * @return bool
- */
+/** Return whether the current form and render context admit SRWF presentation. */
 function srwf_registration_theme_is_presentation_admitted( $form ) {
     $decision = srwf_registration_theme_get_admission_decision( $form );
     return true === $decision['presentationAdmitted'];
@@ -224,9 +211,6 @@ add_filter( 'gform_form_theme_slug', 'srwf_registration_theme_force_orbital', 10
 /**
  * Enqueue SRWF presentation only for an admitted Registration render.
  *
- * The verified Gravity Forms Orbital style handle remains a WordPress style
- * dependency so admitted Registration renders preserve the proven host order.
- *
  * @param array<string,mixed> $form    Gravity Forms form object.
  * @param bool                $is_ajax Whether Gravity Forms is using AJAX submission.
  * @return void
@@ -244,5 +228,36 @@ function srwf_registration_theme_enqueue_styles( $form, $is_ajax ) { // phpcs:ig
     );
 }
 add_action( 'gform_enqueue_scripts', 'srwf_registration_theme_enqueue_styles', 20, 2 );
+
+/**
+ * Insert the short required-field explanation as real inert content once per rendered form.
+ * Gravity Forms remains the sole owner of required state, ARIA, indicator and validation.
+ *
+ * gform_get_form_filter runs on each generated form string, including supported rerenders.
+ * The marker makes the transformation idempotent for the same generated string without
+ * request-global state that could suppress another legitimate form instance.
+ *
+ * @param string              $form_string Generated Gravity Forms HTML.
+ * @param array<string,mixed> $form        Current Form Object.
+ * @return string
+ */
+function srwf_registration_theme_add_required_indicator_note( $form_string, $form ) {
+    if ( ! srwf_registration_theme_is_presentation_admitted( $form ) ) {
+        return $form_string;
+    }
+    if ( 'asterisk' !== (string) ( $form['requiredIndicator'] ?? '' ) ) {
+        return $form_string;
+    }
+    if ( false !== strpos( $form_string, 'data-srwf-required-note="1"' ) ) {
+        return $form_string;
+    }
+
+    $note = '<p class="srwf-required-note" data-srwf-required-note="1">' . esc_html__( 'فیلدهای دارای * الزامی هستند.', 'gravity-theme-builder' ) . '</p>';
+    $count = 0;
+    $filtered = preg_replace( '/(<form\b[^>]*>)/i', '$1' . $note, $form_string, 1, $count );
+
+    return 1 === $count && is_string( $filtered ) ? $filtered : $form_string;
+}
+add_filter( 'gform_get_form_filter', 'srwf_registration_theme_add_required_indicator_note', 10, 2 );
 
 require_once __DIR__ . '/srwf-registration-settings.php';
