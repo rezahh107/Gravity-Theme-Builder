@@ -15,6 +15,7 @@ PHP = THEME / "src" / "srwf-registration-theme.php"
 MAP = THEME / "IMPLEMENTATION_MAP.md"
 REFERENCE = THEME / "reference" / "materialize_reference.sh"
 NARROW_SCOPE = ".gform-theme--framework.srwf-registration-theme_wrapper"
+ENFORCED_SCOPE = "head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper"
 ACTIVATION_CLASS = ".srwf-registration-theme_wrapper"
 HOSTILE_ORBITAL_SELECTOR = '#gform_wrapper_1[data-form-index="0"].gform-theme'
 REFERENCE_SHA256 = "436307d4cd6d896e0f280e502901269240dc310ec2e5927e30e1c29643483000"
@@ -339,16 +340,18 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
             f"duplicate --gf-* declarations found: {counts}",
         )
 
-    def test_non_token_selectors_remain_under_the_narrow_opt_in_scope(self) -> None:
+    def test_non_token_selectors_remain_under_the_bounded_opt_in_scope(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         for selector_group, body in css_blocks(css):
             if gf_token_declarations(body):
                 continue
             for selector in split_selector_list(selector_group):
                 self.assertTrue(
-                    selector.startswith(NARROW_SCOPE),
-                    f"non-token selector escaped narrow SRWF scope: {selector}",
+                    selector.startswith(NARROW_SCOPE) or selector.startswith(ENFORCED_SCOPE),
+                    f"non-token selector escaped bounded SRWF scope: {selector}",
                 )
+                if selector.startswith(ENFORCED_SCOPE):
+                    self.assertIn(".gform_button", selector, "strong enforcement is reserved for proven Submit conflict")
 
     def test_unresolved_values_are_not_promoted(self) -> None:
         css = CSS.read_text(encoding="utf-8")
@@ -359,9 +362,68 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertNotIn("grid-template-columns", css)
         self.assertNotIn("--gf-ctrl-outline-width-focus", css)
         self.assertNotIn("--gf-ctrl-outline-color-focus", css)
-        self.assertNotRegex(css, r"\.gform_title\s*\{")
+        title = re.search(
+            r"\.gform-theme--framework\.srwf-registration-theme_wrapper \.gform_title\s*\{([^}]*)\}",
+            css,
+            re.S,
+        )
+        self.assertIsNotNone(title)
+        title_body = title.group(1)
+        self.assertIn('font-family: "Vazirmatn", system-ui, sans-serif;', title_body)
+        for unresolved in ("font-size", "line-height", "margin", "padding"):
+            self.assertNotIn(unresolved, title_body)
         self.assertNotRegex(css, r"#gform_wrapper_\d+")
         self.assertNotIn("[data-parent-form]", css)
+
+
+    def test_submit_enforcement_reuses_mechanically_stronger_framework_sentinel(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        submit_selectors = [
+            selector
+            for selector_group, body in css_blocks(css)
+            if "inline-size: 100%;" in body
+            for selector in split_selector_list(selector_group)
+        ]
+        self.assertEqual(2, len(submit_selectors))
+        hostile_per_form = selector_specificity(HOSTILE_ORBITAL_SELECTOR)
+        self.assertEqual((1, 2, 0), hostile_per_form)
+        for selector in submit_selectors:
+            self.assertTrue(selector.startswith(ENFORCED_SCOPE))
+            self.assertIn(".gform_button", selector)
+            repaired = selector_specificity(selector)
+            self.assertEqual((1, 5, 2), repaired)
+            self.assertGreater(repaired, hostile_per_form)
+
+    def test_tom_select_adapter_is_runtime_proven_scoped_and_reuses_control_size(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        adapter = re.search(
+            r"\.gform-theme--framework\.srwf-registration-theme_wrapper \.ts-wrapper \.ts-control\s*\{([^}]*)\}",
+            css,
+            re.S,
+        )
+        self.assertIsNotNone(adapter)
+        self.assertIn("min-block-size: var(--gf-ctrl-size);", adapter.group(1))
+        self.assertNotRegex(css, r"(?m)^\s*\.ts-control\s*\{")
+        self.assertEqual([], list((THEME / "src").glob("**/*.js")))
+
+    def test_heading_family_projection_does_not_resolve_title_metrics(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        section = re.search(
+            r"\.gfield--type-section \.gsection_title\s*\{([^}]*)\}",
+            css,
+            re.S,
+        )
+        self.assertIsNotNone(section)
+        self.assertIn('font-family: "Vazirmatn", system-ui, sans-serif;', section.group(1))
+        self.assertIn("font-size: 18px;", section.group(1))
+        self.assertIn("font-weight: 700;", section.group(1))
+
+    def test_gpfup_is_diagnostic_only_until_presentation_mapping_is_proven(self) -> None:
+        css = CSS.read_text(encoding="utf-8")
+        implementation_map = MAP.read_text(encoding="utf-8")
+        self.assertNotIn(".gpfup", css)
+        self.assertIn(".gpfup__droparea", implementation_map)
+        self.assertIn("no production styling in this batch", implementation_map)
 
     def test_activation_is_explicit_class_scoped_and_form_id_free(self) -> None:
         php = PHP.read_text(encoding="utf-8")

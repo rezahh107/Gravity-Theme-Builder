@@ -24,8 +24,9 @@ class SrwfRuntimeStabilizationTests(unittest.TestCase):
 
     def test_submit_rule_still_matches_runtime_element_shape_without_form_id(self) -> None:
         css = CSS.read_text(encoding='utf-8')
-        self.assertIn('.gform-theme--framework.srwf-registration-theme_wrapper .gform-footer .gform_button', css)
-        self.assertIn('.gform-theme--framework.srwf-registration-theme_wrapper .gform_footer .gform_button', css)
+        enforced = 'head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper'
+        self.assertIn(enforced + ' .gform-footer .gform_button', css)
+        self.assertIn(enforced + ' .gform_footer .gform_button', css)
         self.assertIn('inline-size: 100%;', css)
         self.assertNotRegex(css, r'#gform_submit_button_\d+')
 
@@ -55,16 +56,19 @@ class SrwfRuntimeStabilizationTests(unittest.TestCase):
         for token in prohibited:
             self.assertNotIn(token, js, f'prohibited diagnostic access: {token}')
         self.assertIn("schemaVersion: SCHEMA_VERSION", js)
-        self.assertIn("SCHEMA_VERSION = 'v0.2'", js)
+        self.assertIn("SCHEMA_VERSION = 'v0.3'", js)
+        self.assertIn("DIAGNOSTIC_VERSION = '0.3.0'", js)
+        self.assertIn("دانلود گزارش GTB", js)
+        self.assertNotIn('gtb_srwf_diag', js)
 
     def test_diagnostic_fixture_proves_bounded_large_select_path(self) -> None:
         completed = subprocess.run(
-            ['node', str(THEME / 'tests' / 'test_diagnostic_v02.js')],
+            ['node', str(THEME / 'tests' / 'test_diagnostic_v03.js')],
             check=True,
             capture_output=True,
             text=True,
         )
-        self.assertIn('PASS: diagnostic v0.2 bounded/privacy-safe fixture', completed.stdout)
+        self.assertIn('PASS: diagnostic v0.3 bounded/privacy-safe/runtime-consumer fixture', completed.stdout)
 
     def test_main_push_ci_is_restored(self) -> None:
         workflow = WORKFLOW.read_text(encoding='utf-8')

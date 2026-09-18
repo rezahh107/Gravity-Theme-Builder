@@ -7,26 +7,63 @@
         module.exports = api;
     }
 
-    if (root && root.document) {
-        var start = function () {
-            var result = api.run(root.document, root);
-            root.GTB_SRWF_RUNTIME_DIAGNOSTIC_V02 = result;
-            if (root.console && typeof root.console.info === 'function') {
-                root.console.info('GTB SRWF runtime diagnostic v0.2', result);
-            }
-        };
+    function startBrowser() {
+        if (!root || !root.document) {
+            return;
+        }
 
+        var documentObject = root.document;
+        var button = api.ensureDownloadControl(documentObject, root);
+        var pendingResult = null;
+
+        function capture() {
+            pendingResult = api.run(documentObject, root);
+            root.GTB_SRWF_RUNTIME_DIAGNOSTIC_V03 = pendingResult;
+            return pendingResult;
+        }
+
+        if (button && typeof button.addEventListener === 'function') {
+            button.addEventListener('pointerdown', function () {
+                try {
+                    capture();
+                } catch (error) {
+                    pendingResult = null;
+                }
+            });
+
+            button.addEventListener('click', function () {
+                var result;
+                try {
+                    result = pendingResult || capture();
+                    api.downloadJson(documentObject, root, result);
+                } catch (error) {
+                    root.GTB_SRWF_RUNTIME_DIAGNOSTIC_V03 = {
+                        schemaVersion: api.SCHEMA_VERSION,
+                        diagnosticVersion: api.DIAGNOSTIC_VERSION,
+                        diagnosticMode: 'admin-gated-read-only',
+                        collectorFailures: [{ collector: 'report', state: 'COLLECTOR_FAILED' }]
+                    };
+                } finally {
+                    pendingResult = null;
+                }
+            });
+        }
+    }
+
+    if (root && root.document) {
         if (root.document.readyState === 'loading') {
-            root.document.addEventListener('DOMContentLoaded', start, { once: true });
+            root.document.addEventListener('DOMContentLoaded', startBrowser, { once: true });
         } else {
-            start();
+            startBrowser();
         }
     }
 }(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this), function () {
     'use strict';
 
-    var SCHEMA_VERSION = 'v0.2';
+    var SCHEMA_VERSION = 'v0.3';
+    var DIAGNOSTIC_VERSION = '0.3.0';
     var TARGET_SELECTOR = '.gform-theme--framework.srwf-registration-theme_wrapper';
+    var DOWNLOAD_CONTROL_ID = 'gtb-srwf-download-report';
     var BUDGETS = Object.freeze({
         targets: 4,
         normalControls: 64,
@@ -36,15 +73,24 @@
         tomSelectAssociationsPerSource: 4,
         uploadRoots: 16,
         uploadShallowNodesPerRoot: 24,
+        gpfupRoots: 8,
+        gpfupDropareasPerRoot: 4,
         fieldSignatures: 80,
         fieldShallowChildren: 8,
         stylesheetLinks: 128,
         titleConsumers: 8,
-        sectionConsumers: 24
+        sectionConsumers: 24,
+        submitAncestorDepth: 8,
+        cssRuleVisits: 4000,
+        matchedCascadeRules: 96,
+        conditionalContexts: 96,
+        groupingContextDepth: 24,
+        unrelatedForms: 8
     });
 
     var STYLE_PROPERTIES = [
-        'display', 'position', 'width', 'height', 'minWidth', 'maxWidth',
+        'display', 'position', 'width', 'height', 'inlineSize', 'minWidth', 'maxWidth',
+        'minHeight', 'maxHeight', 'minInlineSize', 'maxInlineSize', 'minBlockSize', 'maxBlockSize',
         'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
         'marginTop', 'marginRight', 'marginBottom', 'marginLeft',
         'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth',
@@ -52,7 +98,9 @@
         'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor',
         'borderRadius', 'backgroundColor', 'color', 'fontFamily', 'fontSize',
         'fontWeight', 'lineHeight', 'direction', 'boxSizing', 'zIndex',
-        'visibility', 'opacity'
+        'visibility', 'opacity', 'flex', 'flexBasis', 'flexGrow', 'flexShrink',
+        'justifyContent', 'alignItems', 'alignSelf', 'justifySelf',
+        'gridTemplateColumns', 'gridColumn', 'gridColumnStart', 'gridColumnEnd'
     ];
 
     var CANONICAL_PROPERTIES = [
@@ -85,6 +133,16 @@
         '--gf-ctrl-file-zone-radius',
         '--gf-field-section-border-color',
         '--gf-form-validation-heading-color'
+    ];
+
+    var SUBMIT_CASCADE_PROPERTIES = [
+        'display', 'width', 'inline-size', 'min-width', 'min-inline-size',
+        'max-width', 'max-inline-size', 'flex', 'flex-basis', 'flex-grow',
+        'flex-shrink', 'align-self', 'justify-self'
+    ];
+
+    var SUBMIT_LOCAL_PROPERTIES = [
+        '--gf-local-display', '--gf-local-width', '--gf-local-min-width', '--gf-local-max-width'
     ];
 
     var SAFE_ID_PATTERNS = [
@@ -160,29 +218,29 @@
         return result;
     }
 
-    function canonicalProperties(element, view) {
+    function fixedCustomProperties(element, view, properties) {
         if (!element || !view || typeof view.getComputedStyle !== 'function') {
             return {};
         }
         var style = view.getComputedStyle(element);
         var result = {};
-        for (var i = 0; i < CANONICAL_PROPERTIES.length; i += 1) {
-            var property = CANONICAL_PROPERTIES[i];
+        for (var i = 0; i < properties.length; i += 1) {
+            var property = properties[i];
             result[property] = String(style.getPropertyValue(property) || '').trim();
         }
         return result;
+    }
+
+    function canonicalProperties(element, view) {
+        return fixedCustomProperties(element, view, CANONICAL_PROPERTIES);
     }
 
     function elementSnapshot(element, view) {
         var rect = safeRect(element);
         var presentation = computedPresentation(element, view);
         var visible = Boolean(
-            rect &&
-            rect.width > 0 &&
-            rect.height > 0 &&
-            presentation.display !== 'none' &&
-            presentation.visibility !== 'hidden' &&
-            presentation.opacity !== '0'
+            rect && rect.width > 0 && rect.height > 0 &&
+            presentation.display !== 'none' && presentation.visibility !== 'hidden' && presentation.opacity !== '0'
         );
         return {
             tag: element && element.tagName ? String(element.tagName).toLowerCase() : '',
@@ -212,20 +270,34 @@
         return bounded(root.querySelectorAll(selector), limit);
     }
 
+    function safeUrlMetadata(raw, base) {
+        var result = { path: '', version: null };
+        try {
+            var parsed = new URL(String(raw || ''), String(base || 'http://invalid.local/'));
+            result.path = parsed.pathname;
+            var version = parsed.searchParams.get('ver');
+            if (version && /^[0-9A-Za-z._-]{1,32}$/.test(version)) {
+                result.version = version;
+            }
+        } catch (error) {
+            result.path = '';
+        }
+        return result;
+    }
+
     function collectStylesheetOrder(documentObject) {
         return boundedQuery(documentObject, 'link[rel="stylesheet"]', BUDGETS.stylesheetLinks).map(function (link, index) {
-            var path = '';
-            try {
-                var parsed = new URL(String(link.href || ''), String(documentObject.baseURI || 'http://invalid.local/'));
-                path = parsed.pathname;
-            } catch (error) {
-                path = '';
+            var url = safeUrlMetadata(link && link.href, documentObject && documentObject.baseURI);
+            var id = safeStructuralId(link);
+            if (!id && link && typeof link.id === 'string' && /^(?:gravity|gform|srwf|gpp)[-_]/i.test(link.id)) {
+                id = link.id;
             }
             return {
                 index: index,
-                id: safeStructuralId(link) || (typeof link.id === 'string' && /^(?:gravity|gform|srwf|gpp)[-_]/i.test(link.id) ? link.id : null),
-                path: path,
-                media: typeof link.media === 'string' ? link.media : ''
+                id: id,
+                path: url.path,
+                version: id === 'srwf-registration-theme-css' ? url.version : null,
+                media: link && typeof link.media === 'string' ? link.media : ''
             };
         });
     }
@@ -240,30 +312,20 @@
     }
 
     function collectSubmitControls(target, view) {
-        return boundedQuery(
-            target,
-            'button[type="submit"].gform_button, input[type="submit"].gform_button',
-            BUDGETS.submitControls
-        ).map(function (element) {
+        return boundedQuery(target, 'button[type="submit"].gform_button, input[type="submit"].gform_button', BUDGETS.submitControls).map(function (element) {
             return elementSnapshot(element, view);
         });
     }
 
     function collectValidation(target, documentObject, view) {
-        var states = boundedQuery(
-            target,
-            '.gform_validation_errors, .gfield_error, [aria-invalid="true"]',
-            BUDGETS.validationNodes
-        ).map(function (element) {
+        var states = boundedQuery(target, '.gform_validation_errors, .gfield_error, [aria-invalid="true"]', BUDGETS.validationNodes).map(function (element) {
             return elementSnapshot(element, view);
         });
-
         var focus = null;
         var active = documentObject ? documentObject.activeElement : null;
         if (active && target && typeof target.contains === 'function' && target.contains(active)) {
             focus = elementSnapshot(active, view);
         }
-
         return { states: states, focusOwner: focus };
     }
 
@@ -284,7 +346,6 @@
             }
             found.push({ element: element, method: method });
         }
-
         if (source && source.tomselect && source.tomselect.wrapper) {
             add(source.tomselect.wrapper, 'source.tomselect.wrapper');
         }
@@ -301,33 +362,21 @@
                 add(fieldMatches[0], 'single-field.ts-wrapper');
             }
         }
-
         return bounded(found, BUDGETS.tomSelectAssociationsPerSource);
     }
 
     function collectEnhancedSelects(target, view) {
-        return boundedQuery(
-            target,
-            'select.tomselected, select.ts-hidden-accessible',
-            BUDGETS.enhancedSelectSources
-        ).map(function (source) {
+        return boundedQuery(target, 'select.tomselected, select.ts-hidden-accessible', BUDGETS.enhancedSelectSources).map(function (source) {
             var associations = discoverTomSelect(source).map(function (association) {
                 var wrapper = association.element;
                 return {
                     associationMethod: association.method,
                     wrapper: elementSnapshot(wrapper, view),
-                    controls: boundedQuery(wrapper, '.ts-control', 2).map(function (element) {
-                        return elementSnapshot(element, view);
-                    }),
-                    dropdowns: boundedQuery(wrapper, '.ts-dropdown', 2).map(function (element) {
-                        return elementSnapshot(element, view);
-                    })
+                    controls: boundedQuery(wrapper, '.ts-control', 2).map(function (element) { return elementSnapshot(element, view); }),
+                    dropdowns: boundedQuery(wrapper, '.ts-dropdown', 2).map(function (element) { return elementSnapshot(element, view); })
                 };
             });
-            return {
-                source: selectSnapshot(source, view),
-                associations: associations
-            };
+            return { source: selectSnapshot(source, view), associations: associations };
         });
     }
 
@@ -363,16 +412,25 @@
     }
 
     function collectUploads(target, view) {
-        return boundedQuery(
-            target,
-            '.gform_fileupload_multifile, .ginput_container_fileupload, .gform_drop_area',
-            BUDGETS.uploadRoots
-        ).map(function (root) {
+        return boundedQuery(target, '.gform_fileupload_multifile, .ginput_container_fileupload, .gform_drop_area', BUDGETS.uploadRoots).map(function (uploadRoot) {
             return {
-                root: elementSnapshot(root, view),
-                shallowStructure: shallowStructure(root, BUDGETS.uploadShallowNodesPerRoot)
+                root: elementSnapshot(uploadRoot, view),
+                shallowStructure: shallowStructure(uploadRoot, BUDGETS.uploadShallowNodesPerRoot)
             };
         });
+    }
+
+    function collectGpfup(target, view) {
+        var roots = boundedQuery(target, '.gpfup', BUDGETS.gpfupRoots).map(function (gpfupRoot) {
+            return {
+                root: elementSnapshot(gpfupRoot, view),
+                strictMode: Boolean(gpfupRoot.classList && gpfupRoot.classList.contains('gpfup--strict')),
+                dropareas: boundedQuery(gpfupRoot, '.gpfup__droparea', BUDGETS.gpfupDropareasPerRoot).map(function (droparea) {
+                    return elementSnapshot(droparea, view);
+                })
+            };
+        });
+        return { state: roots.length ? 'RUNTIME_PROVEN' : 'NOT_OBSERVED', roots: roots };
     }
 
     function collectFieldSignatures(target) {
@@ -381,62 +439,376 @@
                 structuralId: safeStructuralId(field),
                 classes: safeClasses(field),
                 children: bounded(field.children || [], BUDGETS.fieldShallowChildren).map(function (child) {
-                    return {
-                        tag: String(child.tagName || '').toLowerCase(),
-                        structuralId: safeStructuralId(child),
-                        classes: safeClasses(child)
-                    };
+                    return { tag: String(child.tagName || '').toLowerCase(), structuralId: safeStructuralId(child), classes: safeClasses(child) };
                 })
             };
         });
     }
 
-    function collectConsumers(target, documentObject, view) {
+    function splitSelectorList(selectorList) {
+        var parts = [], start = 0, paren = 0, bracket = 0, quote = '', escaped = false;
+        for (var i = 0; i < selectorList.length; i += 1) {
+            var char = selectorList.charAt(i);
+            if (escaped) { escaped = false; continue; }
+            if (char === '\\') { escaped = true; continue; }
+            if (quote) { if (char === quote) { quote = ''; } continue; }
+            if (char === '"' || char === "'") { quote = char; continue; }
+            if (char === '(') { paren += 1; continue; }
+            if (char === ')') { paren -= 1; continue; }
+            if (char === '[') { bracket += 1; continue; }
+            if (char === ']') { bracket -= 1; continue; }
+            if (char === ',' && paren === 0 && bracket === 0) {
+                parts.push(selectorList.slice(start, i).trim()); start = i + 1;
+            }
+        }
+        parts.push(selectorList.slice(start).trim());
+        return parts.filter(Boolean);
+    }
+
+    function stylesheetMeta(sheet, index, documentObject) {
+        var owner = sheet && sheet.ownerNode ? sheet.ownerNode : null;
+        var url = safeUrlMetadata(owner && owner.href, documentObject && documentObject.baseURI);
         return {
-            normalControls: collectNormalControls(target, view),
-            submitControls: collectSubmitControls(target, view),
-            validationAndFocus: collectValidation(target, documentObject, view),
-            enhancedSelects: collectEnhancedSelects(target, view),
-            uploads: collectUploads(target, view),
-            titleConsumers: boundedQuery(target, '.gform_title', BUDGETS.titleConsumers).map(function (element) {
-                return elementSnapshot(element, view);
-            }),
-            sectionConsumers: boundedQuery(target, '.gfield--type-section .gsection_title', BUDGETS.sectionConsumers).map(function (element) {
-                return elementSnapshot(element, view);
-            }),
-            fieldSignatures: collectFieldSignatures(target),
-            fileUploadProConsumer: { state: 'NOT_PROVEN' },
+            index: index,
+            id: owner && typeof owner.id === 'string' && /^(?:gravity|gform|srwf|gpp)[-_]/i.test(owner.id) ? owner.id : null,
+            path: url.path
+        };
+    }
+
+    function groupingRuleKind(rule) {
+        var constructorName = rule && rule.constructor && typeof rule.constructor.name === 'string' ? rule.constructor.name : '';
+        if (rule && rule.media && typeof rule.media.mediaText === 'string') {
+            return 'media';
+        }
+        if (constructorName === 'CSSMediaRule') { return 'media'; }
+        if (constructorName === 'CSSSupportsRule') { return 'supports'; }
+        if (constructorName === 'CSSContainerRule') { return 'container'; }
+        if (constructorName === 'CSSScopeRule') { return 'scope'; }
+        if (constructorName === 'CSSStartingStyleRule') { return 'starting-style'; }
+        if (constructorName === 'CSSDocumentRule' || constructorName === 'CSSMozDocumentRule') { return 'document'; }
+        if (constructorName === 'CSSLayerBlockRule') { return 'layer'; }
+        if (constructorName === 'CSSKeyframesRule' || constructorName === 'WebKitCSSKeyframesRule') { return 'non-selector-group'; }
+        return 'unknown-group';
+    }
+
+    function groupingConditionText(rule, kind) {
+        var text = '';
+        if (kind === 'media' && rule && rule.media && typeof rule.media.mediaText === 'string') {
+            text = rule.media.mediaText;
+        } else if (rule && typeof rule.conditionText === 'string') {
+            text = rule.conditionText;
+        }
+        text = String(text || '').trim();
+        return {
+            text: text.slice(0, 2048),
+            length: text.length
+        };
+    }
+
+    function evaluateGroupingApplicability(rule, view) {
+        var kind = groupingRuleKind(rule);
+        var condition = groupingConditionText(rule, kind);
+        var state = 'UNKNOWN';
+        var record = true;
+
+        if (kind === 'layer') {
+            return { kind: kind, state: 'UNCONDITIONAL', conditionText: null, conditionLength: 0, record: false };
+        }
+        if (kind === 'non-selector-group') {
+            return { kind: kind, state: 'SKIP', conditionText: null, conditionLength: 0, record: false };
+        }
+        if (kind === 'media' && condition.text && view && typeof view.matchMedia === 'function') {
+            try {
+                var mediaResult = view.matchMedia(condition.text);
+                if (mediaResult && typeof mediaResult.matches === 'boolean') {
+                    state = mediaResult.matches ? 'ACTIVE' : 'INACTIVE';
+                }
+            } catch (error) {
+                state = 'UNKNOWN';
+            }
+        } else if (kind === 'supports' && condition.text && view && view.CSS && typeof view.CSS.supports === 'function') {
+            try {
+                var supportsResult = view.CSS.supports(condition.text);
+                if (typeof supportsResult === 'boolean') {
+                    state = supportsResult ? 'ACTIVE' : 'INACTIVE';
+                }
+            } catch (error) {
+                state = 'UNKNOWN';
+            }
+        }
+
+        return {
+            kind: kind,
+            state: state,
+            conditionText: condition.text || null,
+            conditionLength: condition.length,
+            record: record
+        };
+    }
+
+    function collectMatchedCascade(element, documentObject, view) {
+        var result = {
+            matchedRules: [],
+            inaccessibleStylesheets: [],
+            conditionalContexts: [],
+            conditionalContextEvidenceTruncated: false,
+            resolvedCustomProperties: fixedCustomProperties(element, view, SUBMIT_LOCAL_PROPERTIES),
+            visitedRules: 0
+        };
+        if (!documentObject || !documentObject.styleSheets || !element || typeof element.matches !== 'function') {
+            return result;
+        }
+        var sheets = bounded(documentObject.styleSheets, BUDGETS.stylesheetLinks);
+
+        function recordContext(applicability, meta, sourceOrder) {
+            if (!applicability.record) {
+                return;
+            }
+            if (result.conditionalContexts.length >= BUDGETS.conditionalContexts) {
+                result.conditionalContextEvidenceTruncated = true;
+                return;
+            }
+            result.conditionalContexts.push({
+                kind: applicability.kind,
+                state: applicability.state,
+                conditionText: applicability.conditionText,
+                conditionLength: applicability.conditionLength,
+                stylesheet: meta,
+                sourceOrder: sourceOrder
+            });
+        }
+
+        function visitRules(rules, meta, activeContexts) {
+            if (!rules || result.visitedRules >= BUDGETS.cssRuleVisits || result.matchedRules.length >= BUDGETS.matchedCascadeRules) {
+                return;
+            }
+            activeContexts = activeContexts || [];
+            for (var r = 0; r < rules.length && result.visitedRules < BUDGETS.cssRuleVisits && result.matchedRules.length < BUDGETS.matchedCascadeRules; r += 1) {
+                var rule = rules[r];
+                result.visitedRules += 1;
+                if (rule && rule.cssRules) {
+                    var applicability = evaluateGroupingApplicability(rule, view);
+                    recordContext(applicability, meta, result.visitedRules);
+                    if (applicability.state === 'INACTIVE' || applicability.state === 'UNKNOWN' || applicability.state === 'SKIP') {
+                        continue;
+                    }
+                    var nextContexts = activeContexts;
+                    if (applicability.state === 'ACTIVE') {
+                        if (activeContexts.length >= BUDGETS.groupingContextDepth) {
+                            recordContext({
+                                kind: 'grouping-context-depth-limit',
+                                state: 'UNKNOWN',
+                                conditionText: null,
+                                conditionLength: 0,
+                                record: true
+                            }, meta, result.visitedRules);
+                            continue;
+                        }
+                        nextContexts = activeContexts.concat([{
+                            kind: applicability.kind,
+                            state: 'ACTIVE',
+                            conditionText: applicability.conditionText,
+                            conditionLength: applicability.conditionLength,
+                            sourceOrder: result.visitedRules
+                        }]);
+                    }
+                    visitRules(rule.cssRules, meta, nextContexts);
+                    continue;
+                }
+                if (!rule || typeof rule.selectorText !== 'string' || !rule.style) {
+                    continue;
+                }
+                var declarations = {};
+                for (var p = 0; p < SUBMIT_CASCADE_PROPERTIES.length; p += 1) {
+                    var property = SUBMIT_CASCADE_PROPERTIES[p];
+                    var declared = String(rule.style.getPropertyValue(property) || '').trim();
+                    if (declared) {
+                        declarations[property] = { declared: declared, priority: String(rule.style.getPropertyPriority(property) || '') };
+                    }
+                }
+                if (!Object.keys(declarations).length) {
+                    continue;
+                }
+                var branches = splitSelectorList(rule.selectorText);
+                for (var b = 0; b < branches.length; b += 1) {
+                    var branch = branches[b];
+                    var matches = false;
+                    try { matches = element.matches(branch); } catch (error) { matches = false; }
+                    if (matches) {
+                        result.matchedRules.push({
+                            selectorBranch: branch.slice(0, 2048),
+                            selectorLength: branch.length,
+                            declarations: declarations,
+                            stylesheet: meta,
+                            sourceOrder: result.visitedRules,
+                            applicabilityContext: activeContexts.slice()
+                        });
+                        if (result.matchedRules.length >= BUDGETS.matchedCascadeRules) { return; }
+                    }
+                }
+            }
+        }
+        for (var s = 0; s < sheets.length && result.visitedRules < BUDGETS.cssRuleVisits; s += 1) {
+            var sheet = sheets[s], rules;
+            var meta = stylesheetMeta(sheet, s, documentObject);
+            try { rules = sheet.cssRules; } catch (error) {
+                result.inaccessibleStylesheets.push(meta);
+                continue;
+            }
+            visitRules(rules, meta, []);
+        }
+        return result;
+    }
+
+    function collectSubmitLayout(target, documentObject, view) {
+        return boundedQuery(target, 'button[type="submit"].gform_button, input[type="submit"].gform_button', BUDGETS.submitControls).map(function (submit) {
+            var footer = typeof submit.closest === 'function' ? submit.closest('.gform-footer, .gform_footer') : null;
+            var ancestors = [], cursor = submit.parentElement, depth = 0;
+            while (cursor && depth < BUDGETS.submitAncestorDepth) {
+                ancestors.push(elementSnapshot(cursor, view));
+                if (cursor === target) { break; }
+                cursor = cursor.parentElement; depth += 1;
+            }
+            return {
+                submit: elementSnapshot(submit, view),
+                footer: footer ? elementSnapshot(footer, view) : null,
+                ancestors: ancestors,
+                matchedCascade: collectMatchedCascade(submit, documentObject, view)
+            };
+        });
+    }
+
+    function collectUnrelatedForms(documentObject, view) {
+        var all = boundedQuery(documentObject, '.gform_wrapper', BUDGETS.unrelatedForms + BUDGETS.targets);
+        return all.filter(function (wrapper) {
+            return !(wrapper.classList && wrapper.classList.contains('srwf-registration-theme_wrapper'));
+        }).slice(0, BUDGETS.unrelatedForms).map(function (wrapper) {
+            return elementSnapshot(wrapper, view);
+        });
+    }
+
+    function safeCollect(failures, name, collector, fallback) {
+        try {
+            return collector();
+        } catch (error) {
+            failures.push({ collector: name, state: 'COLLECTOR_FAILED' });
+            return fallback;
+        }
+    }
+
+    function collectConsumers(target, documentObject, view, failures) {
+        failures = failures || [];
+        return {
+            normalControls: safeCollect(failures, 'normalControls', function () { return collectNormalControls(target, view); }, []),
+            submitControls: safeCollect(failures, 'submitControls', function () { return collectSubmitControls(target, view); }, []),
+            submitLayout: safeCollect(failures, 'submitLayout', function () { return collectSubmitLayout(target, documentObject, view); }, []),
+            validationAndFocus: safeCollect(failures, 'validationAndFocus', function () { return collectValidation(target, documentObject, view); }, { states: [], focusOwner: null }),
+            enhancedSelects: safeCollect(failures, 'enhancedSelects', function () { return collectEnhancedSelects(target, view); }, []),
+            uploads: safeCollect(failures, 'uploads', function () { return collectUploads(target, view); }, []),
+            fileUploadProConsumer: safeCollect(failures, 'fileUploadProConsumer', function () { return collectGpfup(target, view); }, { state: 'COLLECTOR_FAILED', roots: [] }),
+            titleConsumers: safeCollect(failures, 'titleConsumers', function () { return boundedQuery(target, '.gform_title', BUDGETS.titleConsumers).map(function (element) { return elementSnapshot(element, view); }); }, []),
+            sectionConsumers: safeCollect(failures, 'sectionConsumers', function () { return boundedQuery(target, '.gfield--type-section .gsection_title', BUDGETS.sectionConsumers).map(function (element) { return elementSnapshot(element, view); }); }, []),
+            fieldSignatures: safeCollect(failures, 'fieldSignatures', function () { return collectFieldSignatures(target); }, []),
             persianGravityConsumer: { state: 'NOT_PROVEN' }
         };
     }
 
     function run(documentObject, view) {
-        var targets = boundedQuery(documentObject, TARGET_SELECTOR, BUDGETS.targets);
+        var failures = [];
+        var stylesheets = safeCollect(failures, 'stylesheetOrder', function () { return collectStylesheetOrder(documentObject); }, []);
+        var targets = safeCollect(failures, 'targets', function () { return boundedQuery(documentObject, TARGET_SELECTOR, BUDGETS.targets); }, []);
+        var unrelated = safeCollect(failures, 'unrelatedForms', function () { return collectUnrelatedForms(documentObject, view); }, []);
         return {
             schemaVersion: SCHEMA_VERSION,
+            diagnosticVersion: DIAGNOSTIC_VERSION,
             diagnosticMode: 'admin-gated-read-only',
             budgets: BUDGETS,
-            stylesheetOrder: collectStylesheetOrder(documentObject),
-            targets: targets.map(function (target) {
-                var form = typeof target.querySelector === 'function' ? target.querySelector('form.srwf-registration-theme, form') : null;
+            stylesheetOrder: stylesheets,
+            unrelatedForms: unrelated,
+            targets: targets.map(function (target, index) {
+                var form = null;
+                if (typeof target.querySelector === 'function') {
+                    form = target.querySelector('form.srwf-registration-theme, form');
+                }
                 return {
+                    targetIndex: index,
                     wrapper: elementSnapshot(target, view),
                     form: form ? elementSnapshot(form, view) : null,
-                    canonicalProperties: canonicalProperties(target, view),
-                    consumers: collectConsumers(target, documentObject, view)
+                    canonicalProperties: safeCollect(failures, 'canonicalProperties.' + index, function () { return canonicalProperties(target, view); }, {}),
+                    consumers: collectConsumers(target, documentObject, view, failures)
                 };
-            })
+            }),
+            collectorFailures: failures
         };
+    }
+
+    function ensureDownloadControl(documentObject) {
+        if (!documentObject || typeof documentObject.createElement !== 'function') {
+            return null;
+        }
+        var existing = typeof documentObject.getElementById === 'function' ? documentObject.getElementById(DOWNLOAD_CONTROL_ID) : null;
+        if (existing) {
+            return existing;
+        }
+        var button = documentObject.createElement('button');
+        button.id = DOWNLOAD_CONTROL_ID;
+        button.type = 'button';
+        button.setAttribute('aria-label', 'دانلود گزارش GTB');
+        if (typeof documentObject.createTextNode === 'function') {
+            button.appendChild(documentObject.createTextNode('دانلود گزارش GTB'));
+        }
+        button.style.position = 'fixed';
+        button.style.left = '12px';
+        button.style.bottom = '12px';
+        button.style.zIndex = '2147483646';
+        button.style.minHeight = '36px';
+        button.style.padding = '8px 12px';
+        button.style.border = '0';
+        button.style.borderRadius = '6px';
+        button.style.background = '#172033';
+        button.style.color = '#FFFFFF';
+        button.style.font = '600 13px Vazirmatn, system-ui, sans-serif';
+        button.style.cursor = 'pointer';
+        var parent = documentObject.body || documentObject.documentElement;
+        if (parent && typeof parent.appendChild === 'function') {
+            parent.appendChild(button);
+        }
+        return button;
+    }
+
+    function downloadJson(documentObject, view, report) {
+        if (!documentObject || !view || typeof view.Blob !== 'function' || !view.URL || typeof view.URL.createObjectURL !== 'function') {
+            return false;
+        }
+        var blob = new view.Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+        var url = view.URL.createObjectURL(blob);
+        var anchor = documentObject.createElement('a');
+        anchor.href = url;
+        anchor.download = 'gtb-srwf-runtime-diagnostic-v0.3.0.json';
+        if (typeof anchor.click === 'function') {
+            anchor.click();
+        }
+        if (typeof view.URL.revokeObjectURL === 'function') {
+            view.setTimeout(function () { view.URL.revokeObjectURL(url); }, 0);
+        }
+        return true;
     }
 
     return {
         SCHEMA_VERSION: SCHEMA_VERSION,
+        DIAGNOSTIC_VERSION: DIAGNOSTIC_VERSION,
         BUDGETS: BUDGETS,
+        TARGET_SELECTOR: TARGET_SELECTOR,
         selectSnapshot: selectSnapshot,
         collectNormalControls: collectNormalControls,
         collectEnhancedSelects: collectEnhancedSelects,
+        collectGpfup: collectGpfup,
         collectConsumers: collectConsumers,
+        collectMatchedCascade: collectMatchedCascade,
         shallowStructure: shallowStructure,
+        splitSelectorList: splitSelectorList,
+        ensureDownloadControl: ensureDownloadControl,
+        downloadJson: downloadJson,
         run: run
     };
 }));
