@@ -68,7 +68,17 @@ The stored `srwf-registration-theme` class establishes form identity only. Prese
 
 Normal Registration, validation rerenders, and legitimate Registration AJAX renders remain admitted. Gravity Flow Entry Detail remains excluded using the existing source-qualified early enqueue classification plus the authentic `gravityflow_entry_detail_content_before` / `gravityflow_entry_detail_content_after` bracket. GTB does not parse URLs, query strings, page IDs, labels, form IDs, or GPP state. GPP is neither detected nor required.
 
-Historical Owner evidence and exact Gravity Flow 3.1.0 / Gravity Forms 3.1.1.1 source qualification for that lifecycle remain in the repository evidence chronology. Those results explain the retained boundary but do not make this new 0.1.9 package freshly runtime-proven.
+PR #12 was disproved by Owner runtime because the later content bracket alone did not cover Gravity Flow's early form enqueue. Exact Gravity Flow `3.1.0` and Gravity Forms `3.1.1.1` source qualification established the retained order:
+
+`wp_enqueue_scripts` → Gravity Flow `enqueue_frontend_scripts()` → `enqueue_form_scripts()` → Gravity Forms `gform_enqueue_scripts` / `gform_form_theme_slug`, before `gravityflow_entry_detail_content_before`.
+
+The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.9 candidate remains `OWNER_RUNTIME_REQUIRED`.
+
+Pinned source/package evidence retained from the qualified host stack:
+
+- Gravity Flow 3.1.0 package SHA-256: `ac0573b75831380417a21a455176e25eb746d718bbbd0bb70d6da6f48cba5404`;
+- Gravity Flow `class-gravity-flow.php` SHA-256: `16666115e37a7704b8331973eba0a0499e039d3fdfc6b47ed8a8e95a41779a79`;
+- Gravity Forms 3.1.1.1 package SHA-256: `542f56ae0747f3661d1474996527298027db3fb8ed3e6469a6391aaabf61069b`.
 
 ### Authorized v1 presentation now implemented
 
@@ -88,15 +98,18 @@ The 2026-09-19 Owner reconciliation is implementation-driving. The current CSS i
 
 The implementation uses intrinsic sizing, wrapping, logical properties, and no binary device breakpoint. Host-configured Gravity Forms columns remain authoritative.
 
-### Intentionally unresolved host boundaries
+### Runtime-proven / bounded add-on adapters
 
-The surrounding page color `#F6F8FB` is **HOST_INTEGRATION_REQUIRED** because the repository does not currently prove a narrow SRWF-owned page/embed container. GTB therefore does not seize `html`, `body`, page IDs, URLs, or unrelated theme wrappers.
+- GP Advanced Select / Tom Select: only the already-proven `.ts-wrapper > .ts-control` minimum visual integration is used. Search/filter/results/selection/keyboard/mobile behavior remains add-on-owned.
+- GP File Upload Pro — **Report Card only**: the explicit `srwf-role-report-card-upload` styles only the authentic initial `.gpfup` surface while `:not(.gpfup--has-files)` is true. Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned.
 
-Student Photo post-upload/crop/re-crop/delete structure remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN**. GPFUP owns that lifecycle and crop configuration. No Report Card markup assumption is generalized to Photo.
+Student Photo post-upload/crop/re-crop/delete structure remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN**. The historical compatibility label is `RUNTIME_REQUIRED / NOT_IMPLEMENTED`. GPFUP owns that lifecycle and crop configuration. No Report Card markup assumption is generalized to Photo.
 
 PersianGravity/Jalali presentation remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN** until an authentic consumer is captured. No selector or adapter is invented.
 
-GP Advanced Select/Tom Select remains limited to the already-proven `.ts-wrapper > .ts-control` minimum control integration. Search, filtering, results, selection, open/close, keyboard and mobile interaction remain add-on-owned.
+### Intentionally unresolved host boundaries
+
+The surrounding page color `#F6F8FB` is **HOST_INTEGRATION_REQUIRED** because the repository does not currently prove a narrow SRWF-owned page/embed container. GTB therefore does not seize `html`, `body`, page IDs, URLs, or unrelated theme wrappers.
 
 ### Verification boundary
 
