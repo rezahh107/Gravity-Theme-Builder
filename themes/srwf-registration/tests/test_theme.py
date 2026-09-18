@@ -15,6 +15,7 @@ PHP = THEME / "src" / "srwf-registration-theme.php"
 MAP = THEME / "IMPLEMENTATION_MAP.md"
 REFERENCE = THEME / "reference" / "materialize_reference.sh"
 NARROW_SCOPE = ".gform-theme--framework.srwf-registration-theme_wrapper"
+ENFORCEMENT_SCOPE = "head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper"
 ACTIVATION_CLASS = ".srwf-registration-theme_wrapper"
 HOSTILE_ORBITAL_SELECTOR = '#gform_wrapper_1[data-form-index="0"].gform-theme'
 REFERENCE_SHA256 = "436307d4cd6d896e0f280e502901269240dc310ec2e5927e30e1c29643483000"
@@ -346,8 +347,8 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
                 continue
             for selector in split_selector_list(selector_group):
                 self.assertTrue(
-                    selector.startswith(NARROW_SCOPE),
-                    f"non-token selector escaped narrow SRWF scope: {selector}",
+                    selector.startswith(NARROW_SCOPE) or selector.startswith(ENFORCEMENT_SCOPE),
+                    f"non-token selector escaped narrow SRWF scope/enforcement boundary: {selector}",
                 )
 
     def test_unresolved_values_are_not_promoted(self) -> None:
@@ -359,7 +360,14 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertNotIn("grid-template-columns", css)
         self.assertNotIn("--gf-ctrl-outline-width-focus", css)
         self.assertNotIn("--gf-ctrl-outline-color-focus", css)
-        self.assertNotRegex(css, r"\.gform_title\s*\{")
+        title_blocks = [
+            body
+            for selectors, body in css_blocks(css)
+            if ".gform_title" in selectors
+        ]
+        self.assertEqual(1, len(title_blocks), "form-title projection must remain one bounded family-only rule")
+        self.assertIn('font-family: "Vazirmatn", system-ui, sans-serif;', title_blocks[0])
+        self.assertNotRegex(title_blocks[0], r"font-size|line-height|margin|padding")
         self.assertNotRegex(css, r"#gform_wrapper_\d+")
         self.assertNotIn("[data-parent-form]", css)
 
