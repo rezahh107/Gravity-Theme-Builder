@@ -35,7 +35,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertEqual(HISTORICAL_BLOB_SHA, git_blob_sha(HISTORICAL))
         self.assertIn("upstream_revision_id: \"3\"", self.authority)
         self.assertIn("032750fc4ae763b45b2fb136fc56b4543f38b9638617563d4082993a0cf54f58", self.authority)
-        self.assertIn("historical exact predecessor", self.authority)
+        self.assertIn("exact historical predecessor", self.authority)
 
     def test_current_owner_reconciliation_has_honest_provenance(self) -> None:
         self.assertIn("OWNER:SRWF-2026-09-19", self.current)
@@ -62,7 +62,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
             "above the input where supported",
             "minimum card/control target height: `52px`",
             "gap: `12px`",
-            "subtle primary tint `#EDF1FC`",
+            "canonical primary treatment includes subtle tint `#EDF1FC`",
             "tile: `40px × 40px`",
             "minimum height: `96px`",
         )
