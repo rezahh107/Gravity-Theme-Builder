@@ -32,6 +32,13 @@ class FormSettingsContractTests(unittest.TestCase):
         self.assertIn("'recommend' === $action", SETTINGS)
         self.assertIn("made no configuration changes", SETTINGS)
 
+    def test_recommended_draft_does_not_masquerade_as_saved_state(self):
+        self.assertIn("$current_config = srwf_registration_gtb_get_config( $form );", SETTINGS)
+        self.assertIn("Current saved theme profile:", SETTINGS)
+        self.assertIn("$current_config['enabled']", SETTINGS)
+        self.assertIn("unsaved draft", SETTINGS)
+        self.assertNotIn("Theme profile:', 'gravity-theme-builder' ) . '</strong> ' . esc_html( 'SRWF Registration / ' . ( $display_config['enabled']", SETTINGS)
+
     def test_admin_assets_not_globalized(self):
         self.assertNotIn("admin_enqueue_scripts", SETTINGS)
         self.assertNotIn("wp_enqueue_script", SETTINGS)
