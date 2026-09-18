@@ -20,12 +20,12 @@ class SrwfRenderContextBoundaryTests(unittest.TestCase):
         self.assertIn('function srwf_registration_theme_is_registration_context_permitted', php)
         self.assertIn('function srwf_registration_theme_is_presentation_admitted', php)
         self.assertIn('function srwf_registration_theme_get_admission_decision', php)
-        self.assertRegex(
-            php,
+        self.assertIsNotNone(re.search(
             r"function srwf_registration_theme_is_presentation_admitted\( \$form \).*?"
             r"srwf_registration_theme_get_admission_decision\( \$form \).*?presentationAdmitted",
+            php,
             re.S,
-        )
+        ))
 
     def test_authentic_entry_detail_hooks_bracket_request_local_depth(self) -> None:
         php = PRODUCTION_PHP.read_text(encoding='utf-8')
@@ -75,7 +75,8 @@ class SrwfRenderContextBoundaryTests(unittest.TestCase):
             '542f56ae0747f3661d1474996527298027db3fb8ed3e6469a6391aaabf61069b',
         ):
             self.assertIn(required, source)
-        self.assertNotIn('RUNTIME_PROVEN rendering-context boundary', source)
+        self.assertNotRegex(source, r'(?m)^rendering_context_boundary:\s*RUNTIME_PROVEN\s*$')
+        self.assertIn('This is not yet a `RUNTIME_PROVEN rendering-context boundary` claim.', source)
 
     def test_admission_diagnostic_is_bounded_and_private(self) -> None:
         php = DIAGNOSTIC_PHP.read_text(encoding='utf-8')
