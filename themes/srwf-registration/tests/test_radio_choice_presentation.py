@@ -48,13 +48,14 @@ class SrwfRadioChoicePresentationTests(unittest.TestCase):
         self.assertIn("padding: 12px 16px;", label)
 
     def test_ordinary_radios_use_approved_vertical_card_family_and_exclude_binary_roles(self) -> None:
-        scope = body_for(self.css, ORDINARY_SCOPE)
         row = body_for(self.css, f"{ORDINARY_SCOPE} .gfield_radio")
         choice = body_for(self.css, f"{ORDINARY_SCOPE} .gchoice")
+        input_body = body_for(self.css, f"{ORDINARY_SCOPE} .gfield-choice-input")
 
-        self.assertIn("--gf-ctrl-choice-size: 20px;", scope)
-        self.assertIn("--gf-ctrl-radio-check-size: 10px;", scope)
-        self.assertIn("--gf-ctrl-border-width: 2px;", scope)
+        self.assertIn("--gf-ctrl-choice-size: 20px;", self.css)
+        self.assertIn("--gf-ctrl-radio-check-size: 10px;", self.css)
+        self.assertIn("border-width: 2px;", input_body)
+        self.assertIn("border-color: #8690A1;", input_body)
 
         self.assertIn("display: flex;", row)
         self.assertIn("flex-direction: column;", row)
@@ -77,9 +78,11 @@ class SrwfRadioChoicePresentationTests(unittest.TestCase):
     def test_ordinary_selected_card_derives_from_native_checked_state(self) -> None:
         selected_selector = f"{ORDINARY_SCOPE} .gchoice:has(.gfield-choice-input:checked)"
         selected = body_for(self.css, selected_selector)
+        checked_input = body_for(self.css, f"{ORDINARY_SCOPE} .gfield-choice-input:checked")
         self.assertIn("border-color: #1D4ED8;", selected)
         self.assertIn("background: #EEF2FF;", selected)
         self.assertIn("color: #1D4ED8;", selected)
+        self.assertIn("border-color: #1D4ED8;", checked_input)
 
         input_body = body_for(self.css, f"{ORDINARY_SCOPE} .gfield-choice-input")
         self.assertNotIn("display: none", input_body)
