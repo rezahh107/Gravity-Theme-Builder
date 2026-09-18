@@ -37,16 +37,7 @@ The page is registered through Gravity Forms' supported per-form settings seams:
 
 There is no top-level GTB admin menu.
 
-The settings surface stores SRWF activation separately from eight semantic mappings:
-
-- Gender;
-- Graduation Status;
-- Report Card upload;
-- Identity Section Break;
-- Contact Section Break;
-- Education Section Break;
-- School/Documents Section Break;
-- Student Photo Section Break.
+The settings surface stores SRWF activation separately from eight semantic mappings: Gender, Graduation Status, Report Card upload, and the five mapped Section Break roles.
 
 Numeric field IDs shown in the admin UI are internal references to objects in the current Gravity Forms Form Object only. They are not CSS/public presentation identity and are never used as durable selectors.
 
@@ -54,16 +45,11 @@ On explicit **Save GTB Configuration**, GTB validates the complete submitted map
 
 `Check Again` is read-only. Ordinary page render is read-only. `Load Recommended SRWF Draft` is also read-only: it can reuse only already-present explicit unique GTB semantic tokens, never infers the two shared binary roles, reports its proposed changes, and does not save until the explicit Save path succeeds.
 
-Readiness states are:
-
-- `DISABLED`;
-- `NEEDS SETUP`;
-- `ATTENTION REQUIRED`;
-- `READY`.
+Readiness states are `DISABLED`, `NEEDS SETUP`, `ATTENTION REQUIRED`, and `READY`.
 
 The permission boundary prefers Gravity Forms' own `GFAPI::current_user_can_any( 'gravityforms_edit_forms' )` resolver and falls back to the WordPress capability check only when that Gravity Forms API is unavailable. Save/recommend POST actions are nonce-protected independently from authorization.
 
-Historical Owner evidence from the prior PR #14 candidate proved this settings path could load, save, reach `READY`, persist configuration, and project the intended semantic tokens in the Owner runtime. That evidence is preserved in `../evidence/OWNER_RUNTIME_GTB_CONFIGURATION_2026-09-18.md`. It is **historical product-path evidence**, not runtime proof for this reconciled `0.1.8` branch.
+Historical Owner evidence from the prior PR #14 candidate proved this settings path could load, save, reach `READY`, persist configuration, and project the intended semantic tokens in the Owner runtime. That evidence is preserved in `../evidence/OWNER_RUNTIME_GTB_CONFIGURATION_2026-09-18.md`. It is historical product-path evidence, not runtime proof for this reconciled `0.1.8` branch.
 
 ### Presentation admission remains independent from admin state
 
@@ -150,7 +136,7 @@ Current production remains limited to evidence-backed presentation integrations:
 - GP Advanced Select / Tom Select: the runtime-proven `.ts-wrapper > .ts-control` consumer receives the SRWF minimum control height; search/open/keyboard behavior remains add-on-owned.
 - GP File Upload Pro — **Report Card only**: explicit `srwf-role-report-card-upload` styles the authentic initial `.gpfup` drop area while `:not(.gpfup--has-files)` is true; upload lifecycle and uploaded rows/delete remain GPFUP-owned.
 
-Student Photo post-upload / preview / crop / re-crop / delete presentation remains `OWNER_RUNTIME_REQUIRED / NOT_IMPLEMENTED` until authentic states are captured. The Report Card adapter must not be generalized by type, label, DOM position, or numeric ID.
+Student Photo post-upload / preview / crop / re-crop / delete presentation remains **`RUNTIME_REQUIRED / NOT_IMPLEMENTED`** on the production path; under the current evidence vocabulary this means Owner runtime is required before any implementation may assume authentic states. The Report Card adapter must not be generalized by type, label, DOM position, or numeric ID.
 
 ### Current authority vs current CSS
 
