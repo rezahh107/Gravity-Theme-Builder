@@ -32,7 +32,7 @@ function srwf_registration_gtb_owned_role_tokens() {
 }
 
 function srwf_registration_gtb_class_tokens( $value ) {
-    $parts = preg_split( '/\s+/', trim( (string) $value ) );
+    $parts = preg_split( '/\\s+/', trim( (string) $value ) );
     $tokens = array();
     foreach ( is_array( $parts ) ? $parts : array() as $part ) {
         if ( '' !== $part && ! in_array( $part, $tokens, true ) ) {
@@ -363,8 +363,22 @@ function srwf_registration_gtb_notice( $class, $message ) {
     echo '<div class="notice notice-' . esc_attr( $class ) . ' inline"><p>' . esc_html( $message ) . '</p></div>';
 }
 
+/**
+ * Resolve the Form Settings edit permission through Gravity Forms when available.
+ *
+ * Gravity Forms may grant access through its own capability resolver (for example,
+ * gform_full_access), which a raw WordPress current_user_can() check does not model.
+ */
+function srwf_registration_gtb_current_user_can_edit_form() {
+    if ( class_exists( 'GFAPI' ) && is_callable( array( 'GFAPI', 'current_user_can_any' ) ) ) {
+        return (bool) GFAPI::current_user_can_any( SRWF_REGISTRATION_GTB_CAPABILITY );
+    }
+
+    return current_user_can( SRWF_REGISTRATION_GTB_CAPABILITY );
+}
+
 function srwf_registration_gtb_settings_page() {
-    if ( ! current_user_can( SRWF_REGISTRATION_GTB_CAPABILITY ) ) {
+    if ( ! srwf_registration_gtb_current_user_can_edit_form() ) {
         wp_die( esc_html__( 'You do not have permission to edit this Gravity Forms form.', 'gravity-theme-builder' ) );
     }
     $form_id = srwf_registration_gtb_requested_form_id();
