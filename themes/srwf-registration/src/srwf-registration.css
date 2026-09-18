@@ -93,3 +93,158 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     direction: ltr;
     text-align: start;
 }
+
+/*
+ * Owner-approved semantic binary-choice role.
+ * Configure this class only on Gender and Graduation Status. The real GF radio remains
+ * the selection authority; CSS derives presentation exclusively from :checked/:focus-visible.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield_radio {
+    display: flex;
+    gap: 12px;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gchoice {
+    position: relative;
+    flex: 1 1 0;
+    min-inline-size: 0;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield-choice-input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: 0;
+    opacity: 0;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gchoice label {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 48px;
+    padding: 12px 16px;
+    border: 1.5px solid #8690A1;
+    border-radius: 10px;
+    background: #FFFFFF;
+    color: #172033;
+    font-family: "Vazirmatn", system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield-choice-input:checked + label {
+    border-color: #1D4ED8;
+    border-width: 2px;
+    background: #EEF2FF;
+    color: #1D4ED8;
+    font-weight: 700;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield-choice-input:focus-visible + label {
+    outline: auto;
+}
+
+/*
+ * Exact admitted section-icon geometry, bound only by explicit Section Break role classes.
+ * The pseudo-element is decorative and therefore cannot duplicate the authentic section heading.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-identity .gsection_title,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-contact .gsection_title,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-education .gsection_title,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-school-documents .gsection_title,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-student-photo .gsection_title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-identity .gsection_title::before,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-contact .gsection_title::before,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-education .gsection_title::before,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-school-documents .gsection_title::before,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-student-photo .gsection_title::before {
+    content: "";
+    flex: 0 0 28px;
+    inline-size: 28px;
+    block-size: 28px;
+    border-radius: 8px;
+    background-color: #EEF2FF;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-identity .gsection_title::before {
+    background-image: url("icons/section-identity.svg");
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-contact .gsection_title::before {
+    background-image: url("icons/section-contact.svg");
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-education .gsection_title::before {
+    background-image: url("icons/section-education.svg");
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-school-documents .gsection_title::before {
+    background-image: url("icons/section-school-documents.svg");
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-student-photo .gsection_title::before {
+    background-image: url("icons/section-student-photo.svg");
+}
+
+/*
+ * Report Card only. GPFUP remains upload/validation/delete owner. Initial-state geometry
+ * is excluded as soon as the authentic .gpfup--has-files state appears.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    gap: 12px;
+    border: 1.5px dashed #CBD5E1;
+    border-radius: 12px;
+    background: #FAFBFC;
+    text-align: start;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea::before {
+    content: "";
+    flex: 0 0 40px;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: 10px;
+    background-color: #F1F5F9;
+    background-image: url("icons/report-card-file.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 18px 18px;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__select-files {
+    min-block-size: 0;
+    block-size: auto;
+    inline-size: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #172033;
+    font-family: "Vazirmatn", system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: normal;
+    text-align: start;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gform_fileupload_rules {
+    color: #667085;
+}

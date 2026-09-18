@@ -418,12 +418,16 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertIn("font-size: 18px;", section.group(1))
         self.assertIn("font-weight: 700;", section.group(1))
 
-    def test_gpfup_is_diagnostic_only_until_presentation_mapping_is_proven(self) -> None:
+    def test_gpfup_report_mapping_is_role_scoped_and_photo_safe(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         implementation_map = MAP.read_text(encoding="utf-8")
-        self.assertNotIn(".gpfup", css)
-        self.assertIn(".gpfup__droparea", implementation_map)
-        self.assertIn("no production styling in this batch", implementation_map)
+        self.assertIn(".gpfup__droparea", css)
+        self.assertIn(".srwf-role-report-card-upload", css)
+        self.assertIn(".gpfup:not(.gpfup--has-files)", css)
+        self.assertNotIn("gpfup--images-only", css)
+        self.assertIn("AUTHENTIC_RUNTIME_PROVEN_HOST_STATE", implementation_map)
+        self.assertIn("Student Photo post-upload", implementation_map)
+        self.assertIn("NOT_IMPLEMENTED", implementation_map)
 
     def test_activation_is_explicit_class_scoped_and_form_id_free(self) -> None:
         php = PHP.read_text(encoding="utf-8")
