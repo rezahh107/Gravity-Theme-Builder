@@ -291,7 +291,7 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertIn("font-size: 24px;", title.group(1))
         self.assertIn("font-weight: 700;", title.group(1))
         self.assertIn("line-height: 1.5;", title.group(1))
-        self.assertRegex(css, r"@media \(min-width: 960px\).*?\.gform_title\s*\{[^}]*font-size: 26px;", re.S)
+        self.assertRegex(css, r"(?s)@media \(min-width: 960px\).*?\.gform_title\s*\{[^}]*font-size: 26px;")
         for declaration in (
             "--gf-ctrl-desc-font-size: 14px;",
             "--gf-ctrl-desc-font-weight: 400;",
@@ -306,7 +306,7 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
             "--gf-ctrl-outline-style: solid;",
         ):
             self.assertIn(declaration, css)
-        self.assertRegex(css, r"\.gfield--type-section\s*\{[^}]*margin-block-start: 8px;", re.S)
+        self.assertRegex(css, r"(?s)\.gfield--type-section\s*\{[^}]*margin-block-start: 8px;")
 
     def test_submit_enforcement_reuses_mechanically_stronger_framework_sentinel(self) -> None:
         css = CSS.read_text(encoding="utf-8")
