@@ -38,3 +38,66 @@ jobs:
         run: |
           php -l themes/srwf-registration/src/srwf-registration-theme.php
           php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
+
+
+  exact-head-qualification:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Record exact branch Head
+        run: |
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          echo "RESULTING_HEAD=$(git rev-parse HEAD)"
+
+      - name: Verify admitted visual reference
+        run: bash themes/srwf-registration/reference/materialize_reference.sh "$RUNNER_TEMP/OWNER_REFERENCE_new_7.html"
+
+      - name: Run theme-local deterministic tests
+        run: python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
+
+      - name: Check production delivery contract
+        run: php themes/srwf-registration/tests/test_delivery.php
+
+      - name: Check diagnostic delivery contract
+        run: php themes/srwf-registration/tests/test_diagnostic_delivery.php
+
+      - name: Check PHP and JavaScript syntax
+        run: |
+          php -l themes/srwf-registration/src/srwf-registration-theme.php
+          php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
+          node --check themes/srwf-registration/diagnostic/assets/runtime-diagnostic.js
+          node --check themes/srwf-registration/tests/test_diagnostic_v03.js
+
+      - name: Build exact-Head Owner test packages
+        run: |
+          set -euo pipefail
+          THEME_DIR="$RUNNER_TEMP/gtb-srwf-registration"
+          DIAG_DIR="$RUNNER_TEMP/gtb-srwf-runtime-diagnostic"
+          mkdir -p "$THEME_DIR" "$DIAG_DIR/assets"
+          cp themes/srwf-registration/src/srwf-registration-theme.php "$THEME_DIR/"
+          cp themes/srwf-registration/src/srwf-registration.css "$THEME_DIR/"
+          cp themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php "$DIAG_DIR/"
+          cp themes/srwf-registration/diagnostic/README.md "$DIAG_DIR/"
+          cp themes/srwf-registration/diagnostic/assets/runtime-diagnostic.js "$DIAG_DIR/assets/"
+          (
+            cd "$RUNNER_TEMP"
+            zip -qr "gtb-srwf-registration-v0.1.2.zip" "gtb-srwf-registration"
+            zip -qr "gtb-srwf-runtime-diagnostic-v0.3.0.zip" "gtb-srwf-runtime-diagnostic"
+          )
+          sha256sum "$RUNNER_TEMP/gtb-srwf-registration-v0.1.2.zip"
+          sha256sum "$RUNNER_TEMP/gtb-srwf-runtime-diagnostic-v0.3.0.zip"
+
+      - name: Upload exact-Head Owner test packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: srwf-owner-test-packages
+          path: |
+            ${{ runner.temp }}/gtb-srwf-registration-v0.1.2.zip
+            ${{ runner.temp }}/gtb-srwf-runtime-diagnostic-v0.3.0.zip
+          if-no-files-found: error
+          retention-days: 7
