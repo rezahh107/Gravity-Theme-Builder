@@ -2,12 +2,12 @@
 /**
  * Plugin Name: GTB SRWF Runtime Diagnostic
  * Description: Admin-gated privacy-safe structural/presentation diagnostic for SRWF Registration.
- * Version: 0.3.1
+ * Version: 0.3.2
  */
 
 defined( 'ABSPATH' ) || exit;
 
-const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.1';
+const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.2';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_COLLECTOR_VERSION = '0.3.0';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_THEME_CLASS = 'srwf-registration-theme';
 
@@ -35,12 +35,8 @@ function gtb_srwf_runtime_diagnostic_is_target_form( $form ) {
 /**
  * Return the production admission decision using only bounded enumerated facts.
  *
- * The diagnostic consumes the production plugin's decision API when available so it
- * does not create a second request-classification system. When the production plugin
- * is unavailable, the diagnostic says so rather than inventing a context decision.
- *
  * @param array<string,mixed> $form Gravity Forms form object.
- * @return array{formIdentityMatched:bool,presentationAdmitted:?bool,renderingContext:string,exclusionReason:?string}
+ * @return array{formIdentityMatched:bool,presentationAdmitted:?bool,renderingContext:string,contextEvidence:string,exclusionReason:?string}
  */
 function gtb_srwf_runtime_diagnostic_admission_decision( $form ) {
     $identity_matched = gtb_srwf_runtime_diagnostic_is_target_form( $form );
@@ -53,6 +49,11 @@ function gtb_srwf_runtime_diagnostic_admission_decision( $form ) {
                 $context = 'unknown';
             }
 
+            $evidence = isset( $decision['contextEvidence'] ) ? (string) $decision['contextEvidence'] : 'unknown';
+            if ( ! in_array( $evidence, array( 'registration_default', 'gravity_flow_early_enqueue', 'gravity_flow_content_bracket' ), true ) ) {
+                $evidence = 'unknown';
+            }
+
             $reason = isset( $decision['exclusionReason'] ) ? $decision['exclusionReason'] : null;
             if ( ! in_array( $reason, array( null, 'unrelated_form', 'gravity_flow_entry_detail' ), true ) ) {
                 $reason = null;
@@ -62,6 +63,7 @@ function gtb_srwf_runtime_diagnostic_admission_decision( $form ) {
                 'formIdentityMatched'  => true === ( $decision['formIdentityMatched'] ?? false ),
                 'presentationAdmitted' => true === ( $decision['presentationAdmitted'] ?? false ),
                 'renderingContext'     => $context,
+                'contextEvidence'      => $evidence,
                 'exclusionReason'      => $reason,
             );
         }
@@ -71,14 +73,14 @@ function gtb_srwf_runtime_diagnostic_admission_decision( $form ) {
         'formIdentityMatched'  => $identity_matched,
         'presentationAdmitted' => null,
         'renderingContext'     => 'unknown',
+        'contextEvidence'      => 'unknown',
         'exclusionReason'      => $identity_matched ? 'production_admission_unavailable' : 'unrelated_form',
     );
 }
 
 /**
  * Load the local read-only diagnostics for an administrator whenever the SRWF target
- * identity is rendered. This intentionally remains available when production
- * presentation is context-excluded, because observability is not ownership.
+ * identity is rendered. Observability remains available when presentation is excluded.
  *
  * @param array<string,mixed> $form    Gravity Forms form object.
  * @param bool                $is_ajax Whether Gravity Forms is using AJAX submission.
@@ -102,7 +104,7 @@ function gtb_srwf_runtime_diagnostic_enqueue( $form, $is_ajax ) { // phpcs:ignor
     );
 
     wp_enqueue_script(
-        'gtb-srwf-admission-diagnostic-v031',
+        'gtb-srwf-admission-diagnostic-v032',
         plugins_url( 'assets/admission-diagnostic.js', __FILE__ ),
         array(),
         GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION,
@@ -116,7 +118,7 @@ function gtb_srwf_runtime_diagnostic_enqueue( $form, $is_ajax ) { // phpcs:ignor
     }
 
     wp_add_inline_script(
-        'gtb-srwf-admission-diagnostic-v031',
+        'gtb-srwf-admission-diagnostic-v032',
         'window.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS = window.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS || []; window.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS.push(' . $json . ');',
         'before'
     );
