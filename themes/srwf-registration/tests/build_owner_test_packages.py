@@ -15,6 +15,7 @@ DIAGNOSTIC = THEME / 'diagnostic'
 PRODUCTION_FILES = (
     'srwf-registration-theme.php',
     'srwf-registration-settings.php',
+    'srwf-registration-layout.php',
     'srwf-registration.css',
     'icons/report-card-file.svg',
     'icons/section-contact.svg',
@@ -28,6 +29,7 @@ DIAGNOSTIC_FILES = (
     'assets/runtime-diagnostic.js',
     'assets/binary-choice-geometry.js',
     'assets/admission-diagnostic.js',
+    'assets/srwf-v1-qualification.js',
 )
 
 
