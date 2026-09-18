@@ -131,7 +131,15 @@ Gravity Forms theme-layer Asset Enqueue Output Engine SHA-256:
 0a8b62457eba016c1bb0837cb516b8e30fe45e717ab5113d238d1e689a541795
 ```
 
-The pinned source order confirms that Gravity Flow performs form-script/theme enqueue work before the later Entry Detail content bracket. The repaired early boundary remains version-bounded to the inspected Gravity Flow `3.1.0` / Gravity Forms `3.1.1.1` call order and still needs the Owner runtime recheck.
+The pinned source order that confirms the PR #13 repair remains:
+
+1. Gravity Flow `3.1.0` registers `enqueue_frontend_scripts()` on `wp_enqueue_scripts` and calls `enqueue_form_scripts()` before firing `gravityflow_enqueue_frontend_scripts`.
+2. Gravity Flow's `enqueue_form_scripts()` obtains the current form and invokes the Gravity Forms form enqueue path; Gravity Forms then fires `gform_enqueue_scripts`.
+3. The Gravity Forms Theme Layer reaches `gform_form_theme_slug` while resolving the form theme during that enqueue path.
+4. Only later, while Gravity Flow renders Entry Detail, `gravityflow_entry_detail_content_before` fires. That is why PR #12's content bracket could not prevent the earlier theme/style admission.
+5. The repaired early classifier delegates route identity to `is_workflow_detail_page()` and is bounded to the authentic Gravity Flow enqueue lifecycle rather than introducing a request-wide or URL-parsing heuristic.
+
+This source-qualified ordering remains version-bounded to the inspected Gravity Flow `3.1.0` / Gravity Forms `3.1.1.1` call order and still needs the Owner runtime recheck.
 
 ### Host stylesheet order contract
 
