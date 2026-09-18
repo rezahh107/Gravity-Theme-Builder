@@ -30,7 +30,60 @@ The implementation uses Gravity Forms' own supported extension points rather tha
 3. configure the documented semantic field/section Custom CSS Classes from `../IMPLEMENTATION_MAP.md` on the intended real fields/Section Breaks;
 4. keep **Description Placement** and **Validation Message Placement** below inputs and enable the authentic Gravity Forms **Validation Summary** per the approved visual contract.
 
-For that opted-in form, the integration selects the `orbital` form theme through `gform_form_theme_slug` and enqueues the stylesheet through `gform_enqueue_scripts`. Other forms are left untouched. Non-token layout, direction, and presentation adapters remain under `.gform-theme--framework.srwf-registration-theme_wrapper`. The SRWF `--gf-*` CSS API values use the documented Theme Framework stylesheet-sentinel scope plus `.gform-theme--framework.gform-theme.srwf-registration-theme_wrapper`, so the opted-in values can outrank per-form Orbital style settings without `!important` or form-ID identity.
+The stored `srwf-registration-theme` class establishes **form identity only**. Production presentation is admitted only when that identity is present **and** the current rendering context permits Registration ownership. Normal Registration, validation rerenders and legitimate Registration AJAX renders remain admitted. Gravity Flow Entry Detail is explicitly excluded without mutating the stored form class.
+
+For an admitted Registration render, the integration selects the `orbital` form theme through `gform_form_theme_slug` and enqueues the stylesheet through `gform_enqueue_scripts`. Unrelated forms and context-excluded renders are left untouched. Non-token layout, direction, and presentation adapters remain under `.gform-theme--framework.srwf-registration-theme_wrapper`. The SRWF `--gf-*` CSS API values use the documented Theme Framework stylesheet-sentinel scope plus `.gform-theme--framework.gform-theme.srwf-registration-theme_wrapper`, so the opted-in values can outrank per-form Orbital style settings without `!important` or form-ID identity.
+
+### Rendering-context ownership boundary
+
+Gravity Flow Entry Detail may render an editable copy of the same underlying Gravity Forms form while preserving its configured `cssClass`. GTB therefore keeps form identity and rendering-context ownership as separate predicates and combines them only at presentation admission.
+
+Production uses the authentic Gravity Flow hooks:
+
+- `gravityflow_entry_detail_content_before` → increment a request-local Entry Detail depth counter;
+- `gravityflow_entry_detail_content_after` → decrement the counter, floored at zero.
+
+The counter is memory/request-local only. It is not stored in options, transients, user meta, cookies, URLs, form settings or entry data. Nested/re-entrant brackets remain excluded until the outermost bracket exits. If Gravity Flow is absent, the hooks simply never fire and normal Registration admission is unchanged. GPP is neither detected nor required.
+
+#### Host-source qualification
+
+Evidence state for this mechanism:
+
+- current Gravity Flow documentation describes `gravityflow_entry_detail_content_before` as running before the primary form elements and `gravityflow_entry_detail_content_after` as running after them: `DOCUMENTED`;
+- exact owner-supplied Gravity Flow `3.1.0` and Gravity Forms `3.1.1.1` source packages were byte-verified and inspected for timing: `SOURCE_PROVEN`;
+- authentic Owner-site execution of this new GTB boundary has not yet occurred: `OWNER_RUNTIME_REQUIRED`.
+
+Pinned package/source identities used for the source proof:
+
+```text
+Gravity Flow 3.1.0 package SHA-256:
+ac0573b75831380417a21a455176e25eb746d718bbbd0bb70d6da6f48cba5404
+
+Gravity Flow includes/pages/class-entry-detail.php SHA-256:
+a7634c5604184502457bcb22cdf1ade892e84c888cc60996aea8a810ced7680a
+
+Gravity Flow includes/pages/class-entry-editor.php SHA-256:
+92d3ae95f79b31321215a688f7f0ff21b62c5b7046f8315a07f7b9e7442fbdbf
+
+Gravity Forms 3.1.1.1 package SHA-256:
+542f56ae0747f3661d1474996527298027db3fb8ed3e6469a6391aaabf61069b
+
+Gravity Forms form_display.php SHA-256:
+ced7ac432e5326bd557aa5e8c28d7f768933c9bfc883292ad9aa3a5847dfda48
+```
+
+The inspected Gravity Flow `3.1.0` order is mechanically sufficient for GTB's two decisions:
+
+1. `Gravity_Flow_Entry_Detail::entry_detail()` fires `gravityflow_entry_detail_content_before` at source line 139.
+2. It later calls `entry_detail_grid()` at line 161 and fires `gravityflow_entry_detail_content_after` at line 193.
+3. When editable fields are present, `entry_detail_grid()` invokes `Gravity_Flow_Entry_Editor::render_edit_form()` at line 818.
+4. `render_edit_form()` calls `GFFormDisplay::get_form()` at `class-entry-editor.php` line 139.
+5. In the pinned Gravity Forms `3.1.1.1` `GFFormDisplay::get_form()` path, `enqueue_form_scripts()` is called at `form_display.php` line 1247 and the wrapper theme slug is obtained with `get_form_theme_slug()` at line 1286.
+6. That same pinned file fires `gform_enqueue_scripts` from `enqueue_form_scripts()` at line 3392 and applies `gform_form_theme_slug` from `get_form_theme_slug()` at line 884.
+
+Therefore the Gravity Flow `content_before` hook has already completed before the editable Entry Detail form reaches either GTB admission decision, while `content_after` executes only after the Entry Detail grid/editor render. `include_scripts()` occurs earlier in Entry Detail, but the inspected `3.1.0` method contains only the Entry Detail inline helpers and does not call `GFFormDisplay::get_form()`.
+
+This timing claim is intentionally version-bounded to the inspected Gravity Flow `3.1.0` / Gravity Forms `3.1.1.1` pair. A future host version that materially changes this call order must be requalified rather than assumed compatible. This is not yet a `RUNTIME_PROVEN rendering-context boundary` claim.
 
 ### Host stylesheet order contract
 
@@ -46,7 +99,7 @@ Evidence boundary:
 - WordPress `wp_enqueue_style()` defines `$deps` as registered stylesheet handles and resolves dependencies before the dependent stylesheet;
 - if the verified Orbital dependency is unavailable at print-time, WordPress does not process the dependent SRWF branch. This is intentional fail-closed behavior rather than printing GTB early under an unproven ordering assumption.
 
-The hook priority remains `20`; stylesheet order correctness no longer depends on that priority. No GPP class or stylesheet is an activation, dependency, or visual-authority requirement. Extra GPP classes may coexist on the same form without changing GTB's opt-in identity.
+The hook priority remains `20`; stylesheet order correctness no longer depends on that priority. No GPP class or stylesheet is an activation, dependency, rendering-context detector, or visual-authority requirement. Extra unrelated classes may coexist on the same form without changing GTB's identity or context predicates.
 
 Vazirmatn delivery remains owned by the embedding SRWF environment; this package does not fetch fonts from a third-party CDN.
 
@@ -70,8 +123,10 @@ bash themes/srwf-registration/reference/materialize_reference.sh /tmp/OWNER_REFE
 python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
 php themes/srwf-registration/tests/test_delivery.php
 php themes/srwf-registration/tests/test_diagnostic_delivery.php
+node themes/srwf-registration/tests/test_diagnostic_v03.js
+node themes/srwf-registration/tests/test_admission_diagnostic_v031.js
 php -l themes/srwf-registration/src/srwf-registration-theme.php
 php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
 ```
 
-These checks are repository/static evidence only. They do not qualify the theme against a real WordPress + Gravity Forms runtime.
+These checks are repository/static/source-qualification evidence only. They do not qualify the new rendering-context boundary against the Owner WordPress + Gravity Forms + Gravity Flow runtime.
