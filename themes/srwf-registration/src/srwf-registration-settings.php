@@ -410,8 +410,12 @@ function srwf_registration_gtb_settings_page() {
     }
 
     $readiness = srwf_registration_gtb_readiness( $form );
+    $current_config = srwf_registration_gtb_get_config( $form );
     if ( $saved ) {
         srwf_registration_gtb_notice( 'success', 'GTB Theme configuration was saved and GTB-owned presentation tokens were projected.' );
+    }
+    if ( 'recommend' === $action ) {
+        srwf_registration_gtb_notice( 'info', 'Recommended SRWF configuration is loaded as an unsaved draft. Current status and current profile still describe the saved form until Save GTB Configuration succeeds.' );
     }
     if ( isset( $_GET['gtb_check'] ) && '1' === (string) wp_unslash( $_GET['gtb_check'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         srwf_registration_gtb_notice( 'info', 'Check Again completed. GTB re-read the current form and made no configuration changes.' );
@@ -427,7 +431,7 @@ function srwf_registration_gtb_settings_page() {
     echo '<p>' . esc_html__( 'GTB controls presentation only. Gravity Forms continues to own fields, behavior, validation, conditional logic, submission, accessibility semantics and data.', 'gravity-theme-builder' ) . '</p>';
     echo '<h3>' . esc_html__( 'Current status', 'gravity-theme-builder' ) . '</h3>';
     echo '<p><strong>' . esc_html( $readiness['state'] ) . '</strong> — ' . esc_html( $readiness['message'] ) . '</p>';
-    echo '<p><strong>' . esc_html__( 'Theme profile:', 'gravity-theme-builder' ) . '</strong> ' . esc_html( 'SRWF Registration / ' . ( $display_config['enabled'] ? 'Enabled' : 'Disabled' ) ) . '</p>';
+    echo '<p><strong>' . esc_html__( 'Current saved theme profile:', 'gravity-theme-builder' ) . '</strong> ' . esc_html( 'SRWF Registration / ' . ( $current_config['enabled'] ? 'Enabled' : 'Disabled' ) ) . '</p>';
 
     echo '<form method="post">';
     wp_nonce_field( SRWF_REGISTRATION_GTB_NONCE_ACTION, SRWF_REGISTRATION_GTB_NONCE_NAME );
