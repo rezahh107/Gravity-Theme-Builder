@@ -14,6 +14,7 @@ DIAGNOSTIC = THEME / 'diagnostic'
 
 PRODUCTION_FILES = (
     'srwf-registration-theme.php',
+    'srwf-registration-settings.php',
     'srwf-registration.css',
     'icons/report-card-file.svg',
     'icons/section-contact.svg',
