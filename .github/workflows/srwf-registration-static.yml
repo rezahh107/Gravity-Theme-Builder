@@ -28,8 +28,10 @@ jobs:
       - name: Run theme-local deterministic tests
         run: python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
 
-      - name: Check production delivery contract
-        run: php themes/srwf-registration/tests/test_delivery.php
+      - name: Check production delivery and authentic-order context regression
+        run: |
+          php themes/srwf-registration/tests/test_delivery.php
+          php themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 
       - name: Check diagnostic delivery contract
         run: php themes/srwf-registration/tests/test_diagnostic_delivery.php
@@ -38,6 +40,7 @@ jobs:
         run: |
           php -l themes/srwf-registration/src/srwf-registration-theme.php
           php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
+          php -l themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 
   exact-head-qualification:
     if: github.event_name == 'pull_request'
@@ -61,17 +64,19 @@ jobs:
       - name: Run explicit diagnostic JavaScript fixtures
         run: |
           node themes/srwf-registration/tests/test_diagnostic_v03.js
-          node themes/srwf-registration/tests/test_admission_diagnostic_v031.js
+          node themes/srwf-registration/tests/test_admission_diagnostic_v032.js
 
-      - name: Check production and diagnostic delivery
+      - name: Check production, authentic-order context and diagnostic delivery
         run: |
           php themes/srwf-registration/tests/test_delivery.php
+          php themes/srwf-registration/tests/test_entry_detail_early_sequence.php
           php themes/srwf-registration/tests/test_diagnostic_delivery.php
 
       - name: Check PHP syntax
         run: |
           php -l themes/srwf-registration/src/srwf-registration-theme.php
           php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
+          php -l themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 
       - name: Build and smoke-check exact-Head Owner packages
         run: python3 themes/srwf-registration/tests/build_owner_test_packages.py "$RUNNER_TEMP/gtb-owner-test-packages"
