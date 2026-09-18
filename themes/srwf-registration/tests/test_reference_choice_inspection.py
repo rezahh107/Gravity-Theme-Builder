@@ -22,35 +22,39 @@ class TemporaryReferenceChoiceInspection(unittest.TestCase):
             )
             html = output.read_text(encoding="utf-8")
 
-        print("\n=== APPROVED REFERENCE: LABEL CONTEXTS ===")
-        for needle in (
-            "جنسیت",
-            "وضعیت تحصیلی",
-            "وضعیت ثبت",
-            "مقطع تحصیلی",
-            "مرکز ثبت",
-        ):
-            print(f"\n--- {needle} ---")
-            found = False
-            for match in re.finditer(re.escape(needle), html):
-                start = max(0, match.start() - 900)
-                end = min(len(html), match.end() + 1800)
-                print(html[start:end])
-                found = True
-                break
-            if not found:
-                print("NOT FOUND")
+        print("\n=== APPROVED REFERENCE: CHOICE FAMILY MARKUP ===")
+        for marker in ('class="choice-row"', 'class="vertical-choices"'):
+            print(f"\n### {marker} ###")
+            for index, match in enumerate(re.finditer(re.escape(marker), html), start=1):
+                if index > 12:
+                    break
+                start = max(0, match.start() - 650)
+                end = min(len(html), match.end() + 1500)
+                snippet = html[start:end]
+                print(f"\n--- occurrence {index} ---\n{snippet}")
 
         print("\n=== APPROVED REFERENCE: CHOICE/RADIO CSS BLOCKS ===")
         css_chunks = re.findall(r"<style[^>]*>(.*?)</style>", html, flags=re.S | re.I)
         css = "\n".join(css_chunks)
-        for match in re.finditer(r"([^{}]*(?:radio|choice|segmented|gender)[^{}]*)\{([^{}]*)\}", css, flags=re.I):
-            selector = match.group(1).strip()
-            body = match.group(2).strip()
-            if selector and body:
-                print(f"{selector} {{{body}}}")
+        for selector_name in (
+            ".choice-row",
+            ".choice-btn",
+            ".choice-btn.active",
+            ".vertical-choices",
+            ".vertical-choice",
+            ".vertical-choice.active",
+            ".vertical-choice .radio-dot",
+            ".vertical-choice.active .radio-dot",
+            ".vertical-choice.active .radio-dot::after",
+        ):
+            match = re.search(re.escape(selector_name) + r"\s*\{([^{}]*)\}", css, flags=re.S)
+            if match:
+                print(f"{selector_name} {{{match.group(1).strip()}}}")
+            else:
+                print(f"{selector_name} NOT FOUND")
 
-        self.assertIn("جنسیت", html)
+        self.assertIn('class="choice-row"', html)
+        self.assertIn('class="vertical-choices"', html)
 
 
 if __name__ == "__main__":
