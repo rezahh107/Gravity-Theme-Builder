@@ -10,6 +10,8 @@ const SRWF_REGISTRATION_GTB_CAPABILITY = 'gravityforms_edit_forms';
 const SRWF_REGISTRATION_GTB_NONCE_ACTION = 'srwf_registration_gtb_theme_save';
 const SRWF_REGISTRATION_GTB_NONCE_NAME = 'srwf_registration_gtb_theme_nonce';
 
+require_once __DIR__ . '/srwf-registration-layout.php';
+
 function srwf_registration_gtb_role_definitions() {
     return array(
         'gender' => array( 'label' => 'Gender', 'token' => 'srwf-role-binary-choice', 'types' => array( 'radio' ), 'feature' => 'approved two-card Gender choice presentation' ),
@@ -474,6 +476,8 @@ function srwf_registration_gtb_settings_page() {
     echo '<a class="button" href="' . esc_url( $check_url ) . '">' . esc_html__( 'Check Again', 'gravity-theme-builder' ) . '</a></p>';
     echo '<p class="description">' . esc_html__( 'Recommended setup only prepares mappings that existing GTB semantic tokens prove unambiguously. Shared binary-choice roles are never guessed. Nothing changes in Gravity Forms until Save GTB Configuration succeeds.', 'gravity-theme-builder' ) . '</p>';
     echo '</form>';
+
+    srwf_registration_gtb_render_form_presentation_readiness( $form_id );
     GFFormSettings::page_footer();
 }
 add_action( 'gform_form_settings_page_' . SRWF_REGISTRATION_GTB_SETTINGS_VIEW, 'srwf_registration_gtb_settings_page' );
