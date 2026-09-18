@@ -57,16 +57,24 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     font-family: "Vazirmatn", system-ui, sans-serif;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section .gsection_title {
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gform_title {
+    font-family: "Vazirmatn", system-ui, sans-serif;
+}
+
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gfield--type-section .gsection_title {
     color: #172033;
-    font-family: inherit;
+    font-family: "Vazirmatn", system-ui, sans-serif;
     font-size: 18px;
     font-weight: 700;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gform-footer .gform_button,
-.gform-theme--framework.srwf-registration-theme_wrapper .gform_footer .gform_button {
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gform-footer .gform_button,
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gform_footer .gform_button {
     inline-size: 100%;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .ts-wrapper .ts-control {
+    min-block-size: var(--gf-ctrl-size);
 }
 
 .gform-theme--framework.srwf-registration-theme_wrapper input[type="tel"],
