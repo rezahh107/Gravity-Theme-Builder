@@ -28,8 +28,9 @@ jobs:
       - name: Run theme-local deterministic tests
         run: python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
 
-      - name: Check production delivery and authentic-order context regression
+      - name: Check production settings, delivery and authentic-order context regression
         run: |
+          php themes/srwf-registration/tests/test_form_settings.php
           php themes/srwf-registration/tests/test_delivery.php
           php themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 
@@ -39,7 +40,9 @@ jobs:
       - name: Check PHP syntax
         run: |
           php -l themes/srwf-registration/src/srwf-registration-theme.php
+          php -l themes/srwf-registration/src/srwf-registration-settings.php
           php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
+          php -l themes/srwf-registration/tests/test_form_settings.php
           php -l themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 
   exact-head-qualification:
@@ -66,8 +69,9 @@ jobs:
           node themes/srwf-registration/tests/test_diagnostic_v03.js
           node themes/srwf-registration/tests/test_admission_diagnostic_v032.js
 
-      - name: Check production, authentic-order context and diagnostic delivery
+      - name: Check production settings, authentic-order context and diagnostic delivery
         run: |
+          php themes/srwf-registration/tests/test_form_settings.php
           php themes/srwf-registration/tests/test_delivery.php
           php themes/srwf-registration/tests/test_entry_detail_early_sequence.php
           php themes/srwf-registration/tests/test_diagnostic_delivery.php
@@ -75,11 +79,15 @@ jobs:
       - name: Check PHP syntax
         run: |
           php -l themes/srwf-registration/src/srwf-registration-theme.php
+          php -l themes/srwf-registration/src/srwf-registration-settings.php
           php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
+          php -l themes/srwf-registration/tests/test_form_settings.php
           php -l themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 
       - name: Build and smoke-check exact-Head Owner packages
-        run: python3 themes/srwf-registration/tests/build_owner_test_packages.py "$RUNNER_TEMP/gtb-owner-test-packages"
+        run: |
+          python3 themes/srwf-registration/tests/build_owner_test_packages.py "$RUNNER_TEMP/gtb-owner-test-packages"
+          cat "$RUNNER_TEMP/gtb-owner-test-packages/GTB_SRWF_OWNER_TEST_PACKAGES_SHA256.txt"
 
       - name: Upload exact-Head Owner packages
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
