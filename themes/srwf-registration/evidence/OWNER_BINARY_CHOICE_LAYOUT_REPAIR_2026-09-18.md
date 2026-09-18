@@ -26,9 +26,9 @@ Only inside:
 
 GTB now establishes:
 
-- `.gfield_radio { display:flex; flex-direction:row; gap:12px; inline-size:100%; }`
-- each authentic `.gchoice` remains `flex:1 1 0; min-inline-size:0;`
-- each associated label fills its choice cell with `inline-size:100%`;
+- `.gfield_radio { display:flex; flex-direction:row; gap:12px; }`
+- each authentic `.gchoice` remains `flex:1 1 0; min-inline-size:0;`, which divides the available role-field width equally;
+- each associated label remains the existing block-level flex card, filling its flex item without a redundant width override;
 - native radio inputs, checked state, label association, focusability, keyboard navigation, required state, validation and conditional visibility remain Gravity Forms-owned.
 
 No generic `.gfield--type-radio`, `.gfield--choice-align-vertical`, `.gfield_radio` or `.gchoice` rule was added. Ordinary radio groups remain host-owned.
