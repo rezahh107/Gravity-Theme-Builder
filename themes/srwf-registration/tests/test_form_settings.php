@@ -249,6 +249,7 @@ $check_page = ob_get_clean();
 check( GFAPI::$update_calls === 0, 'Check Again mutated configuration' );
 check( strpos( $check_page, 'made no configuration changes' ) !== false, 'Check Again did not explain read-only behavior' );
 
+GFAPI::$forms[91] = $legacy;
 GFAPI::$update_calls = 0;
 $_GET = array( 'id' => '91' );
 $_POST = array( 'gtb_action' => 'recommend', SRWF_REGISTRATION_GTB_NONCE_NAME => 'nonce' );
