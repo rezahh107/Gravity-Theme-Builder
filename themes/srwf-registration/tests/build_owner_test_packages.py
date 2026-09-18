@@ -25,6 +25,7 @@ PRODUCTION_FILES = (
 DIAGNOSTIC_FILES = (
     'srwf-runtime-diagnostic.php',
     'assets/runtime-diagnostic.js',
+    'assets/binary-choice-geometry.js',
     'assets/admission-diagnostic.js',
 )
 
