@@ -25,14 +25,6 @@ jobs:
       - name: Verify admitted visual reference
         run: bash themes/srwf-registration/reference/materialize_reference.sh "$RUNNER_TEMP/OWNER_REFERENCE_new_7.html"
 
-      # Temporary audit-only artifact. Removed after the admitted HTML is inspected.
-      - name: Export admitted visual reference for audit
-        uses: actions/upload-artifact@v4
-        with:
-          name: srwf-visual-authority-audit
-          path: ${{ runner.temp }}/OWNER_REFERENCE_new_7.html
-          retention-days: 1
-
       - name: Run theme-local deterministic tests
         run: python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
 
