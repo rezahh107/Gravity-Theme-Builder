@@ -64,6 +64,7 @@ jobs:
       - name: Run explicit diagnostic JavaScript fixtures
         run: |
           node themes/srwf-registration/tests/test_diagnostic_v03.js
+          node themes/srwf-registration/tests/test_binary_choice_geometry.js
           node themes/srwf-registration/tests/test_admission_diagnostic_v032.js
 
       - name: Check production, authentic-order context and diagnostic delivery
