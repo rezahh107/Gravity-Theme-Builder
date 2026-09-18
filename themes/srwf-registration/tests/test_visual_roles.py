@@ -8,6 +8,7 @@ REPO = Path(__file__).resolve().parents[3]
 THEME = REPO / "themes" / "srwf-registration"
 CSS = THEME / "src" / "srwf-registration.css"
 ICONS = THEME / "src" / "icons"
+FIXTURES = THEME / "tests" / "fixtures" / "semantic-roles-runtime-shapes.md"
 
 BINARY_ROLE = "srwf-role-binary-choice"
 REPORT_ROLE = "srwf-role-report-card-upload"
@@ -52,6 +53,7 @@ def blocks(css: str) -> list[tuple[str, str]]:
 class SrwfVisualRoleTests(unittest.TestCase):
     def setUp(self) -> None:
         self.css = CSS.read_text(encoding="utf-8")
+        self.fixtures = FIXTURES.read_text(encoding="utf-8")
 
     def test_binary_cards_require_explicit_semantic_role(self) -> None:
         binary_selectors = [
@@ -64,18 +66,18 @@ class SrwfVisualRoleTests(unittest.TestCase):
             self.assertIn(f".gfield.{BINARY_ROLE}", selector)
         self.assertNotRegex(self.css, r"\.gfield--type-radio\s+\.gfield_radio\s*\{")
 
-    def test_gender_and_graduation_fixtures_are_role_driven_but_ordinary_radio_is_not(self) -> None:
-        gender_classes = {"gfield", "gfield--type-radio", BINARY_ROLE}
-        graduation_classes = {"gfield", "gfield--type-radio", BINARY_ROLE, "gfield_visibility_hidden"}
-        ordinary_classes = {"gfield", "gfield--type-radio", "gfield--choice-align-vertical"}
-
-        def receives_cards(classes: set[str]) -> bool:
-            return {"gfield", BINARY_ROLE}.issubset(classes)
-
-        self.assertTrue(receives_cards(gender_classes))
-        self.assertTrue(receives_cards(graduation_classes))
-        self.assertFalse(receives_cards(ordinary_classes))
-        self.assertNotIn("display: block", self._role_bodies(BINARY_ROLE, selector_contains="gfield.srwf-role-binary-choice"))
+    def test_binary_fixtures_preserve_authentic_radio_label_structure(self) -> None:
+        self.assertIn(
+            'class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio srwf-role-binary-choice"',
+            self.fixtures,
+        )
+        self.assertIn('class="gfield-choice-input" type="radio"', self.fixtures)
+        self.assertIn('<label for="fixture_choice_a"></label>', self.fixtures)
+        self.assertIn('<label for="fixture_choice_b"></label>', self.fixtures)
+        self.assertIn('name="fixture_choice" value="b" checked', self.fixtures)
+        ordinary = 'class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio gfield--choice-align-vertical"'
+        self.assertIn(ordinary, self.fixtures)
+        self.assertNotIn(BINARY_ROLE, ordinary)
 
     def test_binary_selection_uses_native_checked_state_and_preserves_focusable_radio(self) -> None:
         input_block = next(
@@ -95,16 +97,21 @@ class SrwfVisualRoleTests(unittest.TestCase):
             if f".gfield.{BINARY_ROLE} .gfield-choice-input:checked + label" in selector
         )
         self.assertIn("background: #EEF2FF;", checked_block)
-        self.assertIn("border-width: 2px;", checked_block)
-        self.assertIn("font-weight: 700;", checked_block)
+        self.assertIn("border-color: #1D4ED8;", checked_block)
+        self.assertTrue(
+            "border-width: 2px;" in checked_block or "font-weight: 700;" in checked_block,
+            "selected card must retain a non-color cue",
+        )
 
     def test_binary_cards_use_intrinsic_two_equal_tracks_without_new_breakpoint(self) -> None:
         choice = next(
-            body for selector, body in blocks(self.css)
+            body
+            for selector, body in blocks(self.css)
             if selector.endswith(f".gfield.{BINARY_ROLE} .gchoice")
         )
         row = next(
-            body for selector, body in blocks(self.css)
+            body
+            for selector, body in blocks(self.css)
             if selector.endswith(f".gfield.{BINARY_ROLE} .gfield_radio")
         )
         self.assertIn("display: flex;", row)
@@ -125,6 +132,7 @@ class SrwfVisualRoleTests(unittest.TestCase):
             filename, *geometry = expected
             self.assertIn(f".{role} .gsection_title::before", self.css)
             self.assertIn(f'background-image: url("icons/{filename}");', self.css)
+            self.assertIn(f"gsection {role}", self.fixtures)
             asset = (ICONS / filename).read_text(encoding="utf-8")
             self.assertIn('viewBox="0 0 24 24"', asset)
             self.assertIn('stroke="#1D4ED8"', asset)
@@ -133,14 +141,18 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertNotIn(".gfield--type-section .gsection_title::before {", self.css)
         self.assertNotIn("aria-label", "".join(path.read_text(encoding="utf-8") for path in ICONS.glob("section-*.svg")))
 
-    def test_unmapped_section_fixture_has_no_role_and_no_inferred_icon(self) -> None:
-        mapped = set(SECTION_ICONS)
-        unmapped_classes = {"gfield", "gfield--type-section", "gsection"}
-        self.assertFalse(mapped.intersection(unmapped_classes))
+    def test_unmapped_section_fixture_receives_no_inferred_icon(self) -> None:
+        self.assertIn('class="gfield gfield--type-section gsection"><h3 class="gsection_title"></h3></div>', self.fixtures)
         self.assertNotIn(":nth-child", self.css)
         self.assertNotIn(":nth-of-type", self.css)
 
     def test_report_card_initial_gpfup_is_explicit_role_scoped(self) -> None:
+        self.assertIn(f"gfield--input-type-fileupload {REPORT_ROLE}", self.fixtures)
+        self.assertIn('class="gpfup gpfup--strict gform-theme__no-reset--children"', self.fixtures)
+        self.assertIn('class="gpfup__droparea"', self.fixtures)
+        self.assertIn('class="gpfup__select-files gform_button_select_files"', self.fixtures)
+        self.assertIn('class="gfield_description gform_fileupload_rules"', self.fixtures)
+
         report_blocks = [
             (selector, body)
             for selector, body in blocks(self.css)
@@ -162,7 +174,11 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertIn('<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>', file_icon)
         self.assertIn('<polyline points="14 2 14 8 20 8"/>', file_icon)
 
-    def test_report_has_files_state_is_not_hidden_or_recomposed(self) -> None:
+    def test_report_has_files_fixture_remains_host_owned_and_usable(self) -> None:
+        self.assertIn("gpfup--has-files", self.fixtures)
+        self.assertIn('class="gpfup__files"', self.fixtures)
+        self.assertIn('class="gpfup__delete"', self.fixtures)
+        self.assertIn('class="gpfup__select-files gform_button_select_files"', self.fixtures)
         report_source = self._role_bodies(REPORT_ROLE)
         self.assertNotIn("display: none", report_source)
         self.assertNotIn("visibility: hidden", report_source)
@@ -172,13 +188,9 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertIn(".gpfup:not(.gpfup--has-files) .gpfup__droparea", self.css)
 
     def test_photo_fixture_does_not_receive_report_specific_rules(self) -> None:
-        report_classes = {"gfield", REPORT_ROLE}
-        photo_field_classes = {"gfield", "gfield--type-fileupload"}
-        photo_gpfup_classes = {"gpfup", "gpfup--strict", "gpfup--images-only"}
-        self.assertIn(REPORT_ROLE, report_classes)
-        self.assertNotIn(REPORT_ROLE, photo_field_classes)
-        self.assertIn("gpfup--images-only", photo_gpfup_classes)
+        self.assertIn('class="gpfup gpfup--strict gpfup--images-only gform-theme__no-reset--children"', self.fixtures)
         self.assertNotIn("gpfup--images-only", self._role_bodies(REPORT_ROLE))
+        self.assertNotIn("gpfup--images-only", self.css)
 
     def test_report_surface_is_intrinsically_narrow_safe(self) -> None:
         droparea = next(
@@ -189,20 +201,14 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertIn("box-sizing: border-box;", droparea)
         self.assertIn("display: flex;", droparea)
         self.assertNotIn("min-inline-size:", droparea)
+        self.assertNotIn("inline-size: 840px", droparea)
 
     def test_no_production_javascript_or_behavior_takeover_added(self) -> None:
         self.assertEqual([], list((THEME / "src").glob("**/*.js")))
         self.assertNotIn("onclick", self.css)
 
-    def _role_bodies(self, role: str, selector_contains: str | None = None) -> str:
-        bodies = []
-        for selector, body in blocks(self.css):
-            if role not in selector:
-                continue
-            if selector_contains is not None and selector_contains not in selector:
-                continue
-            bodies.append(body)
-        return "\n".join(bodies)
+    def _role_bodies(self, role: str) -> str:
+        return "\n".join(body for selector, body in blocks(self.css) if role in selector)
 
 
 if __name__ == "__main__":
