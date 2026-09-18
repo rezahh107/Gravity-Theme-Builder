@@ -29,6 +29,8 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     --gf-ctrl-size: 52px;
     --gf-ctrl-font-size: 16px;
     --gf-ctrl-font-weight: 400;
+    --gf-ctrl-choice-size: 20px;
+    --gf-ctrl-radio-check-size: 10px;
 
     --gf-ctrl-label-color-primary: #172033;
     --gf-ctrl-label-font-size-primary: 15px;
@@ -99,12 +101,6 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
  * explicitly excluded because Gender and Graduation Status use the separate two-card row.
  * The authentic Gravity Forms radio remains the checked/focus/keyboard authority.
  */
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) {
-    --gf-ctrl-choice-size: 20px;
-    --gf-ctrl-radio-check-size: 10px;
-    --gf-ctrl-border-width: 2px;
-}
-
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) .gfield_radio {
     display: flex;
     flex-direction: column;
@@ -144,6 +140,12 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     inline-size: var(--gf-ctrl-choice-size);
     block-size: var(--gf-ctrl-choice-size);
     margin: 0;
+    border-width: 2px;
+    border-color: #8690A1;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) .gfield-choice-input:checked {
+    border-color: #1D4ED8;
 }
 
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) .gchoice:has(.gfield-choice-input:checked) {
