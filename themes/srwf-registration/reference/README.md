@@ -1,15 +1,16 @@
 # SRWF Registration — Admitted Visual Reference
 
-Status: **APPROVED TARGET + CURRENT OWNER VISUAL CONTRACT REVISION ADMITTED**
+Status: **APPROVED TARGET + CURRENT OWNER RECONCILIATION ADMITTED**
 
 This directory contains the visual authority package for the first Gravity Theme Builder reference implementation.
 
 ## Mandatory read order for SRWF visual work
 
-1. `VISUAL_AUTHORITY.md` — authority registry, exact-target interpretation, v1.0.0 → v1.0.1 relationship, and deviation gate.
-2. `SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md` — current exact Owner revision, including the 2026-09-18 resolution in §27.
-3. `materialize_reference.sh` — reconstructs and verifies the exact approved artifact.
-4. Inspect the materialized `OWNER_REFERENCE_new_7.html` before implementation decisions that depend on composition/state or exact SVG geometry.
+1. `VISUAL_AUTHORITY.md` — authority registry, current-vs-historical interpretation, provenance limits, and deviation gate.
+2. `SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md` — **current Owner-supplied destination authority** for the decisions it resolves.
+3. `SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md` — exact historical Drive-backed Owner revision retained byte-for-byte for provenance and inherited rules not superseded by the current reconciliation.
+4. `materialize_reference.sh` — reconstructs and verifies the exact approved artifact.
+5. Inspect the materialized `OWNER_REFERENCE_new_7.html` before implementation decisions that depend on composition/state or exact SVG geometry.
 
 Do not begin SRWF visual implementation from memory, screenshots in another conversation, current CSS, or a newly invented visual specification.
 
@@ -29,8 +30,6 @@ These parts concatenate to the Base64 encoding of a deterministic `gzip -n` arch
 bash themes/srwf-registration/reference/materialize_reference.sh
 ```
 
-The script verifies both payload stages.
-
 Identity:
 
 ```text
@@ -42,60 +41,48 @@ html_title: SRWF Student Registration — Final Contract-Corrected Mockup Set (v
 visual_state: CLOSED
 ```
 
-The split storage format does **not** alter the design artifact. Successful materialization reproduces the exact admitted HTML bytes identified by the source SHA-256 above.
+Successful materialization must reproduce those exact bytes. The artifact remains the approved composition/state target and exact geometry source where the authority chain explicitly uses it.
 
-## Visual/UX Contract provenance
+## Historical exact contract provenance
 
-The historical/base contract remains registered for provenance:
+The historical/base contract remains registered as `VA:VC-1.0.0`.
 
-```text
-authority_id: VA:VC-1.0.0
-repository: rezahh107/Gravity-Presentation-Profiles
-path: docs/visual/SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.0.md
-blob_sha: 7400b7d0f97f245f090fd84893deb62c3ec83956
-```
-
-The current implementation authority is the later Owner revision admitted locally:
+The later Drive-backed v1.0.1 revision remains registered as `VA:VC-1.0.1` with its exact admitted identity:
 
 ```text
-authority_id: VA:VC-1.0.1
 path: SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md
+repository_blob_sha: 3fac5772cbe356965d98de64950ef0fbec8d7f21
 upstream_google_drive_file_id: 1t0fDtg-hnq5iHiLIO0wMJyTvOc-dVf4AJ2ULfYdfLgQ
 upstream_revision_id: 3
 upstream_revision_modified_at: 2026-09-18T05:25:12.441Z
 upstream_text_plain_export_sha256: 032750fc4ae763b45b2fb136fc56b4543f38b9638617563d4082993a0cf54f58
-status: OWNER_APPROVED_VISUAL_AUTHORITY__EXPLICIT_RESOLUTION_STATES__RUNTIME_VALIDATION_REQUIRED
 ```
 
-The upstream Drive display title was not renamed when the Owner revised the content; revision 3 itself self-identifies as **Visual / UX Contract v1.0.1**. `VISUAL_AUTHORITY.md` records the repository blob identity of the admitted copy and the exact relationship to v1.0.0.
+That file is intentionally not rewritten. Its prior `NOT_PROVEN`, `NON_NORMATIVE_REFERENCE`, and below-input decisions are historical where the current Owner reconciliation explicitly supersedes them.
 
-Section 27 resolves only the explicitly named binary-choice, Report Card initial upload, Student Photo uploaded destination, and mapped section-icon fragments. Previously unresolved breakpoint, pairing, shadow, title/help/error sizing, rhythm, focus geometry/alpha, crop configuration and runtime-only facts remain unresolved.
+## Current Owner reconciliation
 
-For exact canonical visual values and explicit `NOT_PROVEN` / `NON_NORMATIVE_REFERENCE` states, the current registered contract revision governs. The HTML remains the exact approved composition/state target and the geometry source where §27 explicitly makes an artifact fragment implementation-driving.
+Current project authority for the newly finalized destination is:
 
-This is a domain-scoped visual relationship. It does not import the old repository's engineering architecture or create a cross-domain authority order in Gravity Theme Builder.
+```text
+authority_handle: OWNER:SRWF-2026-09-19
+path: SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md
+provenance: direct Owner-supplied project authority for this execution
+immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR
+```
+
+No new Drive revision/hash is claimed or fabricated. The reconciliation resolves, among other items, the `960px` production breakpoint, host-owned desktop pairings, no-shadow desktop card geometry, exact title/helper/error/rhythm/focus values, and Gravity Forms recommended above-input description/validation/sub-label placement.
+
+Those decisions define **WHAT / acceptance**. They do not prove that the current production CSS implements them, and this foundation batch intentionally does not perform the broad visual rewrite.
 
 ## Exact-reproduction rule
 
-For this first reference theme, the approved artifact is **the implementation target itself**.
-
-It is not:
-
-- inspiration;
-- a loose reference;
-- a redesign brief;
-- permission to modernize, simplify, embellish, or substitute a different design system.
-
-The implementation should make the real Gravity Forms registration surface look like the approved design as faithfully as the supported runtime permits.
-
-Read `VISUAL_AUTHORITY.md` for the complete lock and deviation rules.
+For this first reference theme, the approved artifact plus current Owner authority define the implementation target. This is not inspiration, a redesign brief, or permission to modernize/simplify the design.
 
 ## Behavior firewall
 
-The HTML contains demo/interactivity code used to illustrate visual states. Demo behavior is not production behavior authority.
-
-Gravity Forms and the required add-ons remain responsible for actual validation, conditional logic, submission, search, upload/crop lifecycle, semantics, and persistence. Implement the appearance of authentic host states; do not copy the mockup's simulated behavior into production merely because it appears in the reference.
+Gravity Forms and required add-ons remain responsible for actual validation, conditional logic, submission, search, upload/crop lifecycle, semantics, and persistence. Implement the appearance of authentic host states; do not copy mockup simulation behavior into production.
 
 ## Scope isolation
 
-Do not substitute or mix in the separate Gravity Flow Inbox, Entry Detail, or Print/Dossier visual references. They are different surfaces and are outside this theme's visual authority.
+Do not substitute or mix in the separate Gravity Flow Inbox, Entry Detail, or Print/Dossier visual references. They are different surfaces and outside this theme's visual authority.
