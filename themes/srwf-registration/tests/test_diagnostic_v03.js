@@ -83,14 +83,116 @@ const ruleStyle = {
     getPropertyValue: (property) => property === 'inline-size' ? 'var(--gf-local-width)' : '',
     getPropertyPriority: () => ''
 };
-const docForCascade = {
-    styleSheets: [{ ownerNode: { id: 'gravity_forms_theme_framework-css', href: 'https://example.test/gf.css' }, cssRules: [{ selectorText: '.other, .gform-theme--framework .gform_button', style: ruleStyle }] }],
-    baseURI: 'https://example.test/'
+function styleRule(selector = '.gform-theme--framework .gform_button') {
+    return { selectorText: selector, style: ruleStyle };
+}
+function groupRule(constructorName, conditionText, cssRules) {
+    const rule = { constructor: { name: constructorName }, cssRules };
+    if (constructorName === 'CSSMediaRule') {
+        rule.media = { mediaText: conditionText };
+    } else if (conditionText !== null && conditionText !== undefined) {
+        rule.conditionText = conditionText;
+    }
+    return rule;
+}
+function cascadeDocument(rules) {
+    return {
+        styleSheets: [{ ownerNode: { id: 'gravity_forms_theme_framework-css', href: 'https://example.test/gf.css' }, cssRules: rules }],
+        baseURI: 'https://example.test/'
+    };
+}
+const cascadeView = {
+    getComputedStyle: () => style,
+    matchMedia: (query) => ({ matches: query === '(min-width: 1px)' }),
+    CSS: { supports: (condition) => condition === '(display: grid)' }
 };
-const cascade = api.collectMatchedCascade(submit, docForCascade, view);
-assert.strictEqual(cascade.matchedRules.length, 1, 'matched cascade branch not captured');
-assert.strictEqual(cascade.matchedRules[0].selectorBranch, '.gform-theme--framework .gform_button', 'collector stored wrong selector branch');
-assert.strictEqual(cascade.matchedRules[0].declarations['inline-size'].declared, 'var(--gf-local-width)');
+
+// Positive control: top-level selector-list splitting remains unchanged.
+const unconditional = api.collectMatchedCascade(
+    submit,
+    cascadeDocument([styleRule('.other, .gform-theme--framework .gform_button')]),
+    cascadeView
+);
+assert.strictEqual(unconditional.matchedRules.length, 1, 'unconditional matched cascade branch not captured');
+assert.strictEqual(unconditional.matchedRules[0].selectorBranch, '.gform-theme--framework .gform_button', 'collector stored wrong selector branch');
+assert.strictEqual(unconditional.matchedRules[0].declarations['inline-size'].declared, 'var(--gf-local-width)');
+assert.deepStrictEqual(unconditional.matchedRules[0].applicabilityContext, [], 'top-level rule gained synthetic condition context');
+
+// Definitely false media descendants must never look active merely because the selector matches.
+const falseMedia = api.collectMatchedCascade(
+    submit,
+    cascadeDocument([groupRule('CSSMediaRule', '(max-width: 0px)', [styleRule()])]),
+    cascadeView
+);
+assert.strictEqual(falseMedia.matchedRules.length, 0, 'inactive media descendant was promoted into matchedRules');
+assert.strictEqual(falseMedia.conditionalContexts.length, 1, 'inactive media context not reported');
+assert.strictEqual(falseMedia.conditionalContexts[0].state, 'INACTIVE');
+
+// Definitely active media remains collectible and carries its proven applicability context.
+const activeMedia = api.collectMatchedCascade(
+    submit,
+    cascadeDocument([groupRule('CSSMediaRule', '(min-width: 1px)', [styleRule()])]),
+    cascadeView
+);
+assert.strictEqual(activeMedia.matchedRules.length, 1, 'active media descendant was incorrectly excluded');
+assert.strictEqual(activeMedia.conditionalContexts[0].state, 'ACTIVE');
+assert.strictEqual(activeMedia.matchedRules[0].applicabilityContext.length, 1, 'active media context was not preserved on matched evidence');
+assert.strictEqual(activeMedia.matchedRules[0].applicabilityContext[0].kind, 'media');
+
+// A safely evaluated false @supports-equivalent context is excluded.
+const falseSupports = api.collectMatchedCascade(
+    submit,
+    cascadeDocument([groupRule('CSSSupportsRule', '(display: impossible-value)', [styleRule()])]),
+    cascadeView
+);
+assert.strictEqual(falseSupports.matchedRules.length, 0, 'inactive supports descendant was promoted into matchedRules');
+assert.strictEqual(falseSupports.conditionalContexts[0].state, 'INACTIVE');
+
+// Unassessable applicability fails closed but remains explicit bounded evidence.
+const unknownContainer = api.collectMatchedCascade(
+    submit,
+    cascadeDocument([groupRule('CSSContainerRule', '(width > 10px)', [styleRule()])]),
+    cascadeView
+);
+assert.strictEqual(unknownContainer.matchedRules.length, 0, 'unknown container descendant was promoted into matchedRules');
+assert.strictEqual(unknownContainer.conditionalContexts.length, 1, 'unknown conditional context was silently dropped');
+assert.strictEqual(unknownContainer.conditionalContexts[0].state, 'UNKNOWN');
+assert.strictEqual(unknownContainer.conditionalContexts[0].kind, 'container');
+assert.ok(unknownContainer.conditionalContexts.length <= api.BUDGETS.conditionalContexts, 'conditional context evidence escaped budget');
+
+// Nested applicability is conjunctive: one inactive or unknown ancestor is enough to fail closed.
+const nestedInactive = api.collectMatchedCascade(
+    submit,
+    cascadeDocument([
+        groupRule('CSSMediaRule', '(min-width: 1px)', [
+            groupRule('CSSSupportsRule', '(display: impossible-value)', [styleRule()])
+        ])
+    ]),
+    cascadeView
+);
+assert.strictEqual(nestedInactive.matchedRules.length, 0, 'nested inactive condition failed open');
+assert.deepStrictEqual(nestedInactive.conditionalContexts.map((item) => item.state), ['ACTIVE', 'INACTIVE']);
+
+const nestedUnknown = api.collectMatchedCascade(
+    submit,
+    cascadeDocument([
+        groupRule('CSSMediaRule', '(min-width: 1px)', [
+            groupRule('CSSScopeRule', null, [styleRule()])
+        ])
+    ]),
+    cascadeView
+);
+assert.strictEqual(nestedUnknown.matchedRules.length, 0, 'nested unknown condition failed open');
+assert.deepStrictEqual(nestedUnknown.conditionalContexts.map((item) => item.state), ['ACTIVE', 'UNKNOWN']);
+
+// Unconditional grouping such as @layer remains transparent without losing active ancestors.
+const layerGroup = api.collectMatchedCascade(
+    submit,
+    cascadeDocument([groupRule('CSSLayerBlockRule', null, [styleRule()])]),
+    cascadeView
+);
+assert.strictEqual(layerGroup.matchedRules.length, 1, 'unconditional grouping was not traversed');
+assert.strictEqual(layerGroup.conditionalContexts.length, 0, 'unconditional grouping was mislabeled as conditional evidence');
 
 const appended = [];
 const buttonDoc = {
