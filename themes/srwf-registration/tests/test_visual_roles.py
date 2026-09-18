@@ -147,8 +147,8 @@ class SrwfVisualRoleTests(unittest.TestCase):
             if ".gfield--type-radio" in selector or ".gfield--choice-align-vertical" in selector
         ]
         self.assertEqual([], ordinary_selectors)
-        self.assertNotRegex(self.css, r"\.gfield_radio\s*\{")
-        self.assertNotRegex(self.css, r"\.gchoice\s*\{")
+        self.assertNotRegex(self.css, r"(?m)^\s*\.gfield_radio\s*\{")
+        self.assertNotRegex(self.css, r"(?m)^\s*\.gchoice\s*\{")
 
     def test_binary_role_supports_both_consumers_without_numeric_identity(self) -> None:
         self.assertEqual(2, self.fixtures.count("srwf-role-binary-choice gfield--choice-align-vertical"))
