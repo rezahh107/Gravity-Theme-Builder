@@ -4,11 +4,12 @@ The first real presentation implementation is theme-local under `src/`. It is no
 
 ### Install-required source tree
 
-The production CSS has local runtime dependencies. Install/copy the **complete `src/` tree as one WordPress plugin directory**, not only the PHP and CSS files:
+The production CSS has local runtime dependencies and the plugin now includes the native per-form GTB Theme configuration surface. Install/copy the **complete `src/` tree as one WordPress plugin directory**:
 
 ```text
 src/
 ├── srwf-registration-theme.php
+├── srwf-registration-settings.php
 ├── srwf-registration.css
 └── icons/
     ├── report-card-file.svg
@@ -19,24 +20,56 @@ src/
     └── section-student-photo.svg
 ```
 
-The relative `url("icons/...")` references in `srwf-registration.css` resolve from the stylesheet location. Omitting or relocating any referenced SVG breaks that production presentation dependency. The deterministic test suite enumerates local CSS URL dependencies and fails when a referenced local asset does not resolve inside this installable tree.
+The relative `url("icons/...")` references in `srwf-registration.css` resolve from the stylesheet location. Omitting or relocating any referenced SVG breaks that production presentation dependency. The deterministic package test enumerates local CSS URL dependencies and fails when a referenced local asset does not resolve inside the installable tree.
 
-### Activation
+### Per-form activation and guided setup
 
-The implementation uses Gravity Forms' own supported extension points rather than registering a parallel renderer:
+Normal operation no longer requires the Owner to type or maintain GTB-owned Custom CSS Class tokens manually.
 
 1. install/activate the complete `src/` tree described above;
-2. on the intended SRWF form only, set **Form Settings → Form Layout → CSS Class Name** to `srwf-registration-theme`;
-3. configure the documented semantic field/section Custom CSS Classes from `../IMPLEMENTATION_MAP.md` on the intended real fields/Section Breaks;
-4. keep **Description Placement** and **Validation Message Placement** below inputs and enable the authentic Gravity Forms **Validation Summary** per the approved visual contract.
+2. open **Gravity Forms → the intended form → Settings → GTB Theme**;
+3. enable **SRWF Registration** and map each semantic role to a compatible real field/Section Break;
+4. click **Save GTB Configuration** to validate the whole requested mapping, store the bounded per-form configuration and project GTB-owned tokens;
+5. use **Check Again** as a read-only verification step;
+6. keep authentic Gravity Forms **Description Placement** and **Validation Message Placement** below inputs and enable the Gravity Forms **Validation Summary** according to the approved visual contract.
+
+The page uses current Gravity Forms field labels only so the Owner can recognize real host objects. Labels, admin labels, DOM position and field order are never used to infer semantic identity. Candidate selectors are filtered by authentic host type: the two binary roles accept Radio fields, Report Card accepts File Upload fields, and section-icon roles accept Section Breaks.
+
+The stored per-form record is `gtb_srwf_registration`. It keeps SRWF enablement and separate semantic slots for Gender, Graduation Status, Report Card, and the five section roles. Numeric field IDs are only references inside that form configuration; they are not CSS selectors, public theme identity, durable visual-contract identity, or a hard-coded Form 11 path.
+
+### Token projection and preservation
+
+The semantic GTB classes remain the durable presentation contract consumed by the existing CSS. **Save GTB Configuration** projects them into Gravity Forms form/field `cssClass` values.
+
+GTB projection:
+
+- adds/removes only `srwf-registration-theme` and the documented GTB-owned role tokens;
+- preserves unrelated form/field class tokens;
+- normalizes class whitespace only during explicit Save;
+- avoids duplicate tokens and is idempotent across repeated Save;
+- removes stale GTB-owned role tokens when a mapping moves;
+- preserves a shared token when another configured role still legitimately requires it;
+- validates the complete request before calling the Gravity Forms update API;
+- never rewrites classes merely because the settings page or frontend form rendered.
+
+The **Apply Recommended SRWF Configuration** action prepares only mappings supported by unambiguous existing GTB semantic-token evidence. It does not guess the two binary-choice roles from labels or from their shared token, and it does not persist anything until **Save GTB Configuration** succeeds.
+
+Readiness fails closed:
+
+- `DISABLED` — SRWF Registration is disabled and its activation token is absent;
+- `NEEDS SETUP` — enabled, but one or more required semantic roles are still unmapped;
+- `ATTENTION REQUIRED` — a mapped host object is missing/incompatible or the saved configuration and projected owned tokens disagree;
+- `READY` — all required mappings are valid and exact GTB-owned projection matches the saved configuration.
+
+**Check Again** only re-reads current state. It does not repair or mutate the form.
+
+### Runtime presentation and rendering-context ownership boundary
 
 The stored `srwf-registration-theme` class establishes **form identity only**. Production presentation is admitted only when that identity is present **and** the current rendering context permits Registration ownership. Normal Registration, validation rerenders and legitimate Registration AJAX renders remain admitted. Gravity Flow Entry Detail is excluded without mutating the stored form class.
 
 For an admitted Registration render, the integration selects the `orbital` form theme through `gform_form_theme_slug` and enqueues the stylesheet through `gform_enqueue_scripts`. Unrelated forms and context-excluded renders are left untouched. Non-token layout, direction, and presentation adapters remain under `.gform-theme--framework.srwf-registration-theme_wrapper`.
 
-### Rendering-context ownership boundary
-
-Gravity Flow Entry Detail may render the same underlying Gravity Forms form while preserving its configured `cssClass`. GTB therefore keeps form identity and rendering-context ownership as separate predicates and combines them only at presentation admission.
+Gravity Flow Entry Detail may render the same underlying Gravity Forms form while preserving its configured `cssClass`. GTB therefore keeps form identity and rendering-context ownership as separate predicates and combines them only at presentation admission. The GTB Theme settings feature does not inspect GPP and does not weaken this boundary.
 
 #### PR #12: useful classification, insufficient timing
 
@@ -60,7 +93,7 @@ GTB does not parse `$_GET`, URLs, query strings, page IDs, numeric form IDs, lab
 
 Once the corresponding Gravity Flow post-enqueue action has fired, the early phase is over. This is deliberately **not** a request-wide monotonic suppression. A later independent Registration render in the same request is not suppressed merely because Gravity Flow performed its earlier enqueue work.
 
-The existing primary-content before/after depth counter remains request-local and depth-safe for the later Entry Detail render itself. Nothing is persisted in options, transients, user meta, cookies, form configuration, or entry data.
+The existing primary-content before/after depth counter remains request-local and depth-safe for the later Entry Detail render itself. Nothing is persisted in options, transients, user meta, cookies, form configuration, or entry data by this context classifier.
 
 If Gravity Flow is absent, the early predicate fails closed and normal Registration admission is unchanged. GPP is neither detected nor required.
 
@@ -98,20 +131,7 @@ Gravity Forms theme-layer Asset Enqueue Output Engine SHA-256:
 0a8b62457eba016c1bb0837cb516b8e30fe45e717ab5113d238d1e689a541795
 ```
 
-The pinned source order that confirms the root cause and repair is:
-
-1. Gravity Flow `3.1.0` registers `enqueue_frontend_scripts()` on `wp_enqueue_scripts` at priority `10` (`class-gravity-flow.php`, line 459).
-2. When a Gravity Flow shortcode/block is present, `enqueue_frontend_scripts()` calls `enqueue_form_scripts()` **before** firing `gravityflow_enqueue_frontend_scripts` (`class-gravity-flow.php`, lines 1137–1174; form enqueue at 1144, post-enqueue action at 1172).
-3. Gravity Flow's `enqueue_form_scripts()` obtains the current form and calls `GFFormDisplay::enqueue_form_scripts( $form )` (`class-gravity-flow.php`, lines 7018–7034).
-4. Gravity Forms `3.1.1.1` fires `gform_enqueue_scripts` from `GFFormDisplay::enqueue_form_scripts()` at `form_display.php` line 3392.
-5. The Gravity Forms Theme Layer registers a `gform_enqueue_scripts` callback at priority `1000`; its style path calls `GFFormDisplay::get_themes_to_enqueue()`, which reaches `gform_form_theme_slug` when the host does not already classify the surface as native GF Entry Detail.
-6. Only later, while the Gravity Flow shortcode renders Entry Detail, `gravityflow_entry_detail_content_before` fires in `includes/pages/class-entry-detail.php` line 139. Therefore PR #12's content bracket cannot prevent the earlier Flow-triggered Gravity Forms enqueue.
-7. Gravity Flow's own `is_workflow_detail_page()` predicate requires the host's workflow-detail route state. Standard Inbox detail URLs generated by `includes/pages/class-inbox.php` append both form and entry identity to the host detail base URL, so the predicate is satisfied on the standard query-driven Entry Detail path that triggers the early enqueue.
-8. An Entry Detail rendered from a shortcode/block `entry_id` attribute without the standard query identity does not give `get_current_form()` an early form to enqueue; its later form render remains covered by the existing content bracket.
-
-`gravityflow_entry_detail_args`, permission filters, `gravityflow_inbox_entry_detail_pre_process`, and the content-before hook are all later than the front-end `wp_enqueue_scripts` phase and therefore cannot, by themselves, prevent the Owner-observed early enqueue.
-
-This mechanism is intentionally version-bounded to the inspected Gravity Flow `3.1.0` / Gravity Forms `3.1.1.1` call order. A future host version that changes this ordering or route predicate must be requalified. The repaired boundary is not yet `RUNTIME_PROVEN` on the Owner site.
+The pinned source order confirms that Gravity Flow performs form-script/theme enqueue work before the later Entry Detail content bracket. The repaired early boundary remains version-bounded to the inspected Gravity Flow `3.1.0` / Gravity Forms `3.1.1.1` call order and still needs the Owner runtime recheck.
 
 ### Host stylesheet order contract
 
@@ -119,7 +139,7 @@ For admitted Registration renders, the SRWF stylesheet remains a WordPress depen
 
 `gravity_forms_orbital_theme -> srwf-registration-theme`
 
-This preserves the previously runtime-proven Registration ordering repair. The Entry Detail isolation fix prevents GTB admission earlier; it does not dequeue Gravity Forms assets, fight the host cascade, or introduce `!important`.
+This preserves the previously runtime-proven Registration ordering repair. Entry Detail isolation prevents GTB admission earlier; it does not dequeue Gravity Forms assets, fight the host cascade, or introduce `!important`.
 
 The hook priority remains `20`; stylesheet order correctness does not depend on that priority. No GPP class or stylesheet is an activation, dependency, rendering-context detector, or visual-authority requirement.
 
@@ -143,13 +163,15 @@ Run deterministic checks with:
 ```bash
 bash themes/srwf-registration/reference/materialize_reference.sh /tmp/OWNER_REFERENCE_new_7.html
 python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
+php themes/srwf-registration/tests/test_form_settings.php
 php themes/srwf-registration/tests/test_delivery.php
 php themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 php themes/srwf-registration/tests/test_diagnostic_delivery.php
 node themes/srwf-registration/tests/test_diagnostic_v03.js
 node themes/srwf-registration/tests/test_admission_diagnostic_v032.js
 php -l themes/srwf-registration/src/srwf-registration-theme.php
+php -l themes/srwf-registration/src/srwf-registration-settings.php
 php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
 ```
 
-These checks are repository/static/source-qualification evidence only. They do not qualify the repaired rendering-context boundary against the Owner WordPress + Gravity Forms + Gravity Flow runtime.
+These checks are repository/static/source-qualification evidence only. They do not qualify the new admin settings surface or the repaired rendering-context boundary against the Owner WordPress + Gravity Forms + Gravity Flow runtime.
