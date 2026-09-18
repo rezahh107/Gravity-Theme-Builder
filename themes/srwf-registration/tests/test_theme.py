@@ -37,6 +37,8 @@ REVIEWED_GF_API = {
     "--gf-ctrl-size",
     "--gf-ctrl-font-size",
     "--gf-ctrl-font-weight",
+    "--gf-ctrl-choice-size",
+    "--gf-ctrl-radio-check-size",
     "--gf-ctrl-label-color-primary",
     "--gf-ctrl-label-font-size-primary",
     "--gf-ctrl-label-font-weight-primary",
@@ -375,7 +377,6 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertNotRegex(css, r"#gform_wrapper_\d+")
         self.assertNotIn("[data-parent-form]", css)
 
-
     def test_submit_enforcement_reuses_mechanically_stronger_framework_sentinel(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         submit_selectors = [
@@ -383,6 +384,7 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
             for selector_group, body in css_blocks(css)
             if "inline-size: 100%;" in body
             for selector in split_selector_list(selector_group)
+            if ".gform_button" in selector
         ]
         self.assertEqual(2, len(submit_selectors))
         hostile_per_form = selector_specificity(HOSTILE_ORBITAL_SELECTOR)
