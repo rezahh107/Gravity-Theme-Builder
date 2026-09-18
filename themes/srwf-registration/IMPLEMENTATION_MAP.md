@@ -18,6 +18,10 @@ Current Owner-supplied project authority for the newly resolved destination is `
 
 `VA:VC-1.0.1` remains valid historical/inherited authority where it is not superseded. `OWNER:SRWF-2026-09-19` governs the explicitly reconciled breakpoint, layout ownership, desktop card, title/helper/error/rhythm/focus, placement, required indication, binary dimensions/tint, section tile dimensions, upload dimensions, and accessibility acceptance.
 
+### Historical resolution-state preservation
+
+The exact v1.0.1 predecessor intentionally preserves earlier resolution labels such as `NOT_PROVEN`, `NON_NORMATIVE_REFERENCE`, `DEFER_NOT_PROVEN`, and `RUNTIME_REQUIRED`. They remain provenance/history, not current destination truth where `OWNER:SRWF-2026-09-19` explicitly resolves the question. In particular, the historical **Desktop short-field pairings** and **Desktop shadow** states are now superseded by the Owner-authorized host-owned pairing rule and no-shadow card destination. This distinction prevents future work from treating old unresolved markers as current while preserving why earlier implementation intentionally deferred them.
+
 ## Implementation traceability
 
 | Requirement | Current destination | Authority locator | Mechanism / ownership | Current disposition |
@@ -62,7 +66,7 @@ Current Owner-supplied project authority for the newly resolved destination is `
 | Graduation Status binary card role | same family only when explicitly mapped and host reveals field | `VA:VC-1.0.1` §27 `graduation_status_binary_choice` + `VA:ARTIFACT` + `OWNER:SRWF-2026-09-19` | same explicit token; conditional logic host-owned | PR #15 behavior preserved |
 | Section iconography | exact artifact geometry on explicitly mapped Section Break roles; tile `40×40`, radius `10`, icon `20`, tint `#EDF1FC` | `VA:VC-1.0.1` §27 `section_heading_iconography` + `VA:ARTIFACT` + `OWNER:SRWF-2026-09-19` | mapped role token + local SVG | geometry current; new tile dimensions `NEXT_VISUAL_BATCH` |
 | Report Card initial GPFUP | compact dashed initial surface; current destination min `96px`, pad `16px`, radius `12px`, border `#8690A1` | `VA:VC-1.0.1` §27 `report_card_upload_initial` + `VA:ARTIFACT` + `OWNER:SRWF-2026-09-19` | `srwf-role-report-card-upload` + authentic GPFUP state | existing bounded adapter preserved; new exact dimensions `NEXT_VISUAL_BATCH` |
-| Report Card `.gpfup--has-files` | preserve authentic uploaded row/info/delete | `VA:VC-1.0.1` §§19,27 host-owned GPFUP lifecycle | initial styling stops at authentic uploaded state | regression target |
+| Report Card `.gpfup--has-files` | preserve authentic uploaded row/info/delete | `VA:VC-1.0.1` §§19,27 host-owned GPFUP lifecycle | initial styling stops at authentic uploaded state | `AUTHENTIC_RUNTIME_PROVEN_HOST_STATE`; regression target |
 | Student Photo post-upload | approved destination only over authentic GPFUP states; crop ratio/dimensions host-owned | `VA:VC-1.0.1` §27 `student_photo_uploaded_state` + `VA:ARTIFACT` + `OWNER:SRWF-2026-09-19` | none until authentic state/DOM is qualified | `OWNER_RUNTIME_REQUIRED / NOT_IMPLEMENTED` |
 
 ## Exact section/icon mapping
