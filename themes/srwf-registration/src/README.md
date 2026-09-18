@@ -48,7 +48,7 @@ The same GTB Theme page now reports the host-owned Form Layout destination:
 - Validation Summary: `true`;
 - Required Field Indicator: `asterisk`.
 
-This supersedes the older below-input placement choice.
+Together these placement values establish the intended **above-input** presentation where Gravity Forms supports that placement. This supersedes the older below-input placement choice.
 
 **Apply Recommended SRWF Form Layout** is a separate explicit action. It re-reads the current full Form Object at mutation time, computes only the six-property diff, performs no write if already matching, changes only those six properties, calls `GFAPI::update_form()`, then re-reads and verifies persistence. `customRequiredIndicator` and unrelated form properties are preserved.
 
