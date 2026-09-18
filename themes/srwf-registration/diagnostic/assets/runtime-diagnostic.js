@@ -83,6 +83,8 @@
         submitAncestorDepth: 8,
         cssRuleVisits: 4000,
         matchedCascadeRules: 96,
+        conditionalContexts: 96,
+        groupingContextDepth: 24,
         unrelatedForms: 8
     });
 
@@ -473,21 +475,144 @@
         };
     }
 
+    function groupingRuleKind(rule) {
+        var constructorName = rule && rule.constructor && typeof rule.constructor.name === 'string' ? rule.constructor.name : '';
+        if (rule && rule.media && typeof rule.media.mediaText === 'string') {
+            return 'media';
+        }
+        if (constructorName === 'CSSMediaRule') { return 'media'; }
+        if (constructorName === 'CSSSupportsRule') { return 'supports'; }
+        if (constructorName === 'CSSContainerRule') { return 'container'; }
+        if (constructorName === 'CSSScopeRule') { return 'scope'; }
+        if (constructorName === 'CSSStartingStyleRule') { return 'starting-style'; }
+        if (constructorName === 'CSSDocumentRule' || constructorName === 'CSSMozDocumentRule') { return 'document'; }
+        if (constructorName === 'CSSLayerBlockRule') { return 'layer'; }
+        if (constructorName === 'CSSKeyframesRule' || constructorName === 'WebKitCSSKeyframesRule') { return 'non-selector-group'; }
+        return 'unknown-group';
+    }
+
+    function groupingConditionText(rule, kind) {
+        var text = '';
+        if (kind === 'media' && rule && rule.media && typeof rule.media.mediaText === 'string') {
+            text = rule.media.mediaText;
+        } else if (rule && typeof rule.conditionText === 'string') {
+            text = rule.conditionText;
+        }
+        text = String(text || '').trim();
+        return {
+            text: text.slice(0, 2048),
+            length: text.length
+        };
+    }
+
+    function evaluateGroupingApplicability(rule, view) {
+        var kind = groupingRuleKind(rule);
+        var condition = groupingConditionText(rule, kind);
+        var state = 'UNKNOWN';
+        var record = true;
+
+        if (kind === 'layer') {
+            return { kind: kind, state: 'UNCONDITIONAL', conditionText: null, conditionLength: 0, record: false };
+        }
+        if (kind === 'non-selector-group') {
+            return { kind: kind, state: 'SKIP', conditionText: null, conditionLength: 0, record: false };
+        }
+        if (kind === 'media' && condition.text && view && typeof view.matchMedia === 'function') {
+            try {
+                var mediaResult = view.matchMedia(condition.text);
+                if (mediaResult && typeof mediaResult.matches === 'boolean') {
+                    state = mediaResult.matches ? 'ACTIVE' : 'INACTIVE';
+                }
+            } catch (error) {
+                state = 'UNKNOWN';
+            }
+        } else if (kind === 'supports' && condition.text && view && view.CSS && typeof view.CSS.supports === 'function') {
+            try {
+                var supportsResult = view.CSS.supports(condition.text);
+                if (typeof supportsResult === 'boolean') {
+                    state = supportsResult ? 'ACTIVE' : 'INACTIVE';
+                }
+            } catch (error) {
+                state = 'UNKNOWN';
+            }
+        }
+
+        return {
+            kind: kind,
+            state: state,
+            conditionText: condition.text || null,
+            conditionLength: condition.length,
+            record: record
+        };
+    }
+
     function collectMatchedCascade(element, documentObject, view) {
-        var result = { matchedRules: [], inaccessibleStylesheets: [], resolvedCustomProperties: fixedCustomProperties(element, view, SUBMIT_LOCAL_PROPERTIES), visitedRules: 0 };
+        var result = {
+            matchedRules: [],
+            inaccessibleStylesheets: [],
+            conditionalContexts: [],
+            conditionalContextEvidenceTruncated: false,
+            resolvedCustomProperties: fixedCustomProperties(element, view, SUBMIT_LOCAL_PROPERTIES),
+            visitedRules: 0
+        };
         if (!documentObject || !documentObject.styleSheets || !element || typeof element.matches !== 'function') {
             return result;
         }
         var sheets = bounded(documentObject.styleSheets, BUDGETS.stylesheetLinks);
-        function visitRules(rules, meta) {
+
+        function recordContext(applicability, meta, sourceOrder) {
+            if (!applicability.record) {
+                return;
+            }
+            if (result.conditionalContexts.length >= BUDGETS.conditionalContexts) {
+                result.conditionalContextEvidenceTruncated = true;
+                return;
+            }
+            result.conditionalContexts.push({
+                kind: applicability.kind,
+                state: applicability.state,
+                conditionText: applicability.conditionText,
+                conditionLength: applicability.conditionLength,
+                stylesheet: meta,
+                sourceOrder: sourceOrder
+            });
+        }
+
+        function visitRules(rules, meta, activeContexts) {
             if (!rules || result.visitedRules >= BUDGETS.cssRuleVisits || result.matchedRules.length >= BUDGETS.matchedCascadeRules) {
                 return;
             }
+            activeContexts = activeContexts || [];
             for (var r = 0; r < rules.length && result.visitedRules < BUDGETS.cssRuleVisits && result.matchedRules.length < BUDGETS.matchedCascadeRules; r += 1) {
                 var rule = rules[r];
                 result.visitedRules += 1;
                 if (rule && rule.cssRules) {
-                    visitRules(rule.cssRules, meta);
+                    var applicability = evaluateGroupingApplicability(rule, view);
+                    recordContext(applicability, meta, result.visitedRules);
+                    if (applicability.state === 'INACTIVE' || applicability.state === 'UNKNOWN' || applicability.state === 'SKIP') {
+                        continue;
+                    }
+                    var nextContexts = activeContexts;
+                    if (applicability.state === 'ACTIVE') {
+                        if (activeContexts.length >= BUDGETS.groupingContextDepth) {
+                            recordContext({
+                                kind: 'grouping-context-depth-limit',
+                                state: 'UNKNOWN',
+                                conditionText: null,
+                                conditionLength: 0,
+                                record: true
+                            }, meta, result.visitedRules);
+                            continue;
+                        }
+                        nextContexts = activeContexts.concat([{
+                            kind: applicability.kind,
+                            state: 'ACTIVE',
+                            conditionText: applicability.conditionText,
+                            conditionLength: applicability.conditionLength,
+                            sourceOrder: result.visitedRules
+                        }]);
+                    }
+                    visitRules(rule.cssRules, meta, nextContexts);
                     continue;
                 }
                 if (!rule || typeof rule.selectorText !== 'string' || !rule.style) {
@@ -510,7 +635,14 @@
                     var matches = false;
                     try { matches = element.matches(branch); } catch (error) { matches = false; }
                     if (matches) {
-                        result.matchedRules.push({ selectorBranch: branch.slice(0, 2048), selectorLength: branch.length, declarations: declarations, stylesheet: meta, sourceOrder: result.visitedRules });
+                        result.matchedRules.push({
+                            selectorBranch: branch.slice(0, 2048),
+                            selectorLength: branch.length,
+                            declarations: declarations,
+                            stylesheet: meta,
+                            sourceOrder: result.visitedRules,
+                            applicabilityContext: activeContexts.slice()
+                        });
                         if (result.matchedRules.length >= BUDGETS.matchedCascadeRules) { return; }
                     }
                 }
@@ -523,7 +655,7 @@
                 result.inaccessibleStylesheets.push(meta);
                 continue;
             }
-            visitRules(rules, meta);
+            visitRules(rules, meta, []);
         }
         return result;
     }
