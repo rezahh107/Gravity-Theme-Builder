@@ -1,42 +1,42 @@
 # SRWF Registration Theme
 
-Status: **First reference implementation / exact visual target admitted / not production-qualified yet**
+Status: **First reference implementation / authority reconciled / per-form configuration foundation / not production-qualified**
 
 This directory is the first real theme built with Gravity Theme Builder.
 
 ## Mission lock
 
-The first deliverable is **not a new SRWF-inspired design**.
+The deliverable is not a new SRWF-inspired design. It is faithful implementation of the current admitted SRWF Registration destination under `reference/`.
 
-It is the faithful implementation of the exact approved SRWF Registration design admitted under:
+Before visual implementation planning or review, read:
 
-`reference/`
+1. `reference/VISUAL_AUTHORITY.md`;
+2. `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md` — current Owner project authority for resolved decisions;
+3. `reference/SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md` — exact historical Drive-backed predecessor retained for provenance/inherited rules;
+4. `reference/README.md`;
+5. run `reference/materialize_reference.sh` and inspect the verified `OWNER_REFERENCE_new_7.html` where composition/state/geometry matters.
 
-Before implementation planning, technical design, styling, or visual review for this theme, read:
+The exact historical v1.0.1 mirror is intentionally not rewritten because doing so would falsify its admitted Drive revision/export and repository blob identity. The 2026-09-19 reconciliation is current where it explicitly supersedes that historical state; no unavailable Drive revision/hash has been invented for the newer Owner input.
 
-1. `reference/VISUAL_AUTHORITY.md`
-2. `reference/README.md`
-3. run `reference/materialize_reference.sh` and inspect the verified materialized `OWNER_REFERENCE_new_7.html`
+Gravity Forms Theme Framework and inspected runtime evidence determine **HOW** the design is implemented. They do not redefine **WHAT** the current Owner authority says.
 
-The approved artifact is the implementation target itself. Do not redesign, reinterpret, modernize, simplify, embellish, or substitute it.
+## Current configuration surface
 
-Gravity Forms Theme Framework and inspected runtime evidence determine **HOW** the approved design is implemented. They do not redefine **WHAT** the design should be.
+Normal operation uses:
 
-## Visual authority
+**Gravity Forms → Form Settings → GTB Theme**
 
-The admitted HTML artifact defines the approved composition and visual/state target.
+There is no top-level GTB admin menu.
 
-The owner-approved SRWF Public Registration Visual/UX Contract, identified by exact provenance in `reference/VISUAL_AUTHORITY.md`, governs exact canonical visual rules and explicit resolution states when the mockup contains approximate, demo-only, `NOT_PROVEN`, or `NON_NORMATIVE_REFERENCE` material.
+The settings surface manages SRWF activation separately from explicit semantic role mappings and projects GTB-owned tokens into authentic Gravity Forms Form/Field objects only on explicit Save. Numeric field/section IDs are internal form references, not durable presentation identity.
 
-Do not infer production values for unresolved items from screenshots or prototype CSS.
+Readiness is reported as `DISABLED`, `NEEDS SETUP`, `ATTENTION REQUIRED`, or `READY`. `Check Again` and the recommended setup draft are read-only. The recommended draft never guesses semantic roles from labels, field order, numeric IDs, DOM position, generic Radio type, or unrelated plugins.
 
 ## Runtime boundary
 
-The visual reference does not own Gravity Forms behavior.
+GTB owns presentation, not form structure or behavior. Preserve Gravity Forms and applicable add-on ownership of:
 
-Preserve Gravity Forms and applicable add-on ownership of:
-
-- form markup and lifecycle;
+- fields/order/Section Break structure;
 - validation and submission;
 - conditional logic;
 - accessibility semantics and state;
@@ -45,100 +45,39 @@ Preserve Gravity Forms and applicable add-on ownership of:
 - upload/crop behavior;
 - Persian/Iranian field behavior where applicable.
 
-Mockup scripts are state demonstrations, not production implementation authority.
+The same configured form can render in Gravity Flow Entry Detail. Registration presentation admission therefore remains a separate request-local context decision; admin configuration state does not disable the existing Entry Detail isolation boundary.
 
 ## Scope
 
-Expected responsibilities include:
+Expected responsibilities include public Registration presentation, RTL/Persian typography/layout, field/control appearance, explicit semantic role presentation, responsive behavior, validation/error appearance, keyboard/focus presentation, add-on visual integration, and host isolation.
 
-- public registration form presentation;
-- RTL / Persian typography and layout;
-- field/control styling;
-- field and section composition;
-- responsive behavior;
-- validation/error presentation;
-- keyboard/focus presentation;
-- required custom/add-on field visual integration;
-- host isolation.
+Out of scope unless separately authorized: Gravity Flow Inbox/Entry Detail visual design, workflow UI, dossier/print, business validation/data logic, a generic page builder, a second theme, or broad behavior replacement.
 
-This theme is intentionally independent from Gravity Flow Inbox, Entry Detail, and Print work. Those surfaces are outside this theme's scope.
+## Current batch boundary
 
-## Out of scope
+The current Owner authority has resolved previously open visual values including the `960px` desktop threshold, desktop card geometry/no-shadow, host-owned desktop pairings, title/helper/error/rhythm/focus values, and accessible above-input host placement preferences.
 
-Unless explicitly added later:
-
-- Gravity Flow Inbox;
-- Gravity Flow Entry Detail;
-- Gravity Flow workflow UI;
-- dossier/print output;
-- form business logic;
-- validation logic;
-- data persistence;
-- redesign of the approved registration reference.
-
-## Planned local structure
-
-```text
-srwf-registration/
-├── AGENTS.md          # Theme-local exact-target execution rules
-├── README.md
-├── reference/         # Admitted visual target and authority lock
-├── src/               # Theme-local implementation
-├── adapters/          # Only proven host/add-on gaps
-└── tests/             # Theme-specific validation
-```
-
-Directories should gain code only when implementation requires it; empty architecture should not be manufactured for appearance.
+Those are now **current destination authority**, but this reconciliation/foundation batch intentionally leaves the production CSS unchanged. The next visual batch must implement and runtime-qualify the remaining destination while preserving the merged PR #15 binary-choice repair and all context isolation behavior.
 
 ## Implementation priority
 
-For each approved visual requirement:
+For each visual requirement:
 
-1. Identify the exact requirement from the admitted visual authority.
-2. Consult the repository canonical Gravity Forms Theme Framework source.
-3. Use the narrowest supported Theme Framework / CSS API mechanism that can faithfully express the requirement.
-4. Use a supported Gravity Forms host mechanism when appropriate.
-5. Add the smallest theme-scoped direct CSS rule for a demonstrated API gap.
-6. Add a bounded adapter only after real runtime inspection proves a consumer-specific need.
-7. Never change the approved visual target merely to make implementation easier.
+1. start from the admitted authority chain;
+2. use the repository canonical Gravity Forms Theme Framework source/current official Gravity Forms documentation;
+3. prefer supported host/Theme Framework APIs;
+4. use the smallest theme-scoped direct CSS rule for a demonstrated gap;
+5. add an adapter only after real runtime inspection proves a consumer-specific need;
+6. never turn an unresolved runtime fact into guessed behavior.
 
-## First implementation map
+`IMPLEMENTATION_MAP.md` records the current destination, implementation disposition, and evidence status.
 
-Before substantial styling, create a theme-local `IMPLEMENTATION_MAP.md` that maps each implementation-driving visual requirement to the actual Gravity Forms mechanism and labels its evidence state.
+## Acceptance
 
-The map must start from the admitted artifacts in `reference/`; it must not reconstruct visual intent from memory.
+Final production qualification requires real supported-runtime evidence for desktop/mobile composition, 320px reflow, RTL/Persian content, validation/error states, keyboard focus, text enlargement/text spacing, contrast, target sizing, required add-ons/custom fields, isolation, and no submission/validation regression.
 
-Do not create a mapping from memory when a property or runtime consumer is version-sensitive.
-
-## Deviation rule
-
-A difference from the approved design must never be silent.
-
-A deviation is admissible for consideration only when the visual authority is genuinely ambiguous on the affected point or inspected host/runtime evidence proves exact reproduction infeasible or incompatible with a binding host/accessibility constraint.
-
-Record the constraint and use the smallest authorized reconciliation. `NOT_PROVEN` and `NON_NORMATIVE_REFERENCE` values remain unresolved rather than guessed.
-
-## Acceptance expectations
-
-The visual acceptance question for this first theme is intentionally simple:
-
-> Does the real Gravity Forms SRWF Registration surface reproduce the same approved design admitted in `reference/`, subject only to explicitly documented and authorized runtime reconciliations?
-
-Production qualification additionally requires real runtime evidence for the supported environment, including as applicable:
-
-- approved desktop/mobile composition;
-- 320 CSS px reflow;
-- RTL / Persian content;
-- long labels and values;
-- validation/error states;
-- keyboard focus;
-- text enlargement;
-- required PersianGravity / selected add-ons or custom fields;
-- host/theme isolation;
-- no submission or validation regression.
-
-Static HTML similarity alone does not prove runtime qualification.
+Static tests and exact-head CI are necessary regression evidence; they are not final Owner-site/browser qualification.
 
 ## Reuse rule
 
-Do not move SRWF code into top-level `src/` merely because it looks generic. Promote only after a second real theme or a clearly project-wide invariant proves reuse.
+Do not move SRWF code into top-level shared `src/` merely because it looks generic. Promote only after a second real theme or a clearly project-wide invariant proves reuse.

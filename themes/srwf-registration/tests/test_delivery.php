@@ -9,7 +9,7 @@ function wp_enqueue_style( $handle, $src, $deps, $ver ) { global $styles; $style
 function check( $condition, $message ) { if ( ! $condition ) { fwrite( STDERR, "FAIL: $message\n" ); exit( 1 ); } }
 require __DIR__ . '/../src/srwf-registration-theme.php';
 
-check( SRWF_REGISTRATION_THEME_VERSION === '0.1.7', 'unexpected SRWF test package version' );
+check( SRWF_REGISTRATION_THEME_VERSION === '0.1.8', 'unexpected SRWF test package version' );
 check( SRWF_REGISTRATION_GRAVITY_FORMS_ORBITAL_STYLE_HANDLE === 'gravity_forms_orbital_theme', 'verified Orbital handle changed' );
 
 $target = array( 'cssClass' => 'host-class srwf-registration-theme gpp-enabled gpp-profile-srwf-registration' );
@@ -40,7 +40,7 @@ srwf_registration_theme_enqueue_styles( $target, false );
 check( count( $styles ) === 1, 'normal target did not enqueue exactly once' );
 check( $styles[0]['deps'] === array( 'gravity_forms_orbital_theme' ), 'SRWF is not dependent on Orbital handle' );
 check( $styles[0]['handle'] === 'srwf-registration-theme', 'unexpected SRWF style handle' );
-check( $styles[0]['ver'] === '0.1.7', 'stylesheet package version not propagated' );
+check( $styles[0]['ver'] === '0.1.8', 'stylesheet package version not propagated' );
 
 // A validation rerender has the same target identity and no Entry Detail context.
 check( srwf_registration_theme_force_orbital( 'gravity-theme', $target ) === 'orbital', 'validation-style rerender lost Orbital admission' );
@@ -89,5 +89,9 @@ check( array_filter( $hooks, fn( $h ) => $h[0] === 'filter' && $h[1] === 'gform_
 check( array_filter( $hooks, fn( $h ) => $h[0] === 'action' && $h[1] === 'gform_enqueue_scripts' && $h[2] === 'srwf_registration_theme_enqueue_styles' ) !== array(), 'delivery hook missing' );
 check( array_filter( $hooks, fn( $h ) => $h[0] === 'action' && $h[1] === 'gravityflow_entry_detail_content_before' && $h[2] === 'srwf_registration_theme_enter_entry_detail_context' && $h[3] === 0 && $h[4] === 2 ) !== array(), 'Entry Detail content enter hook missing or changed' );
 check( array_filter( $hooks, fn( $h ) => $h[0] === 'action' && $h[1] === 'gravityflow_entry_detail_content_after' && $h[2] === 'srwf_registration_theme_leave_entry_detail_context' && $h[3] === PHP_INT_MAX && $h[4] === 2 ) !== array(), 'Entry Detail content leave hook missing or changed' );
+
+// Settings registration is additive and must not replace the current presentation hooks.
+check( array_filter( $hooks, fn( $h ) => $h[0] === 'filter' && $h[1] === 'gform_form_settings_menu' && $h[2] === 'srwf_registration_gtb_settings_menu' ) !== array(), 'GTB Theme settings menu hook missing from installable package' );
+check( array_filter( $hooks, fn( $h ) => $h[0] === 'action' && $h[1] === 'gform_form_settings_page_gtb_theme' && $h[2] === 'srwf_registration_gtb_settings_page' ) !== array(), 'GTB Theme settings page hook missing from installable package' );
 
 echo "PASS: production delivery and rendering-context contract\n";

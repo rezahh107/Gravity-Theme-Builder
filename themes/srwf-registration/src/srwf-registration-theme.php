@@ -2,13 +2,14 @@
 /**
  * Plugin Name: SRWF Registration Gravity Forms Theme
  * Description: Theme-local SRWF Registration presentation for opt-in Gravity Forms.
- * Version: 0.1.7
+ * Version: 0.1.8
+ * Text Domain: gravity-theme-builder
  */
 
 defined( 'ABSPATH' ) || exit;
 
 const SRWF_REGISTRATION_THEME_CLASS = 'srwf-registration-theme';
-const SRWF_REGISTRATION_THEME_VERSION = '0.1.7';
+const SRWF_REGISTRATION_THEME_VERSION = '0.1.8';
 const SRWF_REGISTRATION_GRAVITY_FORMS_ORBITAL_STYLE_HANDLE = 'gravity_forms_orbital_theme';
 const SRWF_REGISTRATION_CONTEXT_REGISTRATION = 'registration';
 const SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL = 'gravity_flow_entry_detail';
@@ -243,3 +244,5 @@ function srwf_registration_theme_enqueue_styles( $form, $is_ajax ) { // phpcs:ig
     );
 }
 add_action( 'gform_enqueue_scripts', 'srwf_registration_theme_enqueue_styles', 20, 2 );
+
+require_once __DIR__ . '/srwf-registration-settings.php';
