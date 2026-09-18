@@ -95,18 +95,83 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
 }
 
 /*
+ * Approved ordinary-radio family from the admitted artifact. Binary semantic roles are
+ * explicitly excluded because Gender and Graduation Status use the separate two-card row.
+ * The authentic Gravity Forms radio remains the checked/focus/keyboard authority.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) {
+    --gf-ctrl-choice-size: 20px;
+    --gf-ctrl-radio-check-size: 10px;
+    --gf-ctrl-border-width: 2px;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) .gfield_radio {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    inline-size: 100%;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) .gchoice {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-block-size: 48px;
+    inline-size: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid #8690A1;
+    border-radius: 10px;
+    background: #FFFFFF;
+    color: #172033;
+    font-family: "Vazirmatn", system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) .gchoice label {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    margin: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) .gfield-choice-input {
+    flex: 0 0 var(--gf-ctrl-choice-size);
+    inline-size: var(--gf-ctrl-choice-size);
+    block-size: var(--gf-ctrl-choice-size);
+    margin: 0;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) .gchoice:has(.gfield-choice-input:checked) {
+    border-color: #1D4ED8;
+    background: #EEF2FF;
+    color: #1D4ED8;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-radio:not(.srwf-role-binary-choice) .gchoice:has(.gfield-choice-input:focus-visible) {
+    outline: auto;
+}
+
+/*
  * Owner-approved semantic binary-choice role.
  * Configure this class only on Gender and Graduation Status. The real GF radio remains
  * the selection authority; CSS derives presentation exclusively from :checked/:focus-visible.
  */
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield_radio {
     display: flex;
+    flex-direction: row;
     gap: 12px;
+    inline-size: 100%;
 }
 
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gchoice {
     position: relative;
     flex: 1 1 0;
+    inline-size: 0;
     min-inline-size: 0;
 }
 
@@ -123,6 +188,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     display: flex;
     align-items: center;
     justify-content: center;
+    inline-size: 100%;
     min-block-size: 48px;
     padding: 12px 16px;
     border: 1.5px solid #8690A1;
