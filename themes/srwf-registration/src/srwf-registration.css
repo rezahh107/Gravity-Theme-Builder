@@ -324,6 +324,25 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     text-align: start;
 }
 
+/*
+ * Owner runtime on 0.1.14 proved the authentic GPFUP droparea keeps its instruction /
+ * select-files content inside an anonymous direct child that otherwise expands away
+ * from the decorative pseudo-icon. Center only the two admitted initial variants as
+ * one shrinkable cluster; GPFUP keeps the real button, text, and upload lifecycle.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea {
+    justify-content: center;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea > div,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea > div {
+    flex: 0 1 auto;
+    inline-size: auto;
+    min-inline-size: 0;
+    max-inline-size: calc(100% - 52px);
+}
+
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup:not(.gpfup--has-files) .gpfup__select-files {
     min-block-size: 0;
     block-size: auto;
