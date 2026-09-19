@@ -94,14 +94,16 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertIn("gpfup--images-only", self.implementation_map)
         self.assertIn("Diagnostic package v0.3.5", self.implementation_map)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
-        self.assertIn("0.1.12", self.src_readme)
+        self.assertIn("0.1.13", self.src_readme)
         self.assertIn("960px", self.src_readme)
         self.assertIn("above-input", self.src_readme)
+        self.assertIn("--gf-ctrl-select-padding-x", self.implementation_map)
 
     def test_current_authorized_visual_destination_is_present_without_broad_page_takeover(self) -> None:
         self.assertIn("@media (min-width: 960px)", self.css)
         self.assertIn("--gf-form-gap-y: 24px", self.css)
         self.assertIn("--gf-ctrl-line-height: 1.5", self.css)
+        self.assertIn("--gf-ctrl-select-padding-x: 24px 32px", self.css)
         self.assertIn("--gf-ctrl-label-line-height-primary: 1.5", self.css)
         self.assertIn("--gf-ctrl-btn-line-height: 1.5", self.css)
         self.assertIn("max-inline-size: 904px", self.css)
