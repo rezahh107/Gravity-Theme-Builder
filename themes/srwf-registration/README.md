@@ -1,6 +1,6 @@
 # SRWF Registration Theme
 
-Status: **First reference implementation / authority reconciled / per-form configuration foundation / not production-qualified**
+Status: **First reference implementation / current Owner authority admitted / visual repair statically implemented through 0.1.15 / Owner runtime qualification required**
 
 This directory is the first real theme built with Gravity Theme Builder.
 
@@ -30,7 +30,7 @@ There is no top-level GTB admin menu.
 
 The settings surface manages SRWF activation separately from explicit semantic role mappings and projects GTB-owned tokens into authentic Gravity Forms Form/Field objects only on explicit Save. Numeric field/section IDs are internal form references, not durable presentation identity.
 
-Readiness is reported as `DISABLED`, `NEEDS SETUP`, `ATTENTION REQUIRED`, or `READY`. `Check Again` and the recommended setup draft are read-only. The recommended draft never guesses semantic roles from labels, field order, numeric IDs, DOM position, generic Radio type, or unrelated plugins.
+Readiness is reported as `DISABLED`, `NEEDS SETUP`, `ATTENTION REQUIRED`, or `READY`. `Check Again` and the recommended setup draft are read-only. The recommended draft never guesses semantic roles from labels, field order, numeric IDs, DOM position, generic field type, or unrelated plugins.
 
 ## Runtime boundary
 
@@ -53,11 +53,38 @@ Expected responsibilities include public Registration presentation, RTL/Persian 
 
 Out of scope unless separately authorized: Gravity Flow Inbox/Entry Detail visual design, workflow UI, dossier/print, business validation/data logic, a generic page builder, a second theme, or broad behavior replacement.
 
+## Current implementation state
+
+The current merged theme implementation is `0.1.15`; the runtime diagnostic remains `0.3.5`.
+
+The statically implemented presentation set includes:
+
+- the Owner-authorized `960px` desktop threshold, desktop white-card geometry/no-shadow, mobile padding, typography, spacing, focus, and full-width primary action;
+- all authentic SRWF Radio groups using the common card presentation without semantic-role gating;
+- mapped section icon tiles;
+- the repaired native single-Select and GP Advanced Select / Tom Select presentation family;
+- the shared initial GPFUP outer family and icon/content-cluster presentation for Report Card and authentic image-only Student Photo;
+- existing per-form configuration/readiness and Registration-versus-Entry-Detail context isolation.
+
+Owner runtime of theme `0.1.14` remains historical evidence for the upload family: both admitted initial icon glyphs rendered, but the authentic direct content child remained visually detached from the icon. Theme `0.1.15` statically repairs that residual defect by centering only the two admitted initial dropareas and constraining only their authentic direct content child into one shrinkable icon/instruction/select-file cluster.
+
+This does **not** mean `0.1.15` is production-qualified. Static/CI evidence proves repository/source/package behavior only for exercised scenarios.
+
 ## Current batch boundary
 
-The current Owner authority has resolved previously open visual values including the `960px` desktop threshold, desktop card geometry/no-shadow, host-owned desktop pairings, title/helper/error/rhythm/focus values, and accessible above-input host placement preferences.
+The visual implementation batches authorized so far are no longer waiting on a speculative CSS repair. The next step is **Owner runtime qualification on the exact current `0.1.15` package** and evidence-driven repair only if that runtime exposes a real defect.
 
-Those are now **current destination authority**, but this reconciliation/foundation batch intentionally leaves the production CSS unchanged. The next visual batch must implement and runtime-qualify the remaining destination while preserving the merged PR #15 binary-choice repair and all context isolation behavior.
+Current runtime obligations include, as applicable:
+
+- Report Card and Student Photo initial icon/content-cluster alignment and narrow/mobile wrapping;
+- a real `.gpfup--has-files` transition without initial-state leakage;
+- native Select and GPAS/Tom Select geometry and dynamic states on the current package;
+- Radio checked/keyboard-focused/conditional states;
+- validation/error behavior and preserved host semantics;
+- exact `320 CSS px` reflow, `200%` text resize, text-spacing resilience, contrast and target-size acceptance;
+- relevant PersianGravity/add-on consumers when authentically present.
+
+Page background `#F6F8FB` remains a host-integration responsibility where an authenticated ownership seam exists; GTB must not seize global `html/body` ownership to force it. Student Photo post-upload/crop/re-crop/delete composition remains runtime-dependent / `NOT_PROVEN` and host-owned rather than invented.
 
 ## Implementation priority
 
