@@ -109,7 +109,7 @@ Current project authority for the resolved SRWF destination is:
 ```text
 authority_handle: OWNER:SRWF-2026-09-19
 path: themes/srwf-registration/reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md
-status: CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / GPFUP_INITIAL_ICON_FAMILY_STATICALLY_IMPLEMENTED / RUNTIME_VALIDATION_REQUIRED
+status: CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / GPFUP_INITIAL_ICON_CONTENT_CLUSTER_STATICALLY_IMPLEMENTED / RUNTIME_VALIDATION_REQUIRED
 provenance: direct Owner-supplied project authority for this execution
 immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR
 ```
@@ -133,7 +133,7 @@ No Google Drive revision ID, timestamp, export hash, or immutable upstream blob 
 - the upload-icon alignment goal is presentation-only and must not alter Gravity Forms / GP File Upload Pro core, markup ownership, upload/crop lifecycle, or add-on behavior;
 - current accessibility acceptance requirements.
 
-These are destination/acceptance decisions. Theme `0.1.14` statically implements the shared initial GPFUP icon/alignment destination through bounded SRWF CSS and GTB-owned local assets. Static implementation and CI do not establish the remaining Owner-browser runtime-sensitive states listed in the reconciliation and implementation map.
+Owner runtime of theme `0.1.14` is retained as historical evidence: both admitted initial icon glyphs rendered, but the authentic direct content child remained visually detached from the icon. Theme `0.1.15` is the current static implementation of the completed initial GPFUP icon + content-cluster repair: it retains the shared `40×40` icon slot with `24px` glyphs, centers only the two admitted initial dropareas, and constrains their authentic direct content child so icon/instruction/select-file content forms one shrinkable cluster. Static implementation and CI do not establish a real-browser PASS for the resulting `0.1.15` geometry.
 
 ## 5. WHAT vs HOW
 
@@ -163,6 +163,6 @@ Documented/Owner-authorized values still require runtime qualification where con
 
 The 2026-09-19 visual-fidelity repairs preserve immutable historical authority and host behavior ownership while implementing the current Owner-authorized presentation destination.
 
-Theme `0.1.14` implements the shared initial GPFUP icon/alignment family only on the authentic admitted initial seams: Report Card retains its document glyph, image-only Student Photo receives a local photo/camera glyph, and both use the same icon-slot geometry. The implementation stops before `.gpfup--has-files`; it does **not** authorize or implement Student Photo post-upload/crop composition or any takeover of GPFUP behavior.
+Owner runtime of theme `0.1.14` remains historical evidence for the initial upload family: the Report Card and image-only Student Photo icon glyphs rendered, while the host content remained visually detached from the icon. Theme `0.1.15` is the current static implementation: Report Card retains its document glyph, image-only Student Photo retains its local photo/camera glyph, both retain the same icon-slot geometry, and only those two admitted initial dropareas/direct content children receive the bounded content-cluster alignment repair. The implementation stops before `.gpfup--has-files`; it does **not** authorize or implement Student Photo post-upload/crop composition or any takeover of GPFUP behavior.
 
-Final Owner runtime qualification remains open; CI/static success is not production qualification.
+Final Owner runtime qualification remains open for the `0.1.15` real-browser initial content-cluster alignment, narrow/mobile wrapping, and a real `.gpfup--has-files` transition. Post-upload/crop composition remains `NOT_PROVEN` / host-owned. CI/static success is not production qualification.
