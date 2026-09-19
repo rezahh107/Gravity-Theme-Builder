@@ -48,6 +48,7 @@ jobs:
           php -l themes/srwf-registration/tests/test_form_layout.php
           php -l themes/srwf-registration/tests/test_delivery.php
           php -l themes/srwf-registration/tests/test_entry_detail_early_sequence.php
+          php -l themes/srwf-registration/tests/test_diagnostic_delivery.php
 
   exact-head-qualification:
     if: github.event_name == 'pull_request'
@@ -75,6 +76,8 @@ jobs:
           node themes/srwf-registration/tests/test_admission_diagnostic_v032.js
           node themes/srwf-registration/tests/test_qualification_v034.js
           node themes/srwf-registration/tests/test_diagnostic_download_v034.js
+          node themes/srwf-registration/tests/test_visual_repair_qualification_v035.js
+          node themes/srwf-registration/tests/test_version_provenance_v035.js
 
       - name: Check production settings, layout, authentic-order context and diagnostic delivery
         run: |
@@ -94,6 +97,7 @@ jobs:
           php -l themes/srwf-registration/tests/test_form_layout.php
           php -l themes/srwf-registration/tests/test_delivery.php
           php -l themes/srwf-registration/tests/test_entry_detail_early_sequence.php
+          php -l themes/srwf-registration/tests/test_diagnostic_delivery.php
 
       - name: Build and smoke-check exact-Head Owner packages
         run: |

@@ -37,6 +37,7 @@ REVIEWED_GF_API = {
     "--gf-ctrl-size",
     "--gf-ctrl-font-size",
     "--gf-ctrl-font-weight",
+    "--gf-ctrl-line-height",
     "--gf-ctrl-outline-color-focus",
     "--gf-ctrl-outline-width-focus",
     "--gf-ctrl-outline-offset",
@@ -44,6 +45,8 @@ REVIEWED_GF_API = {
     "--gf-ctrl-label-color-primary",
     "--gf-ctrl-label-font-size-primary",
     "--gf-ctrl-label-font-weight-primary",
+    "--gf-ctrl-label-line-height-primary",
+    "--gf-label-space-primary",
     "--gf-ctrl-desc-color",
     "--gf-ctrl-desc-font-size",
     "--gf-ctrl-desc-font-weight",
@@ -52,6 +55,7 @@ REVIEWED_GF_API = {
     "--gf-ctrl-desc-font-size-error",
     "--gf-ctrl-desc-font-weight-error",
     "--gf-ctrl-desc-line-height-error",
+    "--gf-desc-space",
     "--gf-ctrl-btn-bg-color-primary",
     "--gf-ctrl-btn-bg-color-hover-primary",
     "--gf-ctrl-btn-bg-color-focus-primary",
@@ -60,6 +64,7 @@ REVIEWED_GF_API = {
     "--gf-ctrl-btn-size",
     "--gf-ctrl-btn-font-size",
     "--gf-ctrl-btn-font-weight",
+    "--gf-ctrl-btn-line-height",
     "--gf-ctrl-file-zone-radius",
     "--gf-field-section-border-color",
     "--gf-form-validation-heading-color",
@@ -226,9 +231,13 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
 
     def test_token_enforcement_specificity_outranks_orbital_per_form_scope(self) -> None:
         css = CSS.read_text(encoding="utf-8")
-        token_blocks = gf_token_blocks(css)
-        self.assertEqual(1, len(token_blocks), "expected one SRWF --gf-* enforcement block")
-        selectors = split_selector_list(token_blocks[0][0])
+        root_token_blocks = [
+            (selectors, body)
+            for selectors, body in gf_token_blocks(css)
+            if selectors.strip().startswith(ENFORCED_SCOPE)
+        ]
+        self.assertEqual(1, len(root_token_blocks), "expected one root SRWF --gf-* enforcement block")
+        selectors = split_selector_list(root_token_blocks[0][0])
         self.assertEqual(1, len(selectors))
         self.assertEqual((1, 2, 0), selector_specificity(HOSTILE_ORBITAL_SELECTOR))
         self.assertGreater(selector_specificity(selectors[0]), selector_specificity(HOSTILE_ORBITAL_SELECTOR))
@@ -236,17 +245,26 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertIn(ACTIVATION_CLASS, selectors[0])
         self.assertNotRegex(selectors[0], r"#gform_wrapper_\d+")
 
-    def test_every_reviewed_gf_token_has_single_implementation_source(self) -> None:
+    def test_every_reviewed_gf_token_has_expected_implementation_sources(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         declarations = [name for _, body in css_blocks(css) for name, _ in gf_token_declarations(body)]
         counts = Counter(declarations)
         self.assertEqual(REVIEWED_GF_API, set(counts))
-        self.assertTrue(all(count == 1 for count in counts.values()), f"duplicate --gf declarations: {counts}")
+        self.assertEqual(2, counts["--gf-label-space-primary"], "base 8px plus bounded 6px field override expected")
+        self.assertTrue(
+            all(count == 1 for name, count in counts.items() if name != "--gf-label-space-primary"),
+            f"unexpected duplicate --gf declarations: {counts}",
+        )
 
     def test_all_direct_presentation_selectors_remain_srwf_scoped(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         for selector_group, body in css_blocks(css):
             if gf_token_declarations(body):
+                for selector in split_selector_list(selector_group):
+                    self.assertTrue(
+                        selector.startswith(NARROW_SCOPE) or selector.startswith(ENFORCED_SCOPE),
+                        f"token selector escaped SRWF scope: {selector}",
+                    )
                 continue
             for selector in split_selector_list(selector_group):
                 if selector.startswith("@media"):
@@ -255,7 +273,10 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
                     continue
                 self.assertTrue(selector.startswith(NARROW_SCOPE) or selector.startswith(ENFORCED_SCOPE), f"selector escaped SRWF scope: {selector}")
                 if selector.startswith(ENFORCED_SCOPE):
-                    self.assertIn(".gform_button", selector, "strong sentinel boundary is reserved for proven submit conflict")
+                    self.assertTrue(
+                        any(marker in selector for marker in (".gform_button", ".gform_title", ".gsection_title")),
+                        f"strong framework sentinel escaped proven heading/submit consumers: {selector}",
+                    )
         self.assertNotRegex(css, r"(?m)^\s*(?:html|body)\s*\{")
         self.assertNotRegex(css, r"#gform_wrapper_\d+")
         self.assertNotIn("[data-parent-form]", css)
@@ -287,18 +308,25 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         css = CSS.read_text(encoding="utf-8")
         title = re.search(r"\.gform_title\s*\{([^}]*)\}", css, re.S)
         self.assertIsNotNone(title)
-        self.assertIn('font-family: "Vazirmatn", system-ui, sans-serif;', title.group(1))
+        self.assertIn('font-family: "Vazirmatn", "Vazir", Tahoma, Arial, sans-serif;', title.group(1))
         self.assertIn("font-size: 24px;", title.group(1))
         self.assertIn("font-weight: 700;", title.group(1))
         self.assertIn("line-height: 1.5;", title.group(1))
         self.assertRegex(css, r"(?s)@media \(min-width: 960px\).*?\.gform_title\s*\{[^}]*font-size: 26px;")
+        self.assertRegex(css, r"(?s)\.gfield--type-section \.gsection_title\s*\{[^}]*font-size: 18px;[^}]*font-weight: 700;[^}]*line-height: 1.5;")
+        self.assertIn("gap: 12px;", css)
         for declaration in (
+            "--gf-ctrl-line-height: 1.5;",
+            "--gf-ctrl-label-line-height-primary: 1.5;",
+            "--gf-label-space-primary: 8px;",
             "--gf-ctrl-desc-font-size: 14px;",
             "--gf-ctrl-desc-font-weight: 400;",
             "--gf-ctrl-desc-line-height: 1.5;",
             "--gf-ctrl-desc-font-size-error: 14px;",
             "--gf-ctrl-desc-font-weight-error: 600;",
             "--gf-ctrl-desc-line-height-error: 1.5;",
+            "--gf-desc-space: 8px;",
+            "--gf-ctrl-btn-line-height: 1.5;",
             "--gf-form-gap-y: 24px;",
             "--gf-ctrl-outline-color-focus: #1D4ED8;",
             "--gf-ctrl-outline-width-focus: 2px;",
@@ -306,6 +334,8 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
             "--gf-ctrl-outline-style: solid;",
         ):
             self.assertIn(declaration, css)
+        self.assertIn("--gf-ctrl-size: 52px;", css)
+        self.assertIn("--gf-ctrl-btn-size: 56px;", css)
         self.assertRegex(css, r"(?s)\.gfield--type-section\s*\{[^}]*margin-block-start: 8px;")
 
     def test_submit_enforcement_reuses_mechanically_stronger_framework_sentinel(self) -> None:
@@ -326,15 +356,18 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertNotRegex(css, r"(?m)^\s*\.ts-control\s*\{")
         self.assertEqual([], list((THEME / "src").glob("**/*.js")))
 
-    def test_section_heading_and_report_card_are_role_scoped(self) -> None:
+    def test_section_heading_and_upload_family_keep_specialization_bounded(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         section = re.search(r"\.gfield--type-section \.gsection_title\s*\{([^}]*)\}", css, re.S)
         self.assertIsNotNone(section)
         self.assertIn("font-size: 18px;", section.group(1))
         self.assertIn("font-weight: 700;", section.group(1))
+        self.assertIn("line-height: 1.5;", section.group(1))
         self.assertIn(".srwf-role-report-card-upload", css)
-        self.assertIn(".gpfup:not(.gpfup--has-files)", css)
-        self.assertNotIn("gpfup--images-only", css)
+        self.assertIn(".gfield--type-fileupload .gpfup:not(.gpfup--has-files) .gpfup__droparea", css)
+        self.assertIn(".gpfup.gpfup--images-only:not(.gpfup--has-files)", css)
+        self.assertRegex(css, r"(?s)\.gpfup:not\(\.gpfup--has-files\) \.gpfup__droparea\s*\{[^}]*min-block-size: 96px;[^}]*padding: 16px;[^}]*border: 1px dashed #8690A1;[^}]*border-radius: 12px;")
+        self.assertRegex(css, r"(?s)\.srwf-role-report-card-upload .*?\.gpfup__droparea::before\s*\{[^}]*background-size: 24px 24px;")
 
     def test_activation_is_explicit_class_scoped_and_entry_detail_boundary_retained(self) -> None:
         php = PHP.read_text(encoding="utf-8")

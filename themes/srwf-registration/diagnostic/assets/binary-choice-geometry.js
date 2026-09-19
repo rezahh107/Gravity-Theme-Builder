@@ -18,6 +18,7 @@
 
         function collectNow() {
             var geometry = api.collect(documentObject, view);
+            root.GTB_SRWF_RADIO_CARD_GEOMETRY_V035 = geometry;
             root.GTB_SRWF_BINARY_CHOICE_GEOMETRY_V033 = geometry;
             return geometry;
         }
@@ -27,14 +28,14 @@
             var report = root.GTB_SRWF_RUNTIME_DIAGNOSTIC_V03;
             if (report && typeof report === 'object') {
                 report.binaryChoiceGeometry = geometry;
+                report.radioCardGeometry = geometry;
             }
         }
 
+        root.GTB_SRWF_COLLECT_RADIO_CARD_GEOMETRY_V035 = collectNow;
         collectNow();
 
         if (button && typeof button.addEventListener === 'function') {
-            // runtime-diagnostic.js registers first and captures on pointerdown. This
-            // later handler augments that same report object before the subsequent click download.
             button.addEventListener('pointerdown', augmentExistingReport);
             button.addEventListener('click', augmentExistingReport, true);
         }
@@ -50,10 +51,10 @@
 }(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this), function () {
     'use strict';
 
-    var VERSION = '0.3.3';
-    var FIELD_SELECTOR = '.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice';
-    var MAX_FIELDS = 4;
-    var MAX_CHOICES = 4;
+    var VERSION = '0.3.5';
+    var FIELD_SELECTOR = '.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio';
+    var MAX_FIELDS = 12;
+    var MAX_CHOICES = 12;
 
     function bounded(items, limit) {
         return Array.prototype.slice.call(items || [], 0, limit);
@@ -81,19 +82,33 @@
         };
     }
 
-    function styleValue(element, view, property) {
+    function style(element, view, pseudo) {
         if (!element || !view || typeof view.getComputedStyle !== 'function') {
-            return '';
+            return null;
         }
-        var style = view.getComputedStyle(element);
-        return String(style && style[property] || '');
+        return view.getComputedStyle(element, pseudo || null);
+    }
+
+    function styleValue(element, view, property, pseudo) {
+        var computed = style(element, view, pseudo);
+        return String(computed && computed[property] || '');
+    }
+
+    function isVisible(element, view) {
+        var value = rect(element);
+        if (!value || value.width <= 0 || value.height <= 0) {
+            return false;
+        }
+        return styleValue(element, view, 'display') !== 'none'
+            && styleValue(element, view, 'visibility') !== 'hidden'
+            && styleValue(element, view, 'opacity') !== '0';
     }
 
     function associatedLabel(choice, input) {
         if (!choice || !input || !input.id || !choice.children) {
             return null;
         }
-        var children = bounded(choice.children, 8);
+        var children = bounded(choice.children, 12);
         for (var i = 0; i < children.length; i += 1) {
             var child = children[i];
             if (
@@ -106,16 +121,46 @@
         return null;
     }
 
+    function selectedCueSnapshot(label, view) {
+        if (!label) {
+            return null;
+        }
+        return {
+            width: styleValue(label, view, 'width', '::before'),
+            height: styleValue(label, view, 'height', '::before'),
+            borderWidth: styleValue(label, view, 'borderTopWidth', '::before'),
+            borderColor: styleValue(label, view, 'borderTopColor', '::before'),
+            backgroundColor: styleValue(label, view, 'backgroundColor', '::before'),
+            boxShadow: styleValue(label, view, 'boxShadow', '::before'),
+            content: styleValue(label, view, 'content', '::before')
+        };
+    }
+
     function choiceSnapshot(choice, view) {
         var input = choice && typeof choice.querySelector === 'function'
             ? choice.querySelector('.gfield-choice-input[type="radio"]')
             : null;
         var label = associatedLabel(choice, input);
+        var choiceRect = rect(choice);
+        var labelRect = rect(label);
+        var fillDelta = choiceRect && labelRect ? Math.abs(choiceRect.width - labelRect.width) : null;
         return {
-            choiceRect: rect(choice),
-            labelRect: rect(label),
+            choiceRect: choiceRect,
+            labelRect: labelRect,
+            visible: isVisible(choice, view),
             checked: Boolean(input && input.checked),
             labelAssociated: Boolean(label),
+            labelFillsChoice: fillDelta === null ? null : fillDelta <= 1,
+            labelWidthDeltaPx: fillDelta,
+            labelComputed: label ? {
+                borderWidth: styleValue(label, view, 'borderTopWidth'),
+                borderColor: styleValue(label, view, 'borderTopColor'),
+                backgroundColor: styleValue(label, view, 'backgroundColor'),
+                minHeight: styleValue(label, view, 'minHeight'),
+                outlineWidth: styleValue(label, view, 'outlineWidth'),
+                outlineOffset: styleValue(label, view, 'outlineOffset')
+            } : null,
+            selectedCue: selectedCueSnapshot(label, view),
             inputVisibleGeometry: rect(input),
             inputPosition: styleValue(input, view, 'position'),
             inputOpacity: styleValue(input, view, 'opacity')
@@ -124,21 +169,14 @@
 
     function geometrySummary(choiceSnapshots) {
         var usable = choiceSnapshots.filter(function (item) {
-            return item.choiceRect && item.choiceRect.width > 0 && item.choiceRect.height > 0;
+            return item.visible && item.choiceRect && item.choiceRect.width > 0 && item.choiceRect.height > 0;
         });
-        if (usable.length < 2) {
-            return { sameRow: null, widthDeltaPx: null, approximatelyEqualWidths: null };
-        }
-        var firstY = usable[0].choiceRect.y;
-        var sameRow = usable.every(function (item) {
-            return Math.abs(item.choiceRect.y - firstY) <= 1;
-        });
-        var widths = usable.map(function (item) { return item.choiceRect.width; });
-        var widthDelta = Math.max.apply(Math, widths) - Math.min.apply(Math, widths);
         return {
-            sameRow: sameRow,
-            widthDeltaPx: widthDelta,
-            approximatelyEqualWidths: widthDelta <= 2
+            visibleChoiceCount: usable.length,
+            allVisibleLabelsFillChoices: usable.length > 0 && usable.every(function (item) {
+                return item.labelAssociated && item.labelFillsChoice === true;
+            }),
+            selectedChoiceCount: usable.filter(function (item) { return item.checked; }).length
         };
     }
 
@@ -151,18 +189,17 @@
             : [];
         var snapshots = choices.map(function (choice) { return choiceSnapshot(choice, view); });
         var fieldRect = rect(field);
-        var display = styleValue(field, view, 'display');
-        var visibility = styleValue(field, view, 'visibility');
         return {
             fieldStructuralId: structuralId(field),
             fieldClasses: classes(field),
-            visible: Boolean(fieldRect && fieldRect.width > 0 && fieldRect.height > 0 && display !== 'none' && visibility !== 'hidden'),
+            visible: isVisible(field, view),
             fieldRect: fieldRect,
             choiceCount: choices.length,
             container: {
                 rect: rect(container),
                 display: styleValue(container, view, 'display'),
                 flexDirection: styleValue(container, view, 'flexDirection'),
+                flexWrap: styleValue(container, view, 'flexWrap'),
                 gap: styleValue(container, view, 'gap')
             },
             choices: snapshots,
@@ -171,13 +208,16 @@
     }
 
     function collect(documentObject, view) {
-        var fields = documentObject && typeof documentObject.querySelectorAll === 'function'
-            ? bounded(documentObject.querySelectorAll(FIELD_SELECTOR), MAX_FIELDS)
+        var allFields = documentObject && typeof documentObject.querySelectorAll === 'function'
+            ? documentObject.querySelectorAll(FIELD_SELECTOR)
             : [];
+        var fields = bounded(allFields, MAX_FIELDS);
         return {
             diagnosticVersion: VERSION,
-            role: 'srwf-role-binary-choice',
+            scope: 'all-authentic-radio-fields-in-admitted-srwf-registration',
+            fieldSelector: FIELD_SELECTOR,
             fieldCount: fields.length,
+            fieldsTruncated: Number(allFields.length || 0) > MAX_FIELDS,
             fields: fields.map(function (field) { return fieldSnapshot(field, view); })
         };
     }
