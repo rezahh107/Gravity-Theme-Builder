@@ -92,15 +92,6 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     font-weight: 700;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .srwf-required-note {
-    margin-block: 0 24px;
-    color: #475467;
-    font-family: "Vazirmatn", system-ui, sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.5;
-}
-
 /*
  * Owner runtime: the real GF 3.x submit matches a framework declaration that resolves
  * inline-size from the host local-width value resolving to auto. Reuse the already-proven framework sentinel
