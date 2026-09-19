@@ -1,6 +1,6 @@
 # SRWF Registration — Implementation Map
 
-Status: **VISUAL_REPAIR_STATICALLY_IMPLEMENTED / OWNER_RUNTIME_QUALIFICATION_REQUIRED**
+Status: **VISUAL_REPAIR_STATICALLY_IMPLEMENTED / OWNER_AUTHORIZED_UPLOAD_ICON_ALIGNMENT_PENDING / OWNER_RUNTIME_QUALIFICATION_REQUIRED**
 
 This map distinguishes Owner authority, static/source evidence, host ownership, and evidence that still requires the real Owner runtime. Production qualification is intentionally open.
 
@@ -14,7 +14,7 @@ Registered immutable/exact IDs remain defined in `reference/VISUAL_AUTHORITY.md`
 - `VA:VC-1.0.0` — historical/base contract;
 - `VA:VC-1.0.1` — exact historical Drive-backed Owner revision, including §27.
 
-`OWNER:SRWF-2026-09-19`, recorded in `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md`, is implementation-driving for the current destination. The current Owner lock now explicitly requires **every authentic Gravity Forms Radio field inside admitted SRWF Registration** to use card presentation. That rule supersedes the older binary-only interpretation while leaving the exact historical v1.0.1 mirror byte-preserved.
+`OWNER:SRWF-2026-09-19`, recorded in `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md`, is implementation-driving for the current destination. The current Owner lock requires every authentic Gravity Forms Radio field inside admitted SRWF Registration to use card presentation and now also requires both authentic initial GPFUP upload surfaces to present a consistent decorative icon slot. These decisions leave the exact historical v1.0.1 mirror byte-preserved.
 
 Historical labels such as `RUNTIME_REQUIRED`, `NOT_PROVEN`, `NON_NORMATIVE_REFERENCE`, and `DEFER_NOT_PROVEN` remain provenance rather than current destination truth where the current reconciliation resolves them. Historical desktop short-field pairings remain superseded by `HOST_OWNED / OWNER_CONFIGURABLE`; the authorized desktop card remains shadowless.
 
@@ -46,10 +46,10 @@ Historical labels such as `RUNTIME_REQUIRED`, `NOT_PROVEN`, `NON_NORMATIVE_REFER
 | All Radio choices | every authentic admitted `.gfield--type-radio` uses cards; fill assigned cell; `12px` gap; min `52px`; radius `10px`; unselected `1px #8690A1`; selected `2px #1D4ED8` + `#EDF1FC` + non-color dot cue | native GF radio/label state remains authority; CSS uses host field type, `:checked`, `:focus-visible`; flex-wrap/content-driven layout; no role/text/ID/order gate | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; checked/keyboard/320px runtime pending |
 | Conditional Radio fields | inherit same cards when Gravity Forms reveals them | same field-type rule; GTB does not control conditional visibility | `STATICALLY_PROVEN` selector coverage; authentic reveal runtime pending |
 | Section icon tiles | explicit mapped section roles only; `40×40`, radius `10`, icon `20`, tint `#EDF1FC`, heading gap `12px` | admitted local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
-| Shared initial GPFUP family | min `96px`; pad `16px`; radius `12px`; `1px` dashed `#8690A1`; content-driven hierarchy | authentic `.gfield--type-fileupload .gpfup:not(.gpfup--has-files)` only; behavior host-owned | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; upload runtime pending |
-| Report Card initial GPFUP | shared outer family + explicit Report Card file icon `24px` | explicit `srwf-role-report-card-upload` only for icon specialization; authentic initial GPFUP state | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime hierarchy recheck pending |
+| Shared initial GPFUP family | min `96px`; pad `16px`; radius `12px`; `1px` dashed `#8690A1`; every admitted initial surface has a visible decorative icon slot and common icon/instruction/select-file alignment rhythm | authentic `.gfield--type-fileupload .gpfup:not(.gpfup--has-files)` presentation only; GPFUP behavior remains host-owned | outer family `STATICALLY_IMPLEMENTED`; family-wide icon/alignment goal `OWNER_AUTHORIZED / IMPLEMENTATION_PENDING` |
+| Report Card initial GPFUP | shared outer family + file/document icon `24px` in the shared icon-slot family | explicit `srwf-role-report-card-upload` only for icon specialization; authentic initial GPFUP state | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime hierarchy recheck pending |
 | Report Card has-files | do not force initial state over uploaded UI | initial rules stop at authentic `.gpfup--has-files` state | `HOST_OWNED`; regression-protected; real upload runtime pending |
-| Student Photo initial | same initial upload family on authentic image-only GPFUP configuration | host/config seam `.gpfup.gpfup--images-only:not(.gpfup--has-files)`; no field ID/text/order identity | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; Owner runtime confirmation pending |
+| Student Photo initial | shared initial family + visible photo/camera icon aligned through the same icon-slot presentation as Report Card | authentic host/config seam `.gpfup.gpfup--images-only:not(.gpfup--has-files)`; GTB-owned local asset/CSS only; no field ID/text/order identity | `OWNER_AUTHORIZED / IMPLEMENTATION_PENDING`; runtime confirmation required after implementation |
 | Student Photo post-upload | style only authentic exposed GPFUP preview/replace/re-crop/delete states | no speculative post-upload selector/composition; crop ratio/dimensions remain host/config-owned | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` |
 | GPAS / Tom Select | same select-family inline metric, 52px minimum, zero block padding, SRWF focus visual; add-on behavior untouched | proven `.ts-wrapper > .ts-control` consumes the shared documented `--gf-ctrl-select-padding-x`; source `<select>` classes `.tomselected` / `.ts-hidden-accessible` are excluded from the native-only optical rule; diagnostic targets the visible `.ts-control` | behavior `HOST_OWNED`; exact 0.1.13 open/focus/results runtime pending |
 | PersianGravity / Jalali | style only authentic consumer if admitted | no selector/adapter invented | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` presentation |
@@ -58,7 +58,7 @@ Historical labels such as `RUNTIME_REQUIRED`, `NOT_PROVEN`, `NON_NORMATIVE_REFER
 
 ## Visual-role authority traceability
 
-The exact historical v1.0.1/artifact path remains retrievable. The current all-radio lock supersedes only the former presentation-gating interpretation; it does not erase historical semantic roles or their provenance.
+The exact historical v1.0.1/artifact path remains retrievable. The current Owner reconciliation supersedes only the specific presentation interpretations it explicitly resolves; it does not erase historical semantic roles or their provenance.
 
 | Requirement | Authority path | Implementation | Current disposition |
 |---|---|---|---|
@@ -66,9 +66,9 @@ The exact historical v1.0.1/artifact path remains retrievable. The current all-r
 | Graduation Status historical binary role | same historical chain + current all-radio lock | same: semantic role no longer gates cards; conditional visibility stays host-owned | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
 | Other authentic Radio groups | current Owner all-radio lock | same `.gfield--type-radio` card system automatically covers visible/conditional groups | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
 | Section iconography | `VA:VC-1.0.1` §27 `section_heading_iconography` + `VA:ARTIFACT` + current reconciliation | explicit mapped Section Break tokens + local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
-| Report Card initial GPFUP | `VA:VC-1.0.1` §27 `report_card_upload_initial` + `VA:ARTIFACT` + current reconciliation | shared initial GPFUP family + explicit Report Card `24px` icon | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
+| Report Card initial GPFUP | `VA:VC-1.0.1` §27 `report_card_upload_initial` + `VA:ARTIFACT` + current reconciliation | shared initial GPFUP family + explicit Report Card `24px` file/document icon | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
 | Report Card `.gpfup--has-files` | `VA:VC-1.0.1` §§19,27 + host-owned GPFUP lifecycle | initial rules stop at authentic `.gpfup--has-files` state | `HOST_OWNED`; runtime recheck pending |
-| Student Photo initial | current Owner upload-family lock + authentic GPFUP image-only runtime/config evidence | `.gpfup--images-only` admits only the initial shared family | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
+| Student Photo initial | current Owner upload-family icon/alignment lock + authentic GPFUP image-only runtime/config evidence | current CSS admits the shared initial shell; photo/camera icon specialization is still pending | `OWNER_AUTHORIZED / IMPLEMENTATION_PENDING`; runtime pending after implementation |
 | Student Photo post-upload | `VA:VC-1.0.1` §27 + `VA:ARTIFACT` + current reconciliation | none until authentic Photo state/DOM is captured | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN`; crop config `HOST_OWNED` |
 
 ## Gravity Forms Form Presentation Readiness
@@ -134,6 +134,8 @@ It intentionally excludes entered values, labels/arbitrary page text, select opt
 
 ## Batch boundary
 
-This visual-repair batch implements all currently evidenced `DIFFERENT` presentation items that can be expressed safely with proven Gravity Forms/GPFUP consumers, including the current all-radio Owner lock. It deliberately keeps page-background integration, Student Photo post-upload composition, PersianGravity presentation, authentic invalid/focus/checked state acceptance, GPAS dynamic states, exact `320 CSS px`, `200%` text resize, text spacing, full contrast/target-size acceptance, and other runtime-only obligations open where authentic evidence is not available.
+The previously merged visual-repair batches implement the currently proven presentation set through theme 0.1.13. This documentation-only goal update does not change production CSS, SVG assets, PHP, JavaScript, Gravity Forms/GPFUP behavior, or package version.
+
+The newly authorized shared initial GPFUP icon/alignment requirement is intentionally left `IMPLEMENTATION_PENDING` for a separate bounded visual repair. It must be implemented only through GTB-owned presentation seams after authentic consumer verification and must not invent Student Photo post-upload/crop lifecycle.
 
 `STATICALLY_IMPLEMENTED` / `STATICALLY_PROVEN` does **not** mean WordPress/browser production qualification. Exact-head CI and installable packages provide regression/build evidence only; the bounded Owner real-site runtime checklist remains required.
