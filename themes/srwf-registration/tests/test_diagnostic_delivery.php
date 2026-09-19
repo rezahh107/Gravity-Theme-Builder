@@ -27,6 +27,7 @@ check( GTB_SRWF_RUNTIME_DIAGNOSTIC_ADMISSION_VERSION === '0.3.2', 'existing admi
 check( GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION === '0.3.4', 'qualification collector version changed' );
 
 $form = array(
+    'id' => 11,
     'cssClass' => 'srwf-registration-theme gpp-enabled gpp-profile-srwf-registration',
     'labelPlacement' => 'top_label',
     'descriptionPlacement' => 'above',
@@ -44,7 +45,7 @@ gtb_srwf_runtime_diagnostic_enqueue( $form, false );
 check( count( $scripts ) === 0, 'diagnostic loaded for non-admin' );
 
 $is_admin_user = true;
-gtb_srwf_runtime_diagnostic_enqueue( array( 'cssClass' => 'plain-form' ), false );
+gtb_srwf_runtime_diagnostic_enqueue( array( 'id' => 99, 'cssClass' => 'plain-form' ), false );
 check( count( $scripts ) === 0, 'diagnostic loaded for unrelated form' );
 
 gtb_srwf_runtime_diagnostic_enqueue( $form, false );
@@ -67,9 +68,21 @@ check( $inline_scripts[0]['handle'] === 'gtb-srwf-admission-diagnostic-v032' && 
 check( strpos( $inline_scripts[0]['data'], '"presentationAdmitted":true' ) !== false, 'normal admission fact missing' );
 check( strpos( $inline_scripts[0]['data'], '"renderingContext":"registration"' ) !== false, 'normal context fact missing' );
 check( $inline_scripts[1]['handle'] === 'gtb-srwf-v1-qualification-v034' && $inline_scripts[1]['position'] === 'before', 'layout readiness payload attached to wrong script' );
+check( strpos( $inline_scripts[1]['data'], 'GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID["11"]' ) !== false, 'form 11 readiness is not keyed to its rendered form' );
 check( strpos( $inline_scripts[1]['data'], '"requiredIndicator":{"expected":"asterisk","current":"asterisk","state":"MATCHING"}' ) !== false, 'required indicator readiness missing' );
 check( strpos( $inline_scripts[1]['data'], '"conflictingFieldOverrideCount":1' ) !== false, 'field override count missing' );
 check( strpos( $inline_scripts[1]['data'], 'Field 7' ) === false, 'diagnostic leaked arbitrary field label/text' );
+check( strpos( $inline_scripts[1]['data'], 'GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS =' ) === false, 'legacy unkeyed readiness singleton remains' );
+
+$form_two = $form;
+$form_two['id'] = 12;
+$form_two['descriptionPlacement'] = 'below';
+gtb_srwf_runtime_diagnostic_enqueue( $form_two, false );
+check( count( $inline_scripts ) === 4, 'second target did not publish its own bounded payloads' );
+check( $inline_scripts[3]['handle'] === 'gtb-srwf-v1-qualification-v034', 'second layout readiness attached to wrong script' );
+check( strpos( $inline_scripts[3]['data'], 'GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID["12"]' ) !== false, 'form 12 readiness is not keyed to its rendered form' );
+check( strpos( $inline_scripts[3]['data'], '"state":"NEEDS ATTENTION"' ) !== false, 'form 12 readiness state missing' );
+check( strpos( $inline_scripts[3]['data'], '["11"]' ) === false, 'second target readiness cross-bound to form 11' );
 
 $scripts = array();
 $inline_scripts = array();
@@ -87,6 +100,7 @@ check( strpos( $inline_scripts[0]['data'], '"presentationAdmitted":false' ) !== 
 check( strpos( $inline_scripts[0]['data'], '"renderingContext":"gravity_flow_entry_detail"' ) !== false, 'Entry Detail context fact missing' );
 check( strpos( $inline_scripts[0]['data'], '"contextEvidence":"gravity_flow_early_enqueue"' ) !== false, 'early Entry Detail context evidence missing' );
 check( strpos( $inline_scripts[0]['data'], '"exclusionReason":"gravity_flow_entry_detail"' ) !== false, 'Entry Detail exclusion reason missing' );
+check( strpos( $inline_scripts[1]['data'], 'GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID["11"]' ) !== false, 'context-excluded target readiness lost per-form binding' );
 
 check( array_filter( $hooks, fn( $h ) => $h[0] === 'gform_enqueue_scripts' && $h[1] === 'gtb_srwf_runtime_diagnostic_enqueue' && $h[2] === 30 && $h[3] === 2 ) !== array(), 'diagnostic delivery hook missing' );
-echo "PASS: diagnostic v0.3.4 delivery and bounded qualification contract\n";
+echo "PASS: diagnostic v0.3.4 delivery and per-target bounded qualification contract\n";
