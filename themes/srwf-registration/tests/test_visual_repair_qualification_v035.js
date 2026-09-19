@@ -122,6 +122,9 @@ const view = {
             if (element === report.drop) {
                 return { width: '40px', height: '40px', backgroundSize: '24px 24px', backgroundImage: 'url("report-card-file.svg")', borderRadius: '10px' };
             }
+            if (element === photo.drop) {
+                return { width: '40px', height: '40px', backgroundSize: '24px 24px', backgroundImage: 'url("student-photo-upload.svg")', borderRadius: '10px' };
+            }
             return { width: '', height: '', backgroundSize: '', backgroundImage: '', borderRadius: '' };
         }
         return element && element._style ? element._style : { display: 'block', visibility: 'visible', opacity: '1', overflowX: 'visible' };
@@ -149,10 +152,17 @@ assert.strictEqual(target.labelControlChain.finalTextToControlGapPx, 8);
 
 assert.strictEqual(target.uploads.reportCard.dropArea.computed.minHeight, '96px');
 assert.strictEqual(target.uploads.reportCard.dropArea.computed.borderTopWidth, '1px');
+assert.strictEqual(target.uploads.reportCard.dropArea.pseudoBefore.width, '40px');
+assert.strictEqual(target.uploads.reportCard.dropArea.pseudoBefore.height, '40px');
 assert.strictEqual(target.uploads.reportCard.dropArea.pseudoBefore.backgroundSize, '24px 24px');
+assert.ok(target.uploads.reportCard.dropArea.pseudoBefore.backgroundImage.includes('report-card-file.svg'));
 assert.strictEqual(target.uploads.studentPhoto.status, 'HOST_CONFIG_ADMITTED');
 assert.strictEqual(target.uploads.studentPhoto.admission, 'gpfup--images-only');
 assert.ok(target.uploads.studentPhoto.snapshot.rootClasses.includes('gpfup--images-only'));
+assert.strictEqual(target.uploads.studentPhoto.snapshot.dropArea.pseudoBefore.width, '40px');
+assert.strictEqual(target.uploads.studentPhoto.snapshot.dropArea.pseudoBefore.height, '40px');
+assert.strictEqual(target.uploads.studentPhoto.snapshot.dropArea.pseudoBefore.backgroundSize, '24px 24px');
+assert.ok(target.uploads.studentPhoto.snapshot.dropArea.pseudoBefore.backgroundImage.includes('student-photo-upload.svg'));
 assert.strictEqual(target.gpas.dynamicState, 'NOT_PROVEN_CLOSED');
 assert.strictEqual(target.primaryAction.computed.lineHeight, '24px');
 assert.strictEqual(target.runtimeOnlyStates.validation, 'OBSERVE_IF_AUTHENTIC_INVALID_STATE');
@@ -170,4 +180,4 @@ target = result.targets[0];
 assert.strictEqual(target.shell.horizontalOverflow.scrollingSurface.horizontalScrollOverflow, true, 'actual scroll surface overflow was not recorded');
 assert.strictEqual(target.shell.horizontalOverflow.detected, true);
 
-console.log('PASS: visual repair qualification measures row-normalized rhythm, observed gap chain, visible overflow, actual scroll surface, upload consumers, and unresolved dynamic states');
+console.log('PASS: visual repair qualification measures shared GPFUP icon geometry, row-normalized rhythm, observed gap chain, visible overflow, actual scroll surface, and unresolved dynamic states');
