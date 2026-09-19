@@ -2,16 +2,16 @@
 /**
  * Plugin Name: GTB SRWF Runtime Diagnostic
  * Description: Admin-gated privacy-safe structural/presentation diagnostic for SRWF Registration.
- * Version: 0.3.5
+ * Version: 0.3.6
  */
 
 defined( 'ABSPATH' ) || exit;
 
-const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.5';
+const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.6';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_COLLECTOR_VERSION = '0.3.0';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_ADMISSION_VERSION = '0.3.2';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION = '0.3.4';
-const GTB_SRWF_RUNTIME_DIAGNOSTIC_VISUAL_REPAIR_VERSION = '0.3.5';
+const GTB_SRWF_RUNTIME_DIAGNOSTIC_VISUAL_REPAIR_VERSION = '0.3.6';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_THEME_CLASS = 'srwf-registration-theme';
 
 function gtb_srwf_runtime_diagnostic_is_target_form( $form ) {
