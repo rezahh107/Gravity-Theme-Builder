@@ -104,12 +104,12 @@ The unresolved values recorded inside v1.0.1 are preserved there as **historical
 
 ## 4. Current Owner-supplied reconciliation
 
-Current project authority for the newly resolved SRWF destination is:
+Current project authority for the resolved SRWF destination is:
 
 ```text
 authority_handle: OWNER:SRWF-2026-09-19
 path: themes/srwf-registration/reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md
-status: CURRENT_OWNER_PROJECT_AUTHORITY / RUNTIME_VALIDATION_REQUIRED
+status: CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / RUNTIME_VALIDATION_REQUIRED
 provenance: direct Owner-supplied project authority for this execution
 immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR
 ```
@@ -120,16 +120,19 @@ No Google Drive revision ID, timestamp, export hash, or immutable upstream blob 
 
 - production desktop breakpoint `960 CSS px`;
 - desktop short-field pairings `HOST_OWNED / OWNER_CONFIGURABLE`, with no canonical pair list;
-- desktop card: `#F6F8FB` page, `#FFFFFF` surface, `840px` content cap, `32px` inline card padding, `904px` outer max, `16px` radius, no shadow;
-- exact form-title/helper/error typography and `24px` / `32px` field/section rhythm;
+- desktop card: `#F6F8FB` page where an authenticated ownership seam exists, `#FFFFFF` surface, `840px` content cap, `32px` inline card padding, `904px` outer max, `16px` radius, no shadow;
+- target family stack `Vazirmatn, Vazir, Tahoma, Arial, sans-serif` plus exact title/section/label/control/helper/error/action typography and line-height;
+- `24px` / `32px` field/section rhythm and the local label/helper/error/control gap chain;
 - exact `:focus-visible` outline geometry;
 - Gravity Forms recommended above-input description/validation/sub-label placement where supported, superseding the old below-input Owner choice;
-- native required indication with an asterisk explanation;
-- binary-choice minimum `52px`, `12px` gap, explicit semantic mapping only, and `#EDF1FC` tint;
-- exact section-icon tile dimensions and initial upload-family dimensions;
+- native required indication with the native required legend as the single explanation surface;
+- **all authentic Gravity Forms Radio groups inside admitted SRWF Registration use card presentation**; the host `radio` field type is sufficient presentation scope, and `srwf-role-binary-choice` must not gate cards;
+- Radio cards use min `52px`, `10px` radius, default `12px` gap, unselected `1px #8690A1`, selected `2px #1D4ED8` + `#EDF1FC` + visible non-color cue, with content-driven wrap/reflow and native semantics retained;
+- exact section-icon tile dimensions and `12px` icon-heading gap;
+- shared initial GPFUP upload-family dimensions, Report Card `24px` file icon specialization, and authentic image-only initial Student Photo admission;
 - current accessibility acceptance requirements.
 
-These are destination/acceptance decisions, not claims that current production CSS has already implemented or runtime-qualified them.
+These are destination/acceptance decisions. Static implementation and CI do not by themselves establish the runtime-sensitive states listed in the reconciliation and implementation map.
 
 ## 5. WHAT vs HOW
 
@@ -155,6 +158,10 @@ A visual deviation is admissible only when current authority is genuinely ambigu
 
 Documented/Owner-authorized values still require runtime qualification where consumer, cascade, behavior, reflow, contrast, focus, add-on state, or accessibility behavior is runtime-sensitive.
 
-## 8. Batch boundary
+## 8. Current batch boundary
 
-The 2026-09-19 reconciliation batch admits current authority and restores per-form configuration foundation. It does **not** broadly rewrite production CSS for the newly resolved visual constants. Current merged PR #15 binary-choice behavior remains the production baseline for this batch, and final visual/runtime qualification remains open.
+The 2026-09-19 visual-fidelity repair updates the current reconciliation, production presentation, tests, and diagnostic to close the evidence-backed `DIFFERENT` set while preserving immutable historical authority and host behavior ownership.
+
+The current batch specifically supersedes the prior binary-only card presentation gate. It does **not** invent Student Photo post-upload/crop lifecycle, GPAS dynamic states, validation/focus runtime results, page-background ownership, exact 320px acceptance, 200% text resize, text-spacing, contrast/target-size acceptance, or other states for which authentic runtime evidence is still required.
+
+Final Owner runtime qualification remains open; CI/static success is not production qualification.
