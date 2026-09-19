@@ -190,7 +190,7 @@ class SrwfAuthorityAndDeliveryTests(unittest.TestCase):
             "Report Card initial GPFUP": ("VA:VC-1.0.1", "VA:ARTIFACT", "report_card_upload_initial"),
             "Report Card `.gpfup--has-files`": ("VA:VC-1.0.1", "host-owned GPFUP lifecycle"),
             "Student Photo initial": ("authentic GPFUP image-only runtime/config evidence", "gpfup--images-only"),
-            "Student Photo post-upload": ("VA:VC-1.0.1", "VA:ARTIFACT", "student_photo_uploaded_state"),
+            "Student Photo post-upload": ("VA:VC-1.0.1", "VA:ARTIFACT", "current reconciliation"),
         }
         traceability = self.implementation_map.split("## Visual-role authority traceability", 1)[1]
         lines = traceability.splitlines()
