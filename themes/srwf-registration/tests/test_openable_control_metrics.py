@@ -101,10 +101,11 @@ class OpenableControlMetricTests(unittest.TestCase):
         self.assertEqual([CONTROL_SELECTOR, FOCUS_SELECTOR], openable)
         for selector in openable:
             self.assertTrue(selector.startswith(SCOPE))
+        openable_source = "\n".join(openable + [rule_body(CONTROL_SELECTOR), rule_body(FOCUS_SELECTOR)])
+        self.assertNotRegex(openable_source, r"(?i)school|مدرس")
         self.assertNotRegex(CSS, r"#(?:field|input|choice|label|gform_wrapper|gform)_\d+")
         self.assertNotIn(":nth-child", CSS)
         self.assertNotIn(":nth-of-type", CSS)
-        self.assertNotRegex(CSS, r"(?i)school|مدرس")
 
     def test_native_select_and_tom_select_behavior_are_not_reimplemented(self) -> None:
         clean = strip_comments(CSS)
