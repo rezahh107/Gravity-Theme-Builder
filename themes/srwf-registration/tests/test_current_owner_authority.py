@@ -45,7 +45,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertNotIn("upstream_export_sha256:", self.current)
         self.assertIn("immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR", self.authority)
 
-    def test_previously_unresolved_design_decisions_are_now_explicit_current_destination(self) -> None:
+    def test_current_owner_destination_includes_visual_repair_lock(self) -> None:
         required = (
             "production desktop breakpoint: `960 CSS px`",
             "`desktop_short_field_pairings: HOST_OWNED / OWNER_CONFIGURABLE`",
@@ -53,16 +53,23 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
             "box shadow: `none`",
             "Form title — mobile | `24px` | `700` | `1.5`",
             "Form title — desktop | `26px` | `700` | `1.5`",
+            "Section heading | `18px` | `700` | `1.5`",
+            "Field label | `15px` | `600` | `1.5`",
+            "Control value | `16px` | `400` | `1.5`",
             "Helper | `14px` | `400` | `1.5`",
             "Field error | `14px` | `600` | `1.5`",
+            "Primary action | `16px` | `700` | `1.5`",
             "field vertical rhythm: `24px`",
             "major section rhythm: `32px`",
             "outline: `2px solid #1D4ED8`",
             "outline offset: `2px`",
             "above the input where supported",
+            "Every authentic Gravity Forms Radio field inside admitted SRWF Registration uses card presentation",
             "minimum card/control target height: `52px`",
             "gap: `12px`",
-            "canonical primary treatment includes subtle tint `#EDF1FC`",
+            "unselected card border: `1px solid #8690A1`",
+            "selected card border: `2px solid #1D4ED8`",
+            "visible non-color dot/shape cue",
             "tile: `40px × 40px`",
             "minimum height: `96px`",
         )
@@ -80,24 +87,28 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         ):
             self.assertIn(value, self.current)
 
-    def test_implementation_docs_track_current_destination_and_unresolved_boundaries(self) -> None:
+    def test_implementation_docs_track_repaired_destination_and_unresolved_boundaries(self) -> None:
         self.assertIn("Production breakpoint | `960 CSS px`", self.implementation_map)
         self.assertIn("HOST_OWNED / OWNER_CONFIGURABLE", self.implementation_map)
-        self.assertIn("old below-input choice superseded", self.implementation_map)
-        self.assertIn("STATICALLY_IMPLEMENTED", self.implementation_map)
-        self.assertIn("HOST_INTEGRATION_REQUIRED", self.implementation_map)
+        self.assertIn("All Radio choices", self.implementation_map)
+        self.assertIn("gpfup--images-only", self.implementation_map)
+        self.assertIn("Diagnostic package v0.3.5", self.implementation_map)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
-        self.assertIn("0.1.9", self.src_readme)
+        self.assertIn("0.1.10", self.src_readme)
         self.assertIn("960px", self.src_readme)
         self.assertIn("above-input", self.src_readme)
 
     def test_current_authorized_visual_destination_is_present_without_broad_page_takeover(self) -> None:
         self.assertIn("@media (min-width: 960px)", self.css)
         self.assertIn("--gf-form-gap-y: 24px", self.css)
-        self.assertIn("--gf-ctrl-outline-width-focus: 2px", self.css)
+        self.assertIn("--gf-ctrl-line-height: 1.5", self.css)
+        self.assertIn("--gf-ctrl-label-line-height-primary: 1.5", self.css)
+        self.assertIn("--gf-ctrl-btn-line-height: 1.5", self.css)
         self.assertIn("max-inline-size: 904px", self.css)
         self.assertIn("padding-inline: 32px", self.css)
         self.assertIn("box-shadow: none", self.css)
+        self.assertIn(".gfield.gfield--type-radio", self.css)
+        self.assertNotIn(".gfield.srwf-role-binary-choice .gfield_radio", self.css)
         self.assertIn("background: #EDF1FC", self.css)
         self.assertNotIn("#F6F8FB", self.css, "page background must remain host-integration-owned until a safe seam is proven")
         self.assertNotIn("!important", self.css)
