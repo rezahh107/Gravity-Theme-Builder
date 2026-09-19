@@ -1,6 +1,6 @@
 ## SRWF Registration production candidate
 
-Current production package line: **0.1.11**.
+Current production package line: **0.1.12**.
 
 The SRWF Registration implementation is theme-local under `src/`. It is **not production-qualified** until the bounded Owner WordPress/browser checks are completed.
 
@@ -72,7 +72,7 @@ PR #12 was disproved by Owner runtime because the later content bracket alone di
 
 `wp_enqueue_scripts` → Gravity Flow `enqueue_frontend_scripts()` → `enqueue_form_scripts()` → Gravity Forms `gform_enqueue_scripts` / `gform_form_theme_slug`, before `gravityflow_entry_detail_content_before`.
 
-The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.11 candidate remains `OWNER_RUNTIME_REQUIRED`.
+The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.12 candidate remains `OWNER_RUNTIME_REQUIRED`.
 
 Pinned source/package evidence retained from the qualified host stack:
 
@@ -104,7 +104,7 @@ The implementation uses intrinsic sizing, wrapping, logical properties, and no f
 
 ### Runtime-proven / bounded add-on adapters
 
-- GP Advanced Select / Tom Select: only the already-proven `.ts-wrapper > .ts-control` visual consumer is targeted. Search/filter/results/selection/keyboard/mobile behavior remains add-on-owned.
+- GP Advanced Select / Tom Select: only the already-proven `.ts-wrapper > .ts-control` visible control is targeted. Its closed-control box now reuses the accepted SRWF 52px/1.5 metric family, zero block padding, logical text/indicator reserve, and established SRWF focus visual. Tom Select still owns its caret drawing, search/filter/results, open/close, selection, keyboard behavior, and synchronization. Authentic post-repair Owner-browser geometry remains `OWNER_RUNTIME_REQUIRED`.
 - GP File Upload Pro — initial state only: shared SRWF upload-family CSS stops at `.gpfup--has-files`. Report Card specialization is explicit; Student Photo initial admission is based only on the authentic GPFUP image-only configuration seam. Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned.
 
 Student Photo post-upload/crop/re-crop/delete structure remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN**. GPFUP owns that lifecycle and crop configuration. No post-upload composition is invented.
