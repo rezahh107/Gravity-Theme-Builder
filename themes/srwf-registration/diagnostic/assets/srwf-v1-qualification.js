@@ -154,7 +154,9 @@
         for (var i = 1; i < fields.length && gaps.length < MAX_ORDINARY_GAPS; i += 1) {
             var previousField = fields[i - 1];
             var currentField = fields[i];
-            if (hasClass(previousField, 'gfield--type-section') || hasClass(currentField, 'gfield--type-section')) {
+            var adjacentSiblings = currentField && currentField.previousElementSibling === previousField
+                && currentField.parentElement && previousField.parentElement === currentField.parentElement;
+            if (!adjacentSiblings || hasClass(previousField, 'gfield--type-section') || hasClass(currentField, 'gfield--type-section')) {
                 continue;
             }
             var before = rect(previousField);
