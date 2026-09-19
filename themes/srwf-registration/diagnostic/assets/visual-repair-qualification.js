@@ -45,6 +45,7 @@
     var TARGET_SELECTOR = '.gform-theme--framework.srwf-registration-theme_wrapper';
     var MAX_TARGETS = 4;
     var MAX_FIELDS = 48;
+    var MAX_SCROLL_ANCESTORS = 12;
     var SECTION_ROLES = [
         'srwf-role-section-identity',
         'srwf-role-section-contact',
@@ -105,10 +106,55 @@
         };
     }
 
-    function visibleOverflow(wrapper, view) {
+    function numericDimension(element, property) {
+        var value = element && Number(element[property]);
+        return Number.isFinite(value) ? value : null;
+    }
+
+    function scrollSurfaceSnapshot(element, view, kind) {
+        if (!element) {
+            return null;
+        }
+        var clientWidth = numericDimension(element, 'clientWidth');
+        var scrollWidth = numericDimension(element, 'scrollWidth');
+        return {
+            kind: kind,
+            rect: rect(element),
+            overflowX: styleSnapshot(element, view, ['overflowX']).overflowX || '',
+            clientWidth: clientWidth,
+            scrollWidth: scrollWidth,
+            horizontalScrollOverflow: clientWidth !== null && scrollWidth !== null ? scrollWidth > clientWidth + 1 : null
+        };
+    }
+
+    function actualHorizontalScrollSurface(wrapper, view, documentObject) {
+        var current = wrapper;
+        var depth = 0;
+        while (current && depth < MAX_SCROLL_ANCESTORS) {
+            var style = computed(current, view);
+            var overflowX = String(style && style.overflowX || '');
+            if (/^(auto|scroll)$/.test(overflowX)) {
+                return scrollSurfaceSnapshot(current, view, current === wrapper ? 'theme-wrapper' : 'scroll-ancestor');
+            }
+            current = current.parentElement || null;
+            depth += 1;
+        }
+
+        var scrolling = documentObject && (documentObject.scrollingElement || documentObject.documentElement || documentObject.body);
+        return scrollSurfaceSnapshot(scrolling || wrapper, view, scrolling ? 'document-scrolling-element' : 'theme-wrapper-fallback');
+    }
+
+    function visibleOverflow(wrapper, view, documentObject) {
         var wrapperRect = rect(wrapper);
+        var surface = actualHorizontalScrollSurface(wrapper, view, documentObject);
         if (!wrapperRect || !wrapper || typeof wrapper.querySelectorAll !== 'function') {
-            return { detected: false, sampledVisibleConsumers: 0, overflowingVisibleConsumers: 0 };
+            return {
+                detected: false,
+                visibleConsumerOverflowDetected: false,
+                sampledVisibleConsumers: 0,
+                overflowingVisibleConsumers: 0,
+                scrollingSurface: surface
+            };
         }
         var candidates = bounded(wrapper.querySelectorAll('input, select, textarea, button, .ts-control, .gfield, .gpfup__droparea, .gchoice > label'), 160);
         var sampled = 0;
@@ -123,7 +169,14 @@
                 overflowing += 1;
             }
         });
-        return { detected: overflowing > 0, sampledVisibleConsumers: sampled, overflowingVisibleConsumers: overflowing };
+        var scrollOverflow = Boolean(surface && surface.horizontalScrollOverflow === true);
+        return {
+            detected: overflowing > 0 || scrollOverflow,
+            visibleConsumerOverflowDetected: overflowing > 0,
+            sampledVisibleConsumers: sampled,
+            overflowingVisibleConsumers: overflowing,
+            scrollingSurface: surface
+        };
     }
 
     function rowRhythm(wrapper, view) {
@@ -175,6 +228,25 @@
         return null;
     }
 
+    function orderedGapChain(parts) {
+        var visibleParts = parts.filter(function (part) { return part.rect; });
+        visibleParts.sort(function (a, b) {
+            if (Math.abs(a.rect.y - b.rect.y) <= 1) {
+                return a.order - b.order;
+            }
+            return a.rect.y - b.rect.y;
+        });
+        return visibleParts.map(function (part, index) {
+            var next = index + 1 < visibleParts.length ? visibleParts[index + 1] : null;
+            return {
+                kind: part.kind,
+                rect: part.rect,
+                gapToNextPx: next ? Number(next.rect.y - (part.rect.y + part.rect.height)) : null,
+                nextKind: next ? next.kind : null
+            };
+        });
+    }
+
     function labelControlChain(wrapper, view) {
         var fields = bounded(wrapper.querySelectorAll('.gform_fields > .gfield:not(.gfield--type-section)'), MAX_FIELDS);
         for (var i = 0; i < fields.length; i += 1) {
@@ -193,12 +265,19 @@
             var helperRect = helper && visible(helper, view) ? rect(helper) : null;
             var errorRect = error && visible(error, view) ? rect(error) : null;
             var controlRect = rect(control);
+            var chain = orderedGapChain([
+                { kind: 'label', rect: labelRect, order: 0 },
+                { kind: 'helper', rect: helperRect, order: 1 },
+                { kind: 'error', rect: errorRect, order: 2 },
+                { kind: 'control', rect: controlRect, order: 3 }
+            ]);
             var predecessor = errorRect || helperRect || labelRect;
             return {
                 label: typography(label, view),
                 helper: helperRect ? typography(helper, view) : null,
                 error: errorRect ? typography(error, view) : null,
                 control: typography(control, view),
+                gapChain: chain,
                 finalTextToControlGapPx: predecessor && controlRect ? Number(controlRect.y - (predecessor.y + predecessor.height)) : null
             };
         }
@@ -269,9 +348,9 @@
         return button ? typography(button, view) : null;
     }
 
-    function targetSnapshot(wrapper, view) {
+    function targetSnapshot(wrapper, view, documentObject) {
         return {
-            shell: { rect: rect(wrapper), horizontalOverflow: visibleOverflow(wrapper, view) },
+            shell: { rect: rect(wrapper), horizontalOverflow: visibleOverflow(wrapper, view, documentObject) },
             rowRhythm: rowRhythm(wrapper, view),
             representativeFieldLabel: representativeLabel(wrapper, view),
             labelControlChain: labelControlChain(wrapper, view),
@@ -294,7 +373,7 @@
         return {
             diagnosticVersion: VERSION,
             targetCount: wrappers.length,
-            targets: wrappers.map(function (wrapper) { return targetSnapshot(wrapper, view); })
+            targets: wrappers.map(function (wrapper) { return targetSnapshot(wrapper, view, documentObject); })
         };
     }
 
