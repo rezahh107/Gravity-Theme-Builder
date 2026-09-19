@@ -39,10 +39,11 @@ class SrwfGpfupInitialContentClusterTests(unittest.TestCase):
             if REPORT + " > div" in selector and PHOTO + " > div" in selector
         )
         self.assertIn(".srwf-registration-theme_wrapper", cluster_selector)
-        self.assertIn("flex: 0 1 auto;", cluster)
+        self.assertIn("flex: 0 1 13rem;", cluster)
         self.assertIn("inline-size: auto;", cluster)
         self.assertIn("min-inline-size: 0;", cluster)
-        self.assertIn("max-inline-size: calc(100% - 52px);", cluster)
+        self.assertIn("max-inline-size: 100%;", cluster)
+        self.assertNotIn("calc(100% - 52px)", cluster)
 
     def test_alignment_is_limited_to_the_two_admitted_initial_variants(self) -> None:
         cluster_selectors = [selector for selector, _ in self.blocks if ".gpfup__droparea > div" in selector]
@@ -67,6 +68,7 @@ class SrwfGpfupInitialContentClusterTests(unittest.TestCase):
             "border: 1px dashed #8690A1;",
             "border-radius: 12px;",
             "column-gap: 12px;",
+            "row-gap: 12px;",
             "flex-wrap: wrap;",
         ):
             self.assertIn(declaration, shell)
