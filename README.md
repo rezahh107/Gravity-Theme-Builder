@@ -6,13 +6,13 @@ The repository is intentionally **design-authority driven**: an approved visual 
 
 ## Status
 
-**Early prototype / architecture formation.**
+**First reference implementation active / SRWF visual repair statically implemented / Owner runtime qualification still open.**
 
 The first reference implementation is:
 
 - `SRWF Registration` — a real-world RTL/Persian public registration form theme.
 
-SRWF is the first proving ground for the system, not a special case that defines every future theme.
+SRWF is the first proving ground for the system, not a special case that defines every future theme. The current theme implementation is `0.1.15`; automated/static qualification is green on the merged implementation, but that does not by itself establish production-browser qualification.
 
 ## Current first implementation target
 
@@ -24,13 +24,26 @@ For the authoritative interpretation of this current target, read:
 
 1. `themes/srwf-registration/README.md`
 2. `themes/srwf-registration/reference/VISUAL_AUTHORITY.md`
-3. `themes/srwf-registration/AGENTS.md` before implementation or visual-analysis work
+3. `themes/srwf-registration/reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md`
+4. `themes/srwf-registration/AGENTS.md` before implementation or visual-analysis work
 
 The admitted `OWNER_REFERENCE_new_7.html` design is the implementation target itself. Do not redesign, reinterpret, modernize, simplify, embellish, or substitute it.
 
 Gravity Forms Theme Framework and inspected runtime evidence determine **HOW** that approved design is implemented; they do not redefine **WHAT** the first deliverable should look like.
 
 Any summary of the repository's **current goals, first milestone, or first deliverable** should preserve this fact.
+
+## Current implementation reality
+
+The merged SRWF work currently includes:
+
+- native per-form GTB configuration/readiness;
+- Registration-versus-Gravity-Flow-Entry-Detail presentation isolation;
+- the Owner-authorized responsive shell, typography, spacing, focus, Submit, section-icon, and all-Radio card presentation;
+- the repaired native Select / GP Advanced Select presentation family;
+- the shared initial GPFUP icon/content-cluster presentation for Report Card and image-only Student Photo in theme `0.1.15`.
+
+Remaining work is evidence-driven runtime qualification on the exact current package, including responsive/accessibility states and authentic dynamic add-on states. Page-background ownership still requires an authentic host seam; Student Photo post-upload/crop composition and PersianGravity presentation remain runtime-dependent and must not be guessed.
 
 ## Core approach
 
@@ -73,13 +86,13 @@ The project does **not** aim to replace Gravity Forms, fork Orbital, recreate fo
 
 ## First milestone
 
-Implement the approved **SRWF Registration** visual design as a bounded reference theme and prove it in a real Gravity Forms environment, including RTL, validation states, responsive behavior, accessibility, Persian content, and required add-ons.
+Implement and production-qualify the approved **SRWF Registration** visual design as a bounded reference theme in a real Gravity Forms environment, including RTL, validation states, responsive behavior, accessibility, Persian content, and required add-ons.
 
-Only after the first implementation produces evidence should reusable machinery be promoted from `themes/srwf-registration/` into `src/`.
+Only after real theme evidence demonstrates reuse should reusable machinery be promoted from `themes/srwf-registration/` into `src/`.
 
 ## Documentation authority
 
-`docs/PROJECT_CHARTER.md` is the repository's governing project document. If another repository document conflicts with it, the Charter wins unless an explicit owner decision updates the Charter.
+`docs/PROJECT_CHARTER.md` governs repository engineering rules and project boundaries. Theme visual authority governs **WHAT** an admitted theme should look like, while current official Gravity Forms documentation/source and inspected runtime evidence govern version-sensitive implementation facts about **HOW** the host behaves.
 
 ## License
 

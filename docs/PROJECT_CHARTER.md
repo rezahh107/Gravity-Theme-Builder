@@ -74,6 +74,24 @@ Instead:
 
 If a factual host constraint prevents an approved visual requirement from being implemented as expected, preserve the visual requirement as the target, report the factual constraint, and choose or request the smallest authorized reconciliation. Do not silently weaken the design and do not falsify host behavior.
 
+### 3.7 Standards, official documentation, and evidence-driven default
+
+For routine technical, accessibility, usability, UI/UX, and engineering decisions, the Owner delegates resolution to the project manager and implementer when a sufficiently authoritative external basis exists. Routine re-confirmation is not required.
+
+Use this decision basis, within the relevant domain:
+
+- applicable law, mandatory standard, or normative accessibility requirement;
+- current official documentation and supported guidance from the host/platform/vendor;
+- broad professional consensus supported by multiple reputable sources and, where available, high-quality empirical or academic evidence;
+- established best practices with clear operational value;
+- project-specific preference only where the higher levels do not determine or constrain the choice.
+
+A single expert opinion, isolated blog post, or popularity claim is not enough by itself to establish project authority. Prefer converging evidence and authoritative sources.
+
+This delegation does not authorize silent changes to product purpose, business rules, data/workflow ownership, or major visual identity where multiple compliant choices remain materially different. Those remain Owner decisions when consequential. Runtime-specific facts must still be verified against the supported environment rather than inferred from generic best practice.
+
+When an existing local rule conflicts with a stronger applicable standard or current official host guidance, surface the conflict and amend the stale local rule using the smallest change that restores compliance while preserving project intent.
+
 ## 4. Core architectural position
 
 Gravity Forms remains the behavioral host.
@@ -158,21 +176,13 @@ Do not promote assumptions to project architecture merely because they appear pl
 
 The expected evolution is:
 
-```text
 Approved Design
-    ↓
-Theme-local implementation
-    ↓
-Real runtime validation
-    ↓
-Repeated pattern observed
-    ↓
-Shared abstraction candidate
-    ↓
-Cross-theme proof
-    ↓
-Promotion to src/
-```
+→ Theme-local implementation
+→ Real runtime validation
+→ Repeated pattern observed
+→ Shared abstraction candidate
+→ Cross-theme proof
+→ Promotion to src/
 
 The reverse flow — designing a generic framework first and forcing themes into it — is intentionally avoided.
 
