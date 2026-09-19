@@ -84,7 +84,7 @@ The GTB Theme settings page reports the current and expected host-owned Form Lay
 | `validationSummary` | `true` |
 | `requiredIndicator` | `asterisk` |
 
-`Check Again` and ordinary render remain read-only. **Apply Recommended SRWF Form Layout** remains a separate explicit capability + nonce protected action. At mutation time it re-reads the current full Form Object, computes only the six-property diff, performs no write if already matching, changes only those properties, calls `GFAPI::update_form()` with the coherent current object, re-reads it, and verifies persistence. `customRequiredIndicator` and unrelated form state are preserved.
+`Check Again` and ordinary render remain read-only. **Apply Recommended SRWF Form Layout** remains a separate explicit capability + nonce protected action. At mutation time it re-reads the current full Form Object, computes only the six-property diff, performs no write when already matching, changes only those properties, calls `GFAPI::update_form()` with the coherent current object, re-reads it, and verifies persistence. `customRequiredIndicator` and unrelated form state are preserved.
 
 Explicit field-level `labelPlacement`, `descriptionPlacement`, and `subLabelPlacement` values that conflict with the destination are reported as `ATTENTION REQUIRED` with a field ID/type reference. They are not silently rewritten. Overall Form Presentation Readiness is not `READY` while a known conflict remains.
 
