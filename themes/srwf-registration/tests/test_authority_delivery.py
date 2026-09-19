@@ -192,7 +192,8 @@ class SrwfAuthorityAndDeliveryTests(unittest.TestCase):
             "Student Photo initial": ("authentic GPFUP image-only runtime/config evidence", "gpfup--images-only"),
             "Student Photo post-upload": ("VA:VC-1.0.1", "VA:ARTIFACT", "student_photo_uploaded_state"),
         }
-        lines = self.implementation_map.splitlines()
+        traceability = self.implementation_map.split("## Visual-role authority traceability", 1)[1]
+        lines = traceability.splitlines()
         for label, required in required_rows.items():
             row = next((line for line in lines if line.startswith(f"| {label} |")), None)
             self.assertIsNotNone(row, f"missing implementation-map row: {label}")
