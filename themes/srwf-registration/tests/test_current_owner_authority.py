@@ -97,7 +97,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertIn("student-photo-upload.svg", self.implementation_map)
         self.assertIn("Diagnostic package v0.3.5", self.implementation_map)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
-        self.assertIn("0.1.14", self.src_readme)
+        self.assertIn("0.1.15", self.src_readme)
         self.assertIn("student-photo-upload.svg", self.src_readme)
         self.assertIn("960px", self.src_readme)
         self.assertIn("above-input", self.src_readme)
