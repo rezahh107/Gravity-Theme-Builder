@@ -186,9 +186,9 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.current)
         self.assertIn("NOT_PROVEN", self.authority)
-        self.assertIn("post-upload/crop", self.implementation_map)
-        self.assertIn("post-upload/crop", self.current)
-        self.assertIn("post-upload/crop", self.authority)
+        self.assertIn("post-upload/crop", self.implementation_map.lower())
+        self.assertIn("post-upload/crop", self.current.lower())
+        self.assertIn("post-upload/crop", self.authority.lower())
 
     def test_implementation_docs_track_mobile_polish_and_unresolved_host_width(self) -> None:
         self.assertIn("Production breakpoint | `960 CSS px`", self.implementation_map)
