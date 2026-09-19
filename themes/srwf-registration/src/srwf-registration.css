@@ -350,18 +350,35 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     line-height: 1.5;
 }
 
-/* Report Card keeps its approved file-icon specialization on top of the shared family. */
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea::before {
+/*
+ * The two Owner-admitted initial GPFUP variants share one decorative icon slot.
+ * Only the glyph differs by meaning; GPFUP still owns the authentic upload control,
+ * drop interaction, progress, validation, preview, remove, crop, and persistence.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea::before,
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea::before {
     content: "";
     flex: 0 0 40px;
     inline-size: 40px;
     block-size: 40px;
     border-radius: 10px;
     background-color: #F1F5F9;
-    background-image: url("icons/report-card-file.svg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: 24px 24px;
+}
+
+/* Report Card keeps its approved file/document glyph in the shared icon slot. */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea::before {
+    background-image: url("icons/report-card-file.svg");
+}
+
+/*
+ * Student Photo uses the authentic image-only initial GPFUP seam. This is decorative
+ * presentation only and intentionally stops before any .gpfup--has-files lifecycle.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea::before {
+    background-image: url("icons/student-photo-upload.svg");
 }
 
 /*
