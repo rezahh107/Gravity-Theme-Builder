@@ -229,35 +229,4 @@ function srwf_registration_theme_enqueue_styles( $form, $is_ajax ) { // phpcs:ig
 }
 add_action( 'gform_enqueue_scripts', 'srwf_registration_theme_enqueue_styles', 20, 2 );
 
-/**
- * Insert the short required-field explanation as real inert content once per rendered form.
- * Gravity Forms remains the sole owner of required state, ARIA, indicator and validation.
- *
- * gform_get_form_filter runs on each generated form string, including supported rerenders.
- * The marker makes the transformation idempotent for the same generated string without
- * request-global state that could suppress another legitimate form instance.
- *
- * @param string              $form_string Generated Gravity Forms HTML.
- * @param array<string,mixed> $form        Current Form Object.
- * @return string
- */
-function srwf_registration_theme_add_required_indicator_note( $form_string, $form ) {
-    if ( ! srwf_registration_theme_is_presentation_admitted( $form ) ) {
-        return $form_string;
-    }
-    if ( 'asterisk' !== (string) ( $form['requiredIndicator'] ?? '' ) ) {
-        return $form_string;
-    }
-    if ( false !== strpos( $form_string, 'data-srwf-required-note="1"' ) ) {
-        return $form_string;
-    }
-
-    $note = '<p class="srwf-required-note" data-srwf-required-note="1">' . esc_html__( 'فیلدهای دارای * الزامی هستند.', 'gravity-theme-builder' ) . '</p>';
-    $count = 0;
-    $filtered = preg_replace( '/(<form\b[^>]*>)/i', '$1' . $note, $form_string, 1, $count );
-
-    return 1 === $count && is_string( $filtered ) ? $filtered : $form_string;
-}
-add_filter( 'gform_get_form_filter', 'srwf_registration_theme_add_required_indicator_note', 10, 2 );
-
 require_once __DIR__ . '/srwf-registration-settings.php';
