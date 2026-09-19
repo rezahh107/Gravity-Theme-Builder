@@ -8,6 +8,7 @@ const vm = require('vm');
 const ASSETS = path.resolve(__dirname, '../diagnostic/assets');
 const runtimeSource = fs.readFileSync(path.join(ASSETS, 'runtime-diagnostic.js'), 'utf8');
 const qualificationSource = fs.readFileSync(path.join(ASSETS, 'srwf-v1-qualification.js'), 'utf8');
+const provenanceSource = fs.readFileSync(path.join(ASSETS, 'version-provenance.js'), 'utf8');
 
 function eventTargetElement(tagName) {
     const listeners = new Map();
@@ -104,10 +105,15 @@ function makeBrowserHarness() {
     vm.runInContext(runtimeSource, context, { filename: 'runtime-diagnostic.js' });
     vm.runInContext(qualificationSource, context, { filename: 'srwf-v1-qualification.js' });
 
+    context.GTB_SRWF_COLLECT_RADIO_CARD_GEOMETRY_V035 = () => ({ diagnosticVersion: '0.3.5', viewportCssWidth: context.innerWidth, fieldCount: 3 });
+    context.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V035 = () => ({ diagnosticVersion: '0.3.5', viewportCssWidth: context.innerWidth, targetCount: 1 });
+    vm.runInContext(provenanceSource, context, { filename: 'version-provenance.js' });
+
     const button = documentObject.getElementById('gtb-srwf-download-report');
     assert.ok(button, 'diagnostic download control was not initialized');
-    assert.strictEqual(typeof context.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034, 'function', 'v0.3.4 fresh qualification callable missing');
-    assert.strictEqual(context.GTB_SRWF_V1_QUALIFICATION_V034.viewportCssWidth, 640, 'initial qualification fixture did not collect');
+    assert.strictEqual(typeof context.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034, 'function', 'runtime-compatible final qualification callable missing');
+    assert.strictEqual(typeof context.GTB_SRWF_COLLECT_V1_QUALIFICATION_V035, 'function', 'v0.3.5 composed qualification callable missing');
+    assert.strictEqual(context.GTB_SRWF_V1_QUALIFICATION_V035.viewportCssWidth, 640, 'initial qualification fixture did not collect');
 
     return { context, button, downloads };
 }
@@ -119,8 +125,16 @@ function latestDownload(harness) {
 
 function assertFreshQualification(report, expectedWidth, label) {
     assert.ok(report.srwfV1Qualification, label + ': qualification missing from downloaded report');
-    assert.strictEqual(report.srwfV1Qualification.diagnosticVersion, '0.3.4', label + ': wrong qualification version');
+    assert.strictEqual(report.srwfV1Qualification.diagnosticVersion, '0.3.4', label + ': qualification core version changed');
     assert.strictEqual(report.srwfV1Qualification.viewportCssWidth, expectedWidth, label + ': downloaded qualification is stale');
+    assert.strictEqual(report.packageVersion, '0.3.5', label + ': package version provenance missing');
+    assert.strictEqual(report.diagnosticVersionMap.structuralCollector, '0.3.0', label + ': structural collector provenance missing');
+    assert.strictEqual(report.diagnosticVersionMap.finalQualificationComposer, '0.3.5', label + ': composer provenance missing');
+    assert.strictEqual(report.radioCardGeometry.viewportCssWidth, expectedWidth, label + ': radio geometry is stale');
+    assert.strictEqual(report.visualRepairQualification.viewportCssWidth, expectedWidth, label + ': visual repair qualification is stale');
+    assert.strictEqual(report.srwfV1Qualification.radioCardGeometry.viewportCssWidth, expectedWidth, label + ': composed radio evidence is stale');
+    assert.strictEqual(report.srwfV1Qualification.visualRepairQualification.viewportCssWidth, expectedWidth, label + ': composed visual evidence is stale');
+    assert.strictEqual(report.srwfV1Qualification.repairCollectorFailures.length, 0, label + ': unexpected repair collector failure');
     assert.strictEqual(
         Object.keys(report).filter((key) => key === 'srwfV1Qualification').length,
         1,
@@ -147,9 +161,29 @@ harness.context.innerWidth = 840;
 harness.button.dispatchEvent({ type: 'click', detail: 1 });
 assertFreshQualification(latestDownload(harness), 840, 'pointer activation');
 
-// A stale successful global must not survive a fresh-collection failure at final assembly.
+// A repair collector failure must be visible and must not serialize stale success.
+const staleVisual = harness.context.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V035;
+assert.strictEqual(staleVisual.viewportCssWidth, 840, 'repair failure control did not begin from known evidence');
+harness.context.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V035 = () => { throw new Error('forced visual repair failure'); };
+harness.context.innerWidth = 880;
+harness.button.dispatchEvent({ type: 'click', detail: 0 });
+const repairFailedReport = latestDownload(harness);
+assert.strictEqual(repairFailedReport.visualRepairQualification, null, 'stale visual repair evidence was serialized as current success');
+assert.strictEqual(repairFailedReport.srwfV1Qualification.visualRepairQualification, null, 'stale nested visual repair evidence survived');
+assert.ok(
+    repairFailedReport.collectorFailures.some((item) => item.collector === 'visualRepairQualification' && item.state === 'COLLECTOR_FAILED'),
+    'visual repair collector failure was not represented at the download boundary'
+);
+assert.ok(
+    repairFailedReport.srwfV1Qualification.repairCollectorFailures.some((item) => item.collector === 'visualRepairQualification'),
+    'visual repair collector failure was not represented in composed qualification evidence'
+);
+
+// Restore the repair collector before testing legacy qualification failure.
+harness.context.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V035 = () => ({ diagnosticVersion: '0.3.5', viewportCssWidth: harness.context.innerWidth, targetCount: 1 });
+
+// A stale successful legacy qualification must not survive a fresh core failure at final assembly.
 const staleQualification = harness.context.GTB_SRWF_V1_QUALIFICATION_V034;
-assert.strictEqual(staleQualification.viewportCssWidth, 840, 'failure control did not begin from known stale evidence');
 harness.context.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034 = () => { throw new Error('forced qualification failure'); };
 harness.context.GTB_SRWF_V1_QUALIFICATION_V034 = staleQualification;
 harness.context.innerWidth = 900;
@@ -160,7 +194,7 @@ assert.ok(
     failedReport.collectorFailures.some((item) => item.collector === 'srwfV1Qualification' && item.state === 'COLLECTOR_FAILED'),
     'fresh qualification failure was not represented in bounded collector failure evidence'
 );
-assert.strictEqual(harness.context.GTB_SRWF_V1_QUALIFICATION_V034, null, 'failed final capture left stale global qualification marked current');
+assert.strictEqual(harness.context.GTB_SRWF_V1_QUALIFICATION_V034, null, 'failed final capture left stale core qualification marked current');
 
-assert.strictEqual(harness.downloads.length, 4, 'unexpected number of diagnostic downloads');
-console.log('PASS: diagnostic final download assembly is activation-independent and fresh');
+assert.strictEqual(harness.downloads.length, 5, 'unexpected number of diagnostic downloads');
+console.log('PASS: final diagnostic download is activation-independent, version-explicit, fresh, and stale-repair-safe');
