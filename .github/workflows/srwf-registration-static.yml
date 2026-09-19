@@ -75,9 +75,9 @@ jobs:
           node themes/srwf-registration/tests/test_binary_choice_geometry.js
           node themes/srwf-registration/tests/test_admission_diagnostic_v032.js
           node themes/srwf-registration/tests/test_qualification_v034.js
-          node themes/srwf-registration/tests/test_diagnostic_download_v034.js
-          node themes/srwf-registration/tests/test_visual_repair_qualification_v035.js
-          node themes/srwf-registration/tests/test_version_provenance_v035.js
+          node themes/srwf-registration/tests/test_diagnostic_download_v036.js
+          node themes/srwf-registration/tests/test_visual_repair_qualification_v036.js
+          node themes/srwf-registration/tests/test_version_provenance_v036.js
 
       - name: Check production settings, layout, authentic-order context and diagnostic delivery
         run: |
