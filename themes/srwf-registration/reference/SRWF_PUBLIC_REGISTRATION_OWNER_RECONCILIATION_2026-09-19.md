@@ -1,6 +1,6 @@
 # SRWF Public Registration — Current Owner Reconciliation — 2026-09-19
 
-Status: **CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / RUNTIME_VALIDATION_REQUIRED**
+Status: **CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / OWNER_AUTHORIZED_UPLOAD_ICON_ALIGNMENT_PENDING / RUNTIME_VALIDATION_REQUIRED**
 
 Authority handle: `OWNER:SRWF-2026-09-19`
 
@@ -181,22 +181,28 @@ Authentic initial GPFUP upload surfaces admitted to SRWF Registration share one 
 - padding: `16px`;
 - radius: `12px`;
 - `1px` dashed border: `#8690A1`;
-- visible icon/instruction/authentic select-file/helper hierarchy where the authentic consumer provides those parts;
+- **every admitted initial upload surface has a visible decorative icon as part of the shared presentation family**;
+- Report Card and Student Photo use the same icon-slot geometry and the same icon/instruction/select-file alignment rhythm so their empty-state content reads as one coherent component family;
+- the icon glyphs may differ by meaning, but the presentation mechanism and alignment must stay consistent;
 - persistent helper/file-rule text remains legible at the Owner helper typography;
 - drag-and-drop must not be the only usable path;
 - Gravity Forms / GP File Upload Pro own actual upload behavior.
+
+This is a presentation-only goal. It must not require changes to Gravity Forms or GP File Upload Pro core/add-on files, host markup ownership, upload state, progress, validation, preview, delete, crop, persistence, or JavaScript lifecycle. Prefer GTB-owned local assets and bounded CSS on authentic initial GPFUP seams.
 
 ### Report Card
 
 The explicit Report Card semantic role retains its file-icon specialization over the shared initial upload family:
 
-- file icon visible size: `24px`;
+- file/document icon visible size: `24px`;
 - the already-authorized `96px` / `16px` / `12px` / `1px dashed #8690A1` outer shell is preserved;
 - GTB styles presentation only and does not replace GPFUP upload/progress/error/delete behavior.
 
 ### Student Photo
 
 The authentic GPFUP image-only configuration class `gpfup--images-only` is an admitted host/configuration seam for the **initial** Student Photo upload-family presentation. It does not encode field identity, wording, numeric ID, DOM position, or artifact order.
+
+The initial Student Photo surface must include a visible photo/camera icon in the same visual/icon-slot family as Report Card. The icon is decorative presentation only; it must not introduce replacement markup, custom upload controls, or behavior ownership. A GTB-owned local asset/CSS treatment is preferred when the authentic runtime seam supports it safely.
 
 GTB does not define crop ratio or crop dimensions for v1. Uploaded/preview/replace/re-crop/delete states may be styled only when authentic GPFUP runtime evidence exposes those consumers. GTB must not invent post-upload composition or lifecycle.
 
@@ -229,11 +235,12 @@ These are acceptance requirements, not claims that current production CSS has al
 
 ## Visual-repair implementation boundary
 
-The 2026-09-19 visual-fidelity repair statically implements the evidenced presentation differences authorized above while preserving host ownership and existing admission/isolation boundaries. In particular:
+The 2026-09-19 visual-fidelity repair statically implements the previously evidenced presentation differences while preserving host ownership and existing admission/isolation boundaries. In particular:
 
 - every authentic SRWF Radio field is now presented through the common card system without semantic-role gating;
 - target typography/line-height and section icon-heading gap are represented through supported Theme Framework tokens or bounded SRWF selectors;
-- initial GPFUP surfaces share the authorized upload-family geometry, with Report Card icon specialization and image-only Student Photo admission kept bounded;
+- initial GPFUP surfaces share the authorized upload-family outer geometry, with Report Card icon specialization and image-only Student Photo admission kept bounded;
+- the newly authorized family-wide initial upload icon/alignment goal is **not yet claimed implemented** by this authority-only update;
 - the diagnostic package adds visible-consumer qualification and explicit module-version provenance without fabricating dynamic runtime states.
 
-This static/automated implementation state is **not** full runtime or production qualification. Authentic Owner runtime evidence is still required for checked/keyboard-focused Radio behavior, validation, GPAS dynamic states, GPFUP post-upload states, exact `320 CSS px`, `200%` text resize, text spacing, complete contrast/target-size acceptance, and other runtime-sensitive obligations.
+This static/automated implementation state is **not** full runtime or production qualification. Authentic Owner runtime evidence is still required for the newly authorized upload icon/alignment goal, checked/keyboard-focused Radio behavior, validation, GPAS dynamic states, GPFUP post-upload states, exact `320 CSS px`, `200%` text resize, text spacing, complete contrast/target-size acceptance, and other runtime-sensitive obligations.
