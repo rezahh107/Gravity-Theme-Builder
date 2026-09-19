@@ -39,6 +39,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     --gf-ctrl-label-font-size-primary: 15px;
     --gf-ctrl-label-font-weight-primary: 600;
     --gf-ctrl-label-line-height-primary: 1.5;
+    --gf-label-space-primary: 8px;
     --gf-ctrl-desc-color: #667085;
     --gf-ctrl-desc-font-size: 14px;
     --gf-ctrl-desc-font-weight: 400;
@@ -47,6 +48,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     --gf-ctrl-desc-font-size-error: 14px;
     --gf-ctrl-desc-font-weight-error: 600;
     --gf-ctrl-desc-line-height-error: 1.5;
+    --gf-desc-space: 8px;
 
     --gf-ctrl-btn-bg-color-primary: #1D4ED8;
     --gf-ctrl-btn-bg-color-hover-primary: #1E40AF;
@@ -62,6 +64,17 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     --gf-field-section-border-color: #E4E7EC;
     --gf-form-validation-heading-color: #B42318;
     --gf-form-gap-y: 24px;
+}
+
+/*
+ * Owner field-internal spacing contract. Gravity Forms' documented primary-label and
+ * description spacing APIs own the 8px label/control and final text/control gaps.
+ * Only fields whose authentic above-input helper/error consumer is present narrow the
+ * primary-label spacing to 6px. Intermediate helper/error spacing remains host/content-driven.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.field_description_above:has(> .gfield_description:not(.gform_fileupload_rules)),
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.field_validation_above:has(.gfield_validation_message) {
+    --gf-label-space-primary: 6px;
 }
 
 .gform-theme--framework.srwf-registration-theme_wrapper {
