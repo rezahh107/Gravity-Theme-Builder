@@ -11,7 +11,7 @@
  */
 
 head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper {
-    --gf-font-family-base: "Vazirmatn", system-ui, sans-serif;
+    --gf-font-family-base: "Vazirmatn", "Vazir", Tahoma, Arial, sans-serif;
 
     --gf-color-primary: #1D4ED8;
     --gf-color-primary-rgb: 29, 78, 216;
@@ -29,6 +29,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     --gf-ctrl-size: 52px;
     --gf-ctrl-font-size: 16px;
     --gf-ctrl-font-weight: 400;
+    --gf-ctrl-line-height: 1.5;
     --gf-ctrl-outline-color-focus: #1D4ED8;
     --gf-ctrl-outline-width-focus: 2px;
     --gf-ctrl-outline-offset: 2px;
@@ -37,6 +38,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     --gf-ctrl-label-color-primary: #172033;
     --gf-ctrl-label-font-size-primary: 15px;
     --gf-ctrl-label-font-weight-primary: 600;
+    --gf-ctrl-label-line-height-primary: 1.5;
     --gf-ctrl-desc-color: #667085;
     --gf-ctrl-desc-font-size: 14px;
     --gf-ctrl-desc-font-weight: 400;
@@ -54,6 +56,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     --gf-ctrl-btn-size: 56px;
     --gf-ctrl-btn-font-size: 16px;
     --gf-ctrl-btn-font-weight: 700;
+    --gf-ctrl-btn-line-height: 1.5;
 
     --gf-ctrl-file-zone-radius: 12px;
     --gf-field-section-border-color: #E4E7EC;
@@ -69,13 +72,13 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     margin-inline: auto;
     padding-inline: 16px;
     color: #172033;
-    font-family: "Vazirmatn", system-ui, sans-serif;
+    font-family: "Vazirmatn", "Vazir", Tahoma, Arial, sans-serif;
 }
 
 /* Gravity Forms reset intentionally excludes heading descendants on these host surfaces. */
-.gform-theme--framework.srwf-registration-theme_wrapper .gform_title {
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gform_title {
     color: #172033;
-    font-family: "Vazirmatn", system-ui, sans-serif;
+    font-family: "Vazirmatn", "Vazir", Tahoma, Arial, sans-serif;
     font-size: 24px;
     font-weight: 700;
     line-height: 1.5;
@@ -85,11 +88,12 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     margin-block-start: 8px;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section .gsection_title {
+head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gfield--type-section .gsection_title {
     color: #172033;
-    font-family: "Vazirmatn", system-ui, sans-serif;
+    font-family: "Vazirmatn", "Vazir", Tahoma, Arial, sans-serif;
     font-size: 18px;
     font-weight: 700;
+    line-height: 1.5;
 }
 
 /*
@@ -117,25 +121,24 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
 }
 
 /*
- * Owner-approved semantic binary-choice role.
- * Configure this class only on Gender and Graduation Status. The real GF radio remains
- * the selection authority; CSS derives presentation exclusively from :checked/:focus-visible.
- * Owner runtime proves the authentic fields also carry gfield--choice-align-vertical,
- * so this role must explicitly establish the approved horizontal choice row.
+ * Owner lock: every authentic Gravity Forms Radio field inside the admitted SRWF
+ * Registration surface uses card presentation. Field type is presentation identity;
+ * no label text, numeric ID, DOM position, or semantic option text is consulted.
+ * Gravity Forms remains the radio/checked/keyboard/validation owner.
  */
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield_radio {
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gfield_radio {
     display: flex;
-    flex-direction: row;
+    flex-flow: row wrap;
     gap: 12px;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gchoice {
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gchoice {
     position: relative;
-    flex: 1 1 0;
+    flex: 1 1 8rem;
     min-inline-size: 0;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield-choice-input {
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gfield-choice-input {
     position: absolute;
     inline-size: 1px;
     block-size: 1px;
@@ -143,27 +146,41 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     opacity: 0;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gchoice label {
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gchoice label {
     box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    inline-size: 100%;
     min-block-size: 52px;
     min-inline-size: 0;
     padding: 12px 16px;
-    border: 1.5px solid #8690A1;
+    border: 1px solid #8690A1;
     border-radius: 10px;
     background: #FFFFFF;
     color: #172033;
-    font-family: "Vazirmatn", system-ui, sans-serif;
+    font-family: "Vazirmatn", "Vazir", Tahoma, Arial, sans-serif;
     font-size: 15px;
     font-weight: 600;
+    line-height: 1.5;
     text-align: center;
     overflow-wrap: anywhere;
     cursor: pointer;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield-choice-input:checked + label {
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gchoice label::before {
+    content: "";
+    box-sizing: border-box;
+    flex: 0 0 14px;
+    inline-size: 14px;
+    block-size: 14px;
+    border: 1.5px solid #8690A1;
+    border-radius: 50%;
+    background: #FFFFFF;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gfield-choice-input:checked + label {
     border-color: #1D4ED8;
     border-width: 2px;
     background: #EDF1FC;
@@ -171,7 +188,13 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     font-weight: 700;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-binary-choice .gfield-choice-input:focus-visible + label {
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gfield-choice-input:checked + label::before {
+    border-color: #1D4ED8;
+    background: #1D4ED8;
+    box-shadow: inset 0 0 0 3px #EDF1FC;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gfield-choice-input:focus-visible + label {
     outline: 2px solid #1D4ED8;
     outline-offset: 2px;
     box-shadow: none;
@@ -188,7 +211,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-student-photo .gsection_title {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-section.srwf-role-section-identity .gsection_title::before,
@@ -228,23 +251,58 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
 }
 
 /*
- * Report Card only. GPFUP remains upload/validation/delete owner. Initial-state geometry
- * is excluded as soon as the authentic .gpfup--has-files state appears.
+ * Shared SRWF initial GPFUP upload-family presentation. The consumer identity is the
+ * authentic GPFUP initial-state seam; uploaded/preview/delete/crop behavior remains
+ * entirely host-owned because the rule stops at .gpfup--has-files.
  */
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea {
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup:not(.gpfup--has-files) .gpfup__droparea {
     box-sizing: border-box;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     min-block-size: 96px;
     min-inline-size: 0;
     padding: 16px;
-    gap: 12px;
-    border: 1.5px dashed #8690A1;
+    column-gap: 12px;
+    row-gap: 4px;
+    border: 1px dashed #8690A1;
     border-radius: 12px;
     background: #FAFBFC;
+    color: #475467;
+    font-family: "Vazirmatn", "Vazir", Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
     text-align: start;
 }
 
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup:not(.gpfup--has-files) .gpfup__select-files {
+    min-block-size: 0;
+    block-size: auto;
+    inline-size: auto;
+    min-inline-size: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #172033;
+    font-family: "Vazirmatn", "Vazir", Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: normal;
+    text-align: start;
+    overflow-wrap: anywhere;
+}
+
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gform_fileupload_rules {
+    color: #667085;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+/* Report Card keeps its approved file-icon specialization on top of the shared family. */
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea::before {
     content: "";
     flex: 0 0 40px;
@@ -255,30 +313,16 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     background-image: url("icons/report-card-file.svg");
     background-position: center;
     background-repeat: no-repeat;
-    background-size: 18px 18px;
+    background-size: 24px 24px;
 }
 
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__select-files {
-    min-block-size: 0;
-    block-size: auto;
-    inline-size: auto;
-    min-inline-size: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    color: #172033;
-    font-family: "Vazirmatn", system-ui, sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.5;
-    white-space: normal;
-    text-align: start;
-    overflow-wrap: anywhere;
-}
-
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gform_fileupload_rules {
-    color: #667085;
+/*
+ * Student Photo is admitted through GPFUP's authentic image-only configuration class,
+ * not field identity. It therefore receives the same initial shell/action hierarchy
+ * without inventing any post-upload crop/preview behavior.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea {
+    min-block-size: 96px;
 }
 
 @media (min-width: 960px) {
@@ -290,7 +334,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
         box-shadow: none;
     }
 
-    .gform-theme--framework.srwf-registration-theme_wrapper .gform_title {
+    head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gform_title {
         font-size: 26px;
     }
 }
