@@ -21,6 +21,14 @@ def rule_body(css: str, selector: str) -> str:
     return match.group(1)
 
 
+def selectors(css: str) -> list[str]:
+    clean = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    result: list[str] = []
+    for match in re.finditer(r"([^{}]+)\{[^{}]*\}", clean, flags=re.S):
+        result.extend(part.strip() for part in match.group(1).split(",") if part.strip())
+    return result
+
+
 def fill_contract_closed(css: str) -> bool:
     choice = rule_body(css, CHOICE_SELECTOR)
     label = rule_body(css, LABEL_SELECTOR)
@@ -32,7 +40,9 @@ def fill_contract_closed(css: str) -> bool:
 
 class RadioCardFillRepairTests(unittest.TestCase):
     def test_pre_repair_choice_rule_fails_root_cause_contract(self) -> None:
-        pre_repair = CSS.replace("    display: block;\n", "", 1)
+        current_choice = rule_body(CSS, CHOICE_SELECTOR)
+        pre_repair_choice = re.sub(r"\n\s*display\s*:\s*block\s*;", "", current_choice, count=1)
+        pre_repair = CSS.replace(current_choice, pre_repair_choice, 1)
         self.assertFalse(fill_contract_closed(pre_repair))
         self.assertTrue(fill_contract_closed(CSS))
 
@@ -82,14 +92,15 @@ class RadioCardFillRepairTests(unittest.TestCase):
         self.assertIn(":focus-visible + label", CSS)
 
     def test_repair_is_radio_and_registration_scoped_without_identity_hacks(self) -> None:
-        for selector in re.findall(r"([^{}]+)\{[^{}]*\}", CSS, flags=re.S):
-            if ".gchoice" in selector or ".gfield-choice-input" in selector or ".gfield_radio" in selector:
-                for part in selector.split(","):
-                    part = part.strip()
-                    if not part:
-                        continue
-                    self.assertTrue(part.startswith(".gform-theme--framework.srwf-registration-theme_wrapper"))
-                    self.assertIn(".gfield.gfield--type-radio", part)
+        relevant = [
+            selector
+            for selector in selectors(CSS)
+            if ".gchoice" in selector or ".gfield-choice-input" in selector or ".gfield_radio" in selector
+        ]
+        self.assertTrue(relevant)
+        for selector in relevant:
+            self.assertTrue(selector.startswith(".gform-theme--framework.srwf-registration-theme_wrapper"))
+            self.assertIn(".gfield.gfield--type-radio", selector)
         self.assertNotRegex(CSS, r"#(?:field|input|choice|label|gform_wrapper|gform)_\d+")
         self.assertNotIn(":nth-child", CSS)
         self.assertNotIn(":nth-of-type", CSS)
