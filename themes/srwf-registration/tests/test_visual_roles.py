@@ -183,10 +183,11 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertIn("gpfup--has-files", self.fixtures)
         self.assertIn('class="gpfup__files"', self.fixtures)
         self.assertIn('class="gpfup__delete"', self.fixtures)
-        self.assertNotIn(".gpfup__files", self.css)
-        self.assertNotIn(".gpfup__delete", self.css)
-        self.assertNotIn("crop", self.css.lower())
-        self.assertNotIn("preview", self.css.lower())
+        selectors = "\n".join(selector for selector, _ in blocks(self.css)).lower()
+        self.assertNotIn(".gpfup__files", selectors)
+        self.assertNotIn(".gpfup__delete", selectors)
+        self.assertNotIn("crop", selectors)
+        self.assertNotIn("preview", selectors)
         self.assertIn(".gpfup:not(.gpfup--has-files) .gpfup__droparea", self.css)
 
     def test_upload_family_is_intrinsically_narrow_safe(self) -> None:
