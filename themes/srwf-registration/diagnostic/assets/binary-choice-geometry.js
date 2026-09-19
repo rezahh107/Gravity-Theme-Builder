@@ -32,6 +32,7 @@
             }
         }
 
+        root.GTB_SRWF_COLLECT_RADIO_CARD_GEOMETRY_V035 = collectNow;
         collectNow();
 
         if (button && typeof button.addEventListener === 'function') {
