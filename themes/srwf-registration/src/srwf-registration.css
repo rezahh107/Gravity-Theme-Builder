@@ -30,6 +30,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     --gf-ctrl-font-size: 16px;
     --gf-ctrl-font-weight: 400;
     --gf-ctrl-line-height: 1.5;
+    --gf-ctrl-select-padding-x: 24px 32px;
     --gf-ctrl-outline-color-focus: #1D4ED8;
     --gf-ctrl-outline-width-focus: 2px;
     --gf-ctrl-outline-offset: 2px;
@@ -120,17 +121,26 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
 }
 
 /*
+ * Openable-control family. Gravity Forms owns native Select behavior and publishes
+ * --gf-ctrl-select-padding-x for the value/indicator inline reserve. Owner runtime
+ * proves the real SRWF native single-select additionally needs a 14px block-start
+ * optical compensation to align its browser-rendered value with the accepted control
+ * family. Enhanced Tom Select sources are excluded from that native-only adjustment.
+ */
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-select select.gfield_select:not([multiple]):not(.tomselected):not(.ts-hidden-accessible) {
+    padding-block-start: 14px;
+}
+
+/*
  * GP Advanced Select / Tom Select: Owner runtime proves .ts-wrapper > .ts-control as
- * the visible closed control. Match the accepted SRWF text-control metrics while
- * leaving Tom Select responsible for caret drawing, search, open/close, and value state.
- * The 32px logical end padding mirrors the authentic Gravity Forms select's measured
- * indicator reserve (12px content padding + 20px indicator space) in the same runtime.
+ * the visible closed control. Reuse the same documented select-family inline metric;
+ * Tom Select still owns caret drawing, search, open/close, and value state.
  */
 .gform-theme--framework.srwf-registration-theme_wrapper .ts-wrapper .ts-control {
     box-sizing: border-box;
     min-block-size: var(--gf-ctrl-size);
     padding-block: 0;
-    padding-inline: 12px 32px;
+    padding-inline: var(--gf-ctrl-select-padding-x);
     line-height: var(--gf-ctrl-line-height);
 }
 

@@ -38,6 +38,7 @@ REVIEWED_GF_API = {
     "--gf-ctrl-font-size",
     "--gf-ctrl-font-weight",
     "--gf-ctrl-line-height",
+    "--gf-ctrl-select-padding-x",
     "--gf-ctrl-outline-color-focus",
     "--gf-ctrl-outline-width-focus",
     "--gf-ctrl-outline-offset",
@@ -353,6 +354,7 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         adapter = re.search(r"\.gform-theme--framework\.srwf-registration-theme_wrapper \.ts-wrapper \.ts-control\s*\{([^}]*)\}", css, re.S)
         self.assertIsNotNone(adapter)
         self.assertIn("min-block-size: var(--gf-ctrl-size);", adapter.group(1))
+        self.assertIn("padding-inline: var(--gf-ctrl-select-padding-x);", adapter.group(1))
         self.assertNotRegex(css, r"(?m)^\s*\.ts-control\s*\{")
         self.assertEqual([], list((THEME / "src").glob("**/*.js")))
 
