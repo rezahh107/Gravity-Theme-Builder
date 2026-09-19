@@ -139,16 +139,24 @@ assert.strictEqual(report.targets[1].formLayoutReadiness.state, 'NEEDS ATTENTION
 assert.strictEqual(report.targets[0].formLayoutReadiness.conflictingFieldOverrideCount, 0);
 assert.strictEqual(report.targets[1].formLayoutReadiness.conflictingFieldOverrideCount, 2);
 
-// DOM order differs from SECTION_ROLES declaration: education precedes identity and must win.
 assert.strictEqual(report.targets[0].rhythm.section.role, 'srwf-role-section-education');
 assert.strictEqual(report.targets[0].rhythm.section.gapFromPreviousPx, 32);
-// The normal target has exactly one adjacent ordinary pair A -> B.
 assert.deepStrictEqual(report.targets[0].rhythm.ordinary.gapsPx, [24]);
-// A Section Break separates every ordinary pair in target 2; no cross-section ordinary gap is legal.
 assert.deepStrictEqual(report.targets[1].rhythm.ordinary.gapsPx, []);
 assert.strictEqual(report.targets[1].rhythm.ordinary.sampleCount, 0);
 assert.strictEqual(report.targets[1].rhythm.section.role, 'srwf-role-section-education');
 assert.strictEqual(report.targets[1].rhythm.section.gapFromPreviousPx, 108);
+
+const crossContainer = makeWrapper('gform_wrapper_13', 'normal');
+crossContainer.fields[1].parentElement = {};
+crossContainer.fields[1].previousElementSibling = null;
+const crossContainerReport = api.collect({ activeElement: null, querySelectorAll: () => [crossContainer.wrapper] }, {
+    innerWidth: 1024,
+    GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID: { '13': { state: 'READY', conflictingFieldOverrideCount: 0 } },
+    getComputedStyle: view.getComputedStyle
+});
+assert.deepStrictEqual(crossContainerReport.targets[0].rhythm.ordinary.gapsPx, []);
+
 assert.strictEqual(report.targets[0].focusedConsumer.computed.outlineWidth, '2px');
 assert.strictEqual(report.targets[0].sectionIcons[0].role, 'srwf-role-section-identity');
 assert.strictEqual(report.targets[0].sectionIcons[0].tile.width, '40px');
@@ -158,7 +166,6 @@ assert.strictEqual(report.targets[0].gpas.consumer, 'runtime-proven-ts-wrapper-d
 assert.strictEqual(report.targets[0].studentPhoto.status, 'NOT_PROVEN');
 assert.strictEqual(report.targets[0].persianGravity.status, 'OWNER_RUNTIME_REQUIRED');
 
-// Single-target behavior stays valid and remains explicitly target-bounded.
 const single = api.collect({ activeElement: first.focus, querySelectorAll: () => [first.wrapper] }, view);
 assert.strictEqual(single.targetCount, 1);
 assert.strictEqual(single.targets[0].formLayoutReadiness.state, 'READY');
@@ -170,7 +177,6 @@ assert.strictEqual(missing.targetCount, 0);
 assert.deepStrictEqual(missing.targets, []);
 assert.strictEqual(missing.viewportCssWidth, 320);
 
-// Target budget matches the existing structural collector's four-target cap.
 const many = api.collect({ querySelectorAll: () => [first.wrapper, second.wrapper, first.wrapper, second.wrapper, first.wrapper] }, view);
 assert.strictEqual(api.MAX_TARGETS, 4);
 assert.strictEqual(many.targetCount, 4);
