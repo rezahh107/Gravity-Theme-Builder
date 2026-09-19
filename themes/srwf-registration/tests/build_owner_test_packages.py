@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import re
-import shutil
 import tempfile
 import zipfile
 from pathlib import Path
@@ -30,6 +29,8 @@ DIAGNOSTIC_FILES = (
     'assets/binary-choice-geometry.js',
     'assets/admission-diagnostic.js',
     'assets/srwf-v1-qualification.js',
+    'assets/visual-repair-qualification.js',
+    'assets/version-provenance.js',
 )
 
 
@@ -50,6 +51,26 @@ def local_css_urls(css_source: str) -> list[str]:
             continue
         values.append(value.split('?', 1)[0].split('#', 1)[0])
     return values
+
+
+def diagnostic_runtime_assets(php_source: str) -> set[str]:
+    """Return local plugin assets explicitly enqueued by the diagnostic entry point."""
+    return {
+        match.group(1)
+        for match in re.finditer(r"plugins_url\(\s*['\"]([^'\"]+)['\"]\s*,\s*__FILE__\s*\)", php_source)
+    }
+
+
+def assert_diagnostic_package_closure() -> None:
+    php = (DIAGNOSTIC / 'srwf-runtime-diagnostic.php').read_text(encoding='utf-8')
+    referenced = diagnostic_runtime_assets(php)
+    declared = set(DIAGNOSTIC_FILES)
+    missing_from_archive = sorted(referenced - declared)
+    if missing_from_archive:
+        raise RuntimeError(f'diagnostic archive omits enqueued runtime assets: {missing_from_archive}')
+    missing_on_disk = sorted(relative for relative in referenced if not (DIAGNOSTIC / relative).is_file())
+    if missing_on_disk:
+        raise RuntimeError(f'diagnostic entry point references missing runtime assets: {missing_on_disk}')
 
 
 def deterministic_zip(source_root: Path, files: tuple[str, ...], archive: Path, install_root: str) -> None:
@@ -90,6 +111,7 @@ def sha256(path: Path) -> str:
 def build(output_dir: Path) -> tuple[Path, Path, Path]:
     production_version = read_version(PRODUCTION / 'srwf-registration-theme.php', 'SRWF_REGISTRATION_THEME_VERSION')
     diagnostic_version = read_version(DIAGNOSTIC / 'srwf-runtime-diagnostic.php', 'GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION')
+    assert_diagnostic_package_closure()
 
     production_zip = output_dir / f'gtb-srwf-registration-owner-test-{production_version}.zip'
     diagnostic_zip = output_dir / f'gtb-srwf-runtime-diagnostic-v{diagnostic_version}.zip'
