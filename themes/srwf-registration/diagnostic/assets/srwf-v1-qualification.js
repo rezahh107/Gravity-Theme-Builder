@@ -14,19 +14,36 @@
         var button = documentObject.getElementById('gtb-srwf-download-report');
 
         function collectNow() {
+            var report = root.GTB_SRWF_RUNTIME_DIAGNOSTIC_V03;
+            if (report && typeof report === 'object' && Object.prototype.hasOwnProperty.call(report, 'srwfV1Qualification')) {
+                delete report.srwfV1Qualification;
+            }
+            root.GTB_SRWF_V1_QUALIFICATION_V034 = null;
+
             var result = api.collect(documentObject, root);
             root.GTB_SRWF_V1_QUALIFICATION_V034 = result;
-            var report = root.GTB_SRWF_RUNTIME_DIAGNOSTIC_V03;
             if (report && typeof report === 'object') {
                 report.srwfV1Qualification = result;
             }
             return result;
         }
 
-        collectNow();
+        root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034 = collectNow;
+
+        try {
+            collectNow();
+        } catch (error) {
+            root.GTB_SRWF_V1_QUALIFICATION_V034 = null;
+        }
+
         if (button && typeof button.addEventListener === 'function') {
-            button.addEventListener('pointerdown', collectNow);
-            button.addEventListener('click', collectNow, true);
+            button.addEventListener('pointerdown', function () {
+                try {
+                    collectNow();
+                } catch (error) {
+                    root.GTB_SRWF_V1_QUALIFICATION_V034 = null;
+                }
+            });
         }
     }
 
