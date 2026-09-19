@@ -17,6 +17,9 @@
     });
 
     function parkDiagnosticControls() {
+        if (typeof root.document.getElementById !== 'function') {
+            return;
+        }
         ['gtb-srwf-download-report', 'gtb-srwf-download-admission-report'].forEach(function (id) {
             var button = root.document.getElementById(id);
             if (!button || !button.style) {
