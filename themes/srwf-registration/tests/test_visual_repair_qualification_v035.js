@@ -41,8 +41,9 @@ wrapper.parentElement = scrollParent;
 
 const label = node('legend', ['gfield_label'], { x: 100, y: 100, width: 300, height: 22 }, { fontFamily: 'Vazirmatn', fontSize: '15px', fontWeight: '600', lineHeight: '22.5px', color: 'rgb(23, 32, 51)' });
 const helper = node('div', ['gfield_description'], { x: 100, y: 128, width: 300, height: 21 }, { fontFamily: 'Vazirmatn', fontSize: '14px', fontWeight: '400', lineHeight: '21px', color: 'rgb(102, 112, 133)' });
-const error = node('div', ['gfield_validation_message'], { x: 100, y: 155, width: 300, height: 21 }, { fontFamily: 'Vazirmatn', fontSize: '14px', fontWeight: '600', lineHeight: '21px', color: 'rgb(180, 35, 24)' });
-const control = node('input', [], { x: 100, y: 184, width: 380, height: 52 }, { fontFamily: 'Vazirmatn', fontSize: '16px', fontWeight: '400', lineHeight: '24px', color: 'rgb(23, 32, 51)' });
+// The synthetic helper→error gap is observation-only; AUTHORITY_NOT_INVENTED.
+const error = node('div', ['gfield_validation_message'], { x: 100, y: 160, width: 300, height: 21 }, { fontFamily: 'Vazirmatn', fontSize: '14px', fontWeight: '600', lineHeight: '21px', color: 'rgb(180, 35, 24)' });
+const control = node('input', [], { x: 100, y: 189, width: 380, height: 52 }, { fontFamily: 'Vazirmatn', fontSize: '16px', fontWeight: '400', lineHeight: '24px', color: 'rgb(23, 32, 51)' });
 const fieldOne = node('div', ['gfield'], { x: 100, y: 80, width: 390, height: 120 });
 fieldOne.querySelector = (selector) => {
     if (selector === '.gfield_label') return label;
@@ -141,8 +142,8 @@ assert.strictEqual(target.shell.horizontalOverflow.scrollingSurface.horizontalSc
 assert.deepStrictEqual(target.rowRhythm.gapsPx, [24], 'same-row fields must not create negative field rhythm');
 assert.deepStrictEqual(
     target.labelControlChain.gapChain.map((item) => [item.kind, item.gapToNextPx, item.nextKind]),
-    [['label', 6, 'helper'], ['helper', 6, 'error'], ['error', 8, 'control'], ['control', null, null]],
-    'diagnostic must preserve the visible label/helper/error/control gap chain'
+    [['label', 6, 'helper'], ['helper', 11, 'error'], ['error', 8, 'control'], ['control', null, null]],
+    'diagnostic must preserve the observed visible chain without inventing a helper-to-error Owner constant'
 );
 assert.strictEqual(target.labelControlChain.finalTextToControlGapPx, 8);
 
@@ -169,4 +170,4 @@ target = result.targets[0];
 assert.strictEqual(target.shell.horizontalOverflow.scrollingSurface.horizontalScrollOverflow, true, 'actual scroll surface overflow was not recorded');
 assert.strictEqual(target.shell.horizontalOverflow.detected, true);
 
-console.log('PASS: visual repair qualification measures row-normalized rhythm, gap chain, visible overflow, actual scroll surface, upload consumers, and unresolved dynamic states');
+console.log('PASS: visual repair qualification measures row-normalized rhythm, observed gap chain, visible overflow, actual scroll surface, upload consumers, and unresolved dynamic states');
