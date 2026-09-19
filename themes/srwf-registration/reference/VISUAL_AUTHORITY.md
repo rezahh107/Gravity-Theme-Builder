@@ -109,7 +109,7 @@ Current project authority for the resolved SRWF destination is:
 ```text
 authority_handle: OWNER:SRWF-2026-09-19
 path: themes/srwf-registration/reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md
-status: CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / RUNTIME_VALIDATION_REQUIRED
+status: CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / OWNER_AUTHORIZED_UPLOAD_ICON_ALIGNMENT_PENDING / RUNTIME_VALIDATION_REQUIRED
 provenance: direct Owner-supplied project authority for this execution
 immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR
 ```
@@ -129,10 +129,11 @@ No Google Drive revision ID, timestamp, export hash, or immutable upstream blob 
 - **all authentic Gravity Forms Radio groups inside admitted SRWF Registration use card presentation**; the host `radio` field type is sufficient presentation scope, and `srwf-role-binary-choice` must not gate cards;
 - Radio cards use min `52px`, `10px` radius, default `12px` gap, unselected `1px #8690A1`, selected `2px #1D4ED8` + `#EDF1FC` + visible non-color cue, with content-driven wrap/reflow and native semantics retained;
 - exact section-icon tile dimensions and `12px` icon-heading gap;
-- shared initial GPFUP upload-family dimensions, Report Card `24px` file icon specialization, and authentic image-only initial Student Photo admission;
+- shared initial GPFUP upload-family dimensions plus a **family-wide visible icon requirement for both initial Report Card and image-only Student Photo surfaces**, using consistent icon-slot/alignment presentation while retaining file/document versus photo/camera meaning;
+- the upload-icon alignment goal is presentation-only and must not alter Gravity Forms / GP File Upload Pro core, markup ownership, upload/crop lifecycle, or add-on behavior;
 - current accessibility acceptance requirements.
 
-These are destination/acceptance decisions. Static implementation and CI do not by themselves establish the runtime-sensitive states listed in the reconciliation and implementation map.
+These are destination/acceptance decisions. Static implementation and CI do not by themselves establish the runtime-sensitive states listed in the reconciliation and implementation map. The newly authorized upload-icon family goal is a current destination requirement but is not claimed implemented by this documentation-only authority update.
 
 ## 5. WHAT vs HOW
 
@@ -160,8 +161,8 @@ Documented/Owner-authorized values still require runtime qualification where con
 
 ## 8. Current batch boundary
 
-The 2026-09-19 visual-fidelity repair updates the current reconciliation, production presentation, tests, and diagnostic to close the evidence-backed `DIFFERENT` set while preserving immutable historical authority and host behavior ownership.
+The 2026-09-19 visual-fidelity repair updates the current reconciliation, production presentation, tests, and diagnostic to close the previously evidenced `DIFFERENT` set while preserving immutable historical authority and host behavior ownership.
 
-The current batch specifically supersedes the prior binary-only card presentation gate. It does **not** invent Student Photo post-upload/crop lifecycle, GPAS dynamic states, validation/focus runtime results, page-background ownership, exact 320px acceptance, 200% text resize, text-spacing, contrast/target-size acceptance, or other states for which authentic runtime evidence is still required.
+The current Owner authority now additionally requires both authentic initial GPFUP upload surfaces to carry consistent decorative icon presentation. That goal is authorized but intentionally remains **implementation pending** in this documentation-only update. It does **not** authorize Student Photo post-upload/crop invention or any takeover of GPFUP behavior.
 
 Final Owner runtime qualification remains open; CI/static success is not production qualification.
