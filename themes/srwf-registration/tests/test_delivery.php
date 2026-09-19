@@ -6,7 +6,7 @@ function add_filter( $hook, $callback, $priority = 10, $args = 1 ) { global $hoo
 function add_action( $hook, $callback, $priority = 10, $args = 1 ) { global $hooks; $hooks[] = array( 'action', $hook, $callback, $priority, $args ); }
 function plugins_url( $path, $file ) { return 'https://example.test/plugins/srwf/' . $path; }
 function wp_enqueue_style( $handle, $src, $deps, $ver ) { global $styles; $styles[] = compact( 'handle', 'src', 'deps', 'ver' ); }
-function check( $condition, $message ) { if ( ! $condition ) { fwrite( STDERR, "FAIL: $message\n" ); exit( 1 ); } }
+function check( $condition, $message ) { if ( ! $condition ) { fwrite( STDERR, "FAIL: $message\n" ); exit( 1 ); }
 require __DIR__ . '/../src/srwf-registration-theme.php';
 
 function apply_registered_filter( $hook_name, $value, ...$args ) {
@@ -21,7 +21,7 @@ function apply_registered_filter( $hook_name, $value, ...$args ) {
     return $value;
 }
 
-check( SRWF_REGISTRATION_THEME_VERSION === '0.1.14', 'unexpected SRWF test package version' );
+check( SRWF_REGISTRATION_THEME_VERSION === '0.1.15', 'unexpected SRWF test package version' );
 check( SRWF_REGISTRATION_GRAVITY_FORMS_ORBITAL_STYLE_HANDLE === 'gravity_forms_orbital_theme', 'verified Orbital handle changed' );
 
 $target = array( 'cssClass' => 'host-class srwf-registration-theme gpp-enabled gpp-profile-srwf-registration', 'requiredIndicator' => 'asterisk' );
@@ -52,7 +52,7 @@ srwf_registration_theme_enqueue_styles( $target, false );
 check( count( $styles ) === 1, 'normal target did not enqueue exactly once' );
 check( $styles[0]['deps'] === array( 'gravity_forms_orbital_theme' ), 'SRWF is not dependent on Orbital handle' );
 check( $styles[0]['handle'] === 'srwf-registration-theme', 'unexpected SRWF style handle' );
-check( $styles[0]['ver'] === '0.1.14', 'stylesheet package version not propagated' );
+check( $styles[0]['ver'] === '0.1.15', 'stylesheet package version not propagated' );
 
 // Native Gravity Forms required legend is the sole explanation surface. The fixture
 // includes the native legend so a parallel GTB explanation is mechanically falsifiable.
