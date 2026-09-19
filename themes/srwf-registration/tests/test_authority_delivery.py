@@ -181,13 +181,15 @@ class SrwfAuthorityAndDeliveryTests(unittest.TestCase):
         self.assertNotIn("v1.0.1 + 2026-09-18 addendum", self.implementation_map)
         self.assertNotRegex(self.implementation_map, r"(?<!VA:)Visual Contract §")
 
-    def test_new_implementation_driving_roles_have_retrievable_authority_paths(self) -> None:
+    def test_implementation_driving_roles_have_retrievable_current_authority_paths(self) -> None:
         required_rows = {
-            "Gender binary card role": ("VA:VC-1.0.1", "VA:ARTIFACT", "gender_binary_choice"),
-            "Graduation Status binary card role": ("VA:VC-1.0.1", "VA:ARTIFACT", "graduation_status_binary_choice"),
+            "Gender historical binary role": ("VA:VC-1.0.1", "VA:ARTIFACT", "current Owner reconciliation"),
+            "Graduation Status historical binary role": ("current all-radio lock",),
+            "Other authentic Radio groups": ("current Owner all-radio lock", ".gfield--type-radio"),
             "Section iconography": ("VA:VC-1.0.1", "VA:ARTIFACT", "section_heading_iconography"),
             "Report Card initial GPFUP": ("VA:VC-1.0.1", "VA:ARTIFACT", "report_card_upload_initial"),
             "Report Card `.gpfup--has-files`": ("VA:VC-1.0.1", "host-owned GPFUP lifecycle"),
+            "Student Photo initial": ("authentic GPFUP image-only runtime/config evidence", "gpfup--images-only"),
             "Student Photo post-upload": ("VA:VC-1.0.1", "VA:ARTIFACT", "student_photo_uploaded_state"),
         }
         lines = self.implementation_map.splitlines()
@@ -233,11 +235,13 @@ class SrwfAuthorityAndDeliveryTests(unittest.TestCase):
         self.assertIn("icons/", self.src_readme)
         for dependency in EXPECTED_LOCAL_URLS:
             self.assertIn(Path(dependency).name, self.src_readme)
-        self.assertIn("GP File Upload Pro — **Report Card only**", self.src_readme)
-        self.assertIn("srwf-role-report-card-upload", self.src_readme)
-        self.assertIn("Student Photo post-upload", self.src_readme)
-        self.assertIn("`RUNTIME_REQUIRED / NOT_IMPLEMENTED`", self.src_readme)
-        self.assertNotIn("GP File Upload Pro/crop selectors are not authored", self.src_readme)
+        self.assertIn("GP File Upload Pro — initial state only", self.src_readme)
+        self.assertIn("shared SRWF upload-family CSS stops at `.gpfup--has-files`", self.src_readme)
+        self.assertIn("Report Card specialization is explicit", self.src_readme)
+        self.assertIn("gpfup--images-only", self.src_readme)
+        self.assertIn("Student Photo post-upload/crop/re-crop/delete structure", self.src_readme)
+        self.assertIn("OWNER_RUNTIME_REQUIRED / NOT_PROVEN", self.src_readme)
+        self.assertIn("Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned", self.src_readme)
 
 
 if __name__ == "__main__":
