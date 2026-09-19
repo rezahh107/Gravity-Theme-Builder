@@ -42,7 +42,10 @@
 
     var VERSION = '0.3.4';
     var TARGET_SELECTOR = '.gform-theme--framework.srwf-registration-theme_wrapper';
-    var MAX_ORDINARY_FIELDS = 3;
+    var MAX_TARGETS = 4;
+    var MAX_RHYTHM_FIELDS = 12;
+    var MAX_ORDINARY_GAPS = 3;
+    var MAX_SECTIONS = 8;
     var SECTION_ROLES = Object.freeze([
         'srwf-role-section-identity',
         'srwf-role-section-contact',
@@ -112,15 +115,31 @@
         };
     }
 
-    function firstExplicitSection(wrapper) {
-        if (!wrapper || typeof wrapper.querySelector !== 'function') {
+    function hasClass(element, className) {
+        return Boolean(element && element.classList && typeof element.classList.contains === 'function' && element.classList.contains(className));
+    }
+
+    function explicitSectionRole(field) {
+        if (!field) {
             return null;
         }
         for (var i = 0; i < SECTION_ROLES.length; i += 1) {
-            var role = SECTION_ROLES[i];
-            var found = wrapper.querySelector('.gfield--type-section.' + role);
-            if (found) {
-                return { role: role, field: found };
+            if (hasClass(field, SECTION_ROLES[i])) {
+                return SECTION_ROLES[i];
+            }
+        }
+        return null;
+    }
+
+    function firstExplicitSection(wrapper) {
+        if (!wrapper || typeof wrapper.querySelectorAll !== 'function') {
+            return null;
+        }
+        var sections = bounded(wrapper.querySelectorAll('.gform_fields > .gfield.gfield--type-section'), MAX_SECTIONS);
+        for (var i = 0; i < sections.length; i += 1) {
+            var role = explicitSectionRole(sections[i]);
+            if (role) {
+                return { role: role, field: sections[i] };
             }
         }
         return null;
@@ -130,16 +149,21 @@
         if (!wrapper || typeof wrapper.querySelectorAll !== 'function') {
             return { sampleCount: 0, gapsPx: [] };
         }
-        var fields = bounded(wrapper.querySelectorAll('.gform_fields > .gfield:not(.gfield--type-section)'), MAX_ORDINARY_FIELDS);
+        var fields = bounded(wrapper.querySelectorAll('.gform_fields > .gfield'), MAX_RHYTHM_FIELDS);
         var gaps = [];
-        for (var i = 1; i < fields.length; i += 1) {
-            var before = rect(fields[i - 1]);
-            var after = rect(fields[i]);
+        for (var i = 1; i < fields.length && gaps.length < MAX_ORDINARY_GAPS; i += 1) {
+            var previousField = fields[i - 1];
+            var currentField = fields[i];
+            if (hasClass(previousField, 'gfield--type-section') || hasClass(currentField, 'gfield--type-section')) {
+                continue;
+            }
+            var before = rect(previousField);
+            var after = rect(currentField);
             if (before && after) {
                 gaps.push(Number(after.y - (before.y + before.height)));
             }
         }
-        return { sampleCount: fields.length, gapsPx: gaps };
+        return { sampleCount: gaps.length, gapsPx: gaps };
     }
 
     function sectionRhythm(wrapper) {
@@ -148,6 +172,10 @@
             return { role: null, gapFromPreviousPx: null };
         }
         var previous = section.field.previousElementSibling;
+        var sameParent = previous && section.field.parentElement && previous.parentElement === section.field.parentElement;
+        if (!sameParent || !hasClass(previous, 'gfield')) {
+            return { role: section.role, gapFromPreviousPx: null };
+        }
         var currentRect = rect(section.field);
         var previousRect = rect(previous);
         return {
@@ -235,18 +263,22 @@
         };
     }
 
-    function collect(documentObject, view) {
-        var wrapper = documentObject && typeof documentObject.querySelector === 'function'
-            ? documentObject.querySelector(TARGET_SELECTOR)
-            : null;
-        if (!wrapper) {
-            return {
-                diagnosticVersion: VERSION,
-                targetFound: false,
-                viewportCssWidth: view ? Number(view.innerWidth || 0) : 0
-            };
-        }
+    function formIdFromWrapper(wrapper) {
+        var id = wrapper && wrapper.id ? String(wrapper.id) : '';
+        var match = /^gform_wrapper_(\d+)$/.exec(id);
+        return match ? match[1] : null;
+    }
 
+    function formLayoutReadiness(wrapper, view) {
+        var formId = formIdFromWrapper(wrapper);
+        var map = view && view.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID;
+        if (!formId || !map || typeof map !== 'object') {
+            return null;
+        }
+        return Object.prototype.hasOwnProperty.call(map, formId) ? map[formId] : null;
+    }
+
+    function collectTarget(wrapper, targetIndex, documentObject, view) {
         var section = firstExplicitSection(wrapper);
         var title = wrapper.querySelector('.gform_title');
         var helper = wrapper.querySelector('.gfield_description');
@@ -254,9 +286,7 @@
         var sectionTitle = section && section.field ? section.field.querySelector('.gsection_title') : null;
 
         return {
-            diagnosticVersion: VERSION,
-            targetFound: true,
-            viewportCssWidth: view ? Number(view.innerWidth || 0) : 0,
+            targetIndex: targetIndex,
             shell: shellSnapshot(wrapper, view),
             typography: {
                 formTitle: typographySnapshot(title, view),
@@ -280,15 +310,31 @@
                 status: 'OWNER_RUNTIME_REQUIRED',
                 reason: 'no-authentic-persiangravity-presentation-consumer-admitted'
             },
-            formLayoutReadiness: view && view.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS
-                ? view.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS
-                : null
+            formLayoutReadiness: formLayoutReadiness(wrapper, view)
+        };
+    }
+
+    function collect(documentObject, view) {
+        var allWrappers = documentObject && typeof documentObject.querySelectorAll === 'function'
+            ? documentObject.querySelectorAll(TARGET_SELECTOR)
+            : [];
+        var wrappers = bounded(allWrappers, MAX_TARGETS);
+        return {
+            diagnosticVersion: VERSION,
+            targetFound: wrappers.length > 0,
+            targetCount: wrappers.length,
+            targetsTruncated: Number(allWrappers.length || 0) > MAX_TARGETS,
+            viewportCssWidth: view ? Number(view.innerWidth || 0) : 0,
+            targets: wrappers.map(function (wrapper, index) {
+                return collectTarget(wrapper, index, documentObject, view);
+            })
         };
     }
 
     return {
         VERSION: VERSION,
         TARGET_SELECTOR: TARGET_SELECTOR,
+        MAX_TARGETS: MAX_TARGETS,
         collect: collect
     };
 }));
