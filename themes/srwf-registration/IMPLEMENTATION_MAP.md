@@ -85,26 +85,23 @@ Evidence: Gravity Forms Form Object/settings/update behavior is `DOCUMENTED`/`SO
 
 ## Required indicator explanation
 
-When SRWF presentation is admitted and the Form Object uses `requiredIndicator=asterisk`, GTB inserts exactly one inert localized paragraph through `gform_get_form_filter`:
-
-> فیلدهای دارای * الزامی هستند.
-
-The marker makes repeated filtering of the same generated HTML idempotent without request-global suppression. A fresh validation/AJAX rerender can therefore render its own single note. Gravity Forms remains authoritative for required state, native indicators, ARIA, and validation. Unrelated forms and excluded Entry Detail renders receive no note.
+For `requiredIndicator=asterisk`, Gravity Forms' native required legend remains the single explanation surface. GTB does not inject a parallel paragraph, suppress or replace the native legend, or recreate required state/indicator/ARIA/validation semantics. This keeps required-indicator and required-legend presentation at the Gravity Forms ownership boundary while unrelated forms and excluded Entry Detail renders remain untouched.
 
 ## Diagnostic v0.3.4
 
 The admin-gated diagnostic adds a bounded SRWF v1 qualification collector for:
 
-- viewport width and admitted wrapper rect/padding/max width/surface/radius/shadow/horizontal overflow;
+- up to four SRWF targets, matching the existing structural collector target budget, with each target carrying only its own Form Layout readiness selected by the rendered wrapper's Gravity Forms identity;
+- viewport width and per-target wrapper rect/padding/max width/surface/radius/shadow/horizontal overflow;
 - representative title/section/helper/error computed typography;
-- bounded ordinary and section rhythm samples;
+- bounded ordinary rhythm only for actual adjacent ordinary `.gfield` siblings, plus section rhythm only from the actual preceding sibling of the first explicit section encountered in DOM order;
 - real currently-focused admitted consumer outline facts only (no synthetic focus);
 - explicit section icon pseudo-element geometry;
 - explicit Report Card drop-area geometry and `.gpfup--has-files` boolean;
 - the already-proven GPAS/Tom Select control consumer;
 - sanitized Form Layout readiness and conflicting-override count.
 
-It intentionally excludes entered values, labels/arbitrary page text, select option contents, filenames, upload URLs, query data, and Student Photo/PersianGravity speculative internals. Student Photo and PersianGravity are emitted only as unresolved status markers.
+It intentionally excludes entered values, labels/arbitrary page text, select option contents, filenames, upload URLs, query data, and Student Photo/PersianGravity speculative internals. Student Photo and PersianGravity are emitted only as unresolved status markers. Form Layout readiness is published server-side in a form-ID-keyed bounded map and consumed only inside the corresponding rendered target result; the prior overwriteable singleton is not used.
 
 ## Exact section/icon mapping
 
