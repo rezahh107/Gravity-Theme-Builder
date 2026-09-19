@@ -1,6 +1,6 @@
 # SRWF Public Registration — Current Owner Reconciliation — 2026-09-19
 
-Status: **CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / GPFUP_INITIAL_ICON_FAMILY_STATICALLY_IMPLEMENTED / RUNTIME_VALIDATION_REQUIRED**
+Status: **CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / GPFUP_INITIAL_ICON_CONTENT_CLUSTER_STATICALLY_IMPLEMENTED / RUNTIME_VALIDATION_REQUIRED**
 
 Authority handle: `OWNER:SRWF-2026-09-19`
 
@@ -240,8 +240,9 @@ The 2026-09-19 visual-fidelity repairs statically implement the currently eviden
 - every authentic SRWF Radio field is presented through the common card system without semantic-role gating;
 - target typography/line-height and section icon-heading gap are represented through supported Theme Framework tokens or bounded SRWF selectors;
 - initial GPFUP surfaces share the authorized upload-family outer geometry;
-- theme `0.1.14` statically implements the family-wide initial upload icon/alignment goal through one shared `40×40` decorative icon slot with a `24px` local glyph, retaining the Report Card document glyph and adding the image-only Student Photo photo/camera glyph through the authentic `gpfup--images-only` seam;
+- Owner runtime of theme `0.1.14` is retained as historical evidence for the initial upload family: both admitted icon glyphs rendered, but the authentic direct content child remained visually detached from the icon;
+- theme `0.1.15` is the current static implementation of the icon + content-cluster repair: the shared `40×40` decorative icon slot and `24px` local glyphs remain, while only the two admitted initial dropareas are centered and only their authentic direct content child is constrained into a shrinkable cluster;
 - the implementation stops at `.gpfup--has-files` and does not take over upload/progress/error/remove/preview/crop/persistence or JavaScript lifecycle;
-- diagnostic v0.3.5 already captures the required initial drop-area and `::before` icon geometry for both authentic consumers, so no diagnostic source/version change is required.
+- diagnostic v0.3.5 already captures the initial drop-area structure, `::before` icon geometry, and select-files geometry used to diagnose the `0.1.14` residual defect, so no diagnostic source/version change is required.
 
-This static/automated implementation state is **not** full runtime or production qualification. Authentic Owner runtime evidence is still required for Report Card/Student Photo initial icon visibility and alignment, a real `.gpfup--has-files` transition, checked/keyboard-focused Radio behavior, validation, GPAS dynamic states, GPFUP post-upload states, exact `320 CSS px`, `200%` text resize, text spacing, complete contrast/target-size acceptance, and other runtime-sensitive obligations.
+This static/automated implementation state is **not** full runtime or production qualification. Authentic Owner runtime evidence is still required for the `0.1.15` Report Card/Student Photo initial content-cluster alignment, narrow/mobile wrapping, a real `.gpfup--has-files` transition, checked/keyboard-focused Radio behavior, validation, GPAS dynamic states, exact `320 CSS px`, `200%` text resize, text spacing, complete contrast/target-size acceptance, and other runtime-sensitive obligations. Student Photo post-upload/crop/re-crop/delete composition remains `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` and host-owned.
