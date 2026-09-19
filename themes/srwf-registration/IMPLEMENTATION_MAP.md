@@ -1,6 +1,6 @@
 # SRWF Registration — Implementation Map
 
-Status: **VISUAL_REPAIR_STATICALLY_IMPLEMENTED / OWNER_AUTHORIZED_UPLOAD_ICON_ALIGNMENT_PENDING / OWNER_RUNTIME_QUALIFICATION_REQUIRED**
+Status: **VISUAL_REPAIR_STATICALLY_IMPLEMENTED / GPFUP_INITIAL_ICON_CONTENT_CLUSTER_STATICALLY_IMPLEMENTED / OWNER_RUNTIME_QUALIFICATION_REQUIRED**
 
 This map distinguishes Owner authority, static/source evidence, host ownership, and evidence that still requires the real Owner runtime. Production qualification is intentionally open.
 
@@ -14,9 +14,11 @@ Registered immutable/exact IDs remain defined in `reference/VISUAL_AUTHORITY.md`
 - `VA:VC-1.0.0` — historical/base contract;
 - `VA:VC-1.0.1` — exact historical Drive-backed Owner revision, including §27.
 
-`OWNER:SRWF-2026-09-19`, recorded in `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md`, is implementation-driving for the current destination. The current Owner lock requires every authentic Gravity Forms Radio field inside admitted SRWF Registration to use card presentation and now also requires both authentic initial GPFUP upload surfaces to present a consistent decorative icon slot. These decisions leave the exact historical v1.0.1 mirror byte-preserved.
+`OWNER:SRWF-2026-09-19`, recorded in `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md`, is implementation-driving for the current destination. The current Owner lock requires every authentic Gravity Forms Radio field inside admitted SRWF Registration to use card presentation and requires both authentic initial GPFUP upload surfaces to present a consistent decorative icon slot. These decisions leave the exact historical v1.0.1 mirror byte-preserved.
 
 Historical labels such as `RUNTIME_REQUIRED`, `NOT_PROVEN`, `NON_NORMATIVE_REFERENCE`, and `DEFER_NOT_PROVEN` remain provenance rather than current destination truth where the current reconciliation resolves them. Historical desktop short-field pairings remain superseded by `HOST_OWNED / OWNER_CONFIGURABLE`; the authorized desktop card remains shadowless.
+
+Current static theme implementation: `0.1.15`. Owner runtime of theme `0.1.14` is retained as historical evidence for the initial GPFUP repair: both admitted icon glyphs rendered, but the authentic direct content child remained visually detached from the icon. Theme `0.1.15` statically repairs that residual defect by centering only the two admitted initial dropareas and constraining their authentic direct content child into the same shrinkable icon/instruction/select-file cluster. Real-browser qualification of that `0.1.15` cluster remains open.
 
 ## Implementation traceability
 
@@ -42,16 +44,16 @@ Historical labels such as `RUNTIME_REQUIRED`, `NOT_PROVEN`, `NON_NORMATIVE_REFER
 | Major section rhythm | `32px` | host `24px` form gap + bounded `8px` Section Break offset | `STATICALLY_IMPLEMENTED`; actual geometry runtime pending |
 | Field-internal spacing | no-helper label→control `8px`; label→helper/error `6px`; final helper/error→control `8px`; intermediate helper/error spacing remains content/host-driven | documented `--gf-label-space-primary:8px` and `--gf-desc-space:8px`; narrow SRWF field selectors reduce only the primary-label transition to `6px` when authentic above-input helper/error consumers are present | `OWNER_AUTHORIZED / STATICALLY_PROVEN`; computed browser geometry `OWNER_RUNTIME_REQUIRED` |
 | Visible focus | `2px solid #1D4ED8`, offset `2px`, no intended glow | GF focus API; direct projection from native hidden radio focus to visible card | `DOCUMENTED / STATICALLY_IMPLEMENTED`; authentic keyboard runtime pending |
-| Native single Select | same SRWF control/value family with `24px` logical content start, `32px` indicator reserve, and runtime-proven vertical optical alignment | documented `--gf-ctrl-select-padding-x:24px 32px`; bounded SRWF `.gfield--type-select select.gfield_select:not([multiple]):not(.tomselected):not(.ts-hidden-accessible)` applies only `padding-block-start:14px`; native GF value/keyboard/open behavior remains host-owned | Owner runtime proved the padding correction closes the visible misalignment; exact 0.1.13 computed browser recheck `OWNER_RUNTIME_REQUIRED` |
+| Native single Select | same SRWF control/value family with `24px` logical content start, `32px` indicator reserve, and runtime-proven vertical optical alignment | documented `--gf-ctrl-select-padding-x:24px 32px`; bounded SRWF `.gfield--type-select select.gfield_select:not([multiple]):not(.tomselected):not(.ts-hidden-accessible)` applies only `padding-block-start:14px`; native GF value/keyboard/open behavior remains host-owned | Owner runtime proved the padding correction closes the visible misalignment; exact 0.1.15 computed browser recheck `OWNER_RUNTIME_REQUIRED` |
 | All Radio choices | every authentic admitted `.gfield--type-radio` uses cards; fill assigned cell; `12px` gap; min `52px`; radius `10px`; unselected `1px #8690A1`; selected `2px #1D4ED8` + `#EDF1FC` + non-color dot cue | native GF radio/label state remains authority; CSS uses host field type, `:checked`, `:focus-visible`; flex-wrap/content-driven layout; no role/text/ID/order gate | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; checked/keyboard/320px runtime pending |
 | Conditional Radio fields | inherit same cards when Gravity Forms reveals them | same field-type rule; GTB does not control conditional visibility | `STATICALLY_PROVEN` selector coverage; authentic reveal runtime pending |
 | Section icon tiles | explicit mapped section roles only; `40×40`, radius `10`, icon `20`, tint `#EDF1FC`, heading gap `12px` | admitted local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
-| Shared initial GPFUP family | min `96px`; pad `16px`; radius `12px`; `1px` dashed `#8690A1`; every admitted initial surface has a visible decorative icon slot and common icon/instruction/select-file alignment rhythm | authentic `.gfield--type-fileupload .gpfup:not(.gpfup--has-files)` presentation only; GPFUP behavior remains host-owned | outer family `STATICALLY_IMPLEMENTED`; family-wide icon/alignment goal `OWNER_AUTHORIZED / IMPLEMENTATION_PENDING` |
-| Report Card initial GPFUP | shared outer family + file/document icon `24px` in the shared icon-slot family | explicit `srwf-role-report-card-upload` only for icon specialization; authentic initial GPFUP state | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime hierarchy recheck pending |
-| Report Card has-files | do not force initial state over uploaded UI | initial rules stop at authentic `.gpfup--has-files` state | `HOST_OWNED`; regression-protected; real upload runtime pending |
-| Student Photo initial | shared initial family + visible photo/camera icon aligned through the same icon-slot presentation as Report Card | authentic host/config seam `.gpfup.gpfup--images-only:not(.gpfup--has-files)`; GTB-owned local asset/CSS only; no field ID/text/order identity | `OWNER_AUTHORIZED / IMPLEMENTATION_PENDING`; runtime confirmation required after implementation |
-| Student Photo post-upload | style only authentic exposed GPFUP preview/replace/re-crop/delete states | no speculative post-upload selector/composition; crop ratio/dimensions remain host/config-owned | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` |
-| GPAS / Tom Select | same select-family inline metric, 52px minimum, zero block padding, SRWF focus visual; add-on behavior untouched | proven `.ts-wrapper > .ts-control` consumes the shared documented `--gf-ctrl-select-padding-x`; source `<select>` classes `.tomselected` / `.ts-hidden-accessible` are excluded from the native-only optical rule; diagnostic targets the visible `.ts-control` | behavior `HOST_OWNED`; exact 0.1.13 open/focus/results runtime pending |
+| Shared initial GPFUP family | min `96px`; pad `16px`; radius `12px`; `1px` dashed `#8690A1`; every admitted initial surface has a visible `40×40` decorative icon slot with `24px` glyph and common icon/instruction/select-file alignment rhythm | authentic `.gfield--type-fileupload .gpfup:not(.gpfup--has-files)` shell plus bounded SRWF rules for the two admitted initial variants; `0.1.15` centers those dropareas and constrains their authentic direct content child into the same shrinkable cluster; GPFUP behavior remains host-owned | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED` in `0.1.15`; real-browser cluster alignment and narrow/mobile wrapping `OWNER_RUNTIME_REQUIRED` |
+| Report Card initial GPFUP | shared outer family + file/document icon `24px` in the shared icon-slot family | explicit `srwf-role-report-card-upload` only for glyph specialization; `icons/report-card-file.svg`; authentic initial GPFUP state; bounded `0.1.15` content-cluster repair | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; `0.1.14` glyph rendering is historical runtime evidence; `0.1.15` cluster runtime recheck pending |
+| Report Card has-files | do not force initial state over uploaded UI | initial rules stop at authentic `.gpfup--has-files` state | `HOST_OWNED`; regression-protected; real upload transition `OWNER_RUNTIME_REQUIRED` |
+| Student Photo initial | shared initial family + visible photo/camera icon aligned through the same icon-slot presentation as Report Card | authentic host/config seam `.gpfup.gpfup--images-only:not(.gpfup--has-files)`; `icons/student-photo-upload.svg`; bounded `0.1.15` content-cluster repair; no field ID/text/order identity | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; `0.1.14` glyph rendering is historical runtime evidence; `0.1.15` cluster runtime recheck pending |
+| Student Photo post-upload | style only authentic exposed GPFUP preview/replace/re-crop/delete states | no speculative post-upload selector/composition; crop ratio/dimensions remain host/config-owned | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN`; host-owned |
+| GPAS / Tom Select | same select-family inline metric, 52px minimum, zero block padding, SRWF focus visual; add-on behavior untouched | proven `.ts-wrapper > .ts-control` consumes the shared documented `--gf-ctrl-select-padding-x`; source `<select>` classes `.tomselected` / `.ts-hidden-accessible` are excluded from the native-only optical rule; diagnostic targets the visible `.ts-control` | behavior `HOST_OWNED`; exact 0.1.15 open/focus/results runtime pending |
 | PersianGravity / Jalali | style only authentic consumer if admitted | no selector/adapter invented | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` presentation |
 | Desktop short-field pairings | Gravity Forms configuration remains authoritative | no GTB pair map | `HOST_OWNED / OWNER_CONFIGURABLE` |
 | 320px/200%/text spacing/contrast | resilient intrinsic layout required | logical sizing/wrapping + host responsive mechanics | `OWNER_RUNTIME_REQUIRED` |
@@ -66,9 +68,9 @@ The exact historical v1.0.1/artifact path remains retrievable. The current Owner
 | Graduation Status historical binary role | same historical chain + current all-radio lock | same: semantic role no longer gates cards; conditional visibility stays host-owned | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
 | Other authentic Radio groups | current Owner all-radio lock | same `.gfield--type-radio` card system automatically covers visible/conditional groups | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
 | Section iconography | `VA:VC-1.0.1` §27 `section_heading_iconography` + `VA:ARTIFACT` + current reconciliation | explicit mapped Section Break tokens + local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
-| Report Card initial GPFUP | `VA:VC-1.0.1` §27 `report_card_upload_initial` + `VA:ARTIFACT` + current reconciliation | shared initial GPFUP family + explicit Report Card `24px` file/document icon | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
-| Report Card `.gpfup--has-files` | `VA:VC-1.0.1` §§19,27 + host-owned GPFUP lifecycle | initial rules stop at authentic `.gpfup--has-files` state | `HOST_OWNED`; runtime recheck pending |
-| Student Photo initial | current Owner upload-family icon/alignment lock + authentic GPFUP image-only runtime/config evidence (`gpfup--images-only`) | current CSS admits the shared initial shell; photo/camera icon specialization is still pending | `OWNER_AUTHORIZED / IMPLEMENTATION_PENDING`; runtime pending after implementation |
+| Report Card initial GPFUP | `VA:VC-1.0.1` §27 `report_card_upload_initial` + `VA:ARTIFACT` + current reconciliation | shared initial GPFUP family + shared `40×40` slot + Report Card `24px` file/document glyph + bounded `0.1.15` content-cluster repair | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; `0.1.14` glyph render historical evidence; `0.1.15` cluster runtime pending |
+| Report Card `.gpfup--has-files` | `VA:VC-1.0.1` §§19,27 + host-owned GPFUP lifecycle | initial rules stop at authentic `.gpfup--has-files` state | `HOST_OWNED`; real transition `OWNER_RUNTIME_REQUIRED` |
+| Student Photo initial | current Owner upload-family icon/alignment lock + authentic GPFUP image-only runtime/config evidence (`gpfup--images-only`) | shared initial shell/icon slot + `src/icons/student-photo-upload.svg` + bounded `0.1.15` content-cluster repair | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; `0.1.14` glyph render historical evidence; `0.1.15` cluster runtime pending |
 | Student Photo post-upload | `VA:VC-1.0.1` §27 + `VA:ARTIFACT` + current reconciliation | none until authentic Photo state/DOM is captured | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN`; crop config `HOST_OWNED` |
 
 ## Gravity Forms Form Presentation Readiness
@@ -84,7 +86,7 @@ The GTB Theme settings page reports the current and expected host-owned Form Lay
 | `validationSummary` | `true` |
 | `requiredIndicator` | `asterisk` |
 
-`Check Again` and ordinary render remain read-only. **Apply Recommended SRWF Form Layout** remains a separate explicit capability + nonce protected action. At mutation time it re-reads the current full Form Object, computes only the six-property diff, performs no write when already matching, changes only those properties, calls `GFAPI::update_form()` with the coherent current object, re-reads it, and verifies persistence. `customRequiredIndicator` and unrelated form state are preserved.
+`Check Again` and ordinary render remain read-only. **Apply Recommended SRWF Form Layout** remains a separate explicit capability + nonce protected action. At mutation time it re-reads the current full Form Object, computes only the six-property diff, performs no write if already matching, changes only those properties, calls `GFAPI::update_form()` with the coherent current object, re-reads it, and verifies persistence. `customRequiredIndicator` and unrelated form state are preserved.
 
 Explicit field-level `labelPlacement`, `descriptionPlacement`, and `subLabelPlacement` values that conflict with the destination are reported as `ATTENTION REQUIRED` with a field ID/type reference. They are not silently rewritten. Overall Form Presentation Readiness is not `READY` while a known conflict remains.
 
@@ -105,7 +107,9 @@ The package keeps previously proven collectors intact and adds bounded repair-sp
 - radio-card geometry collector: `0.3.5`;
 - visual-repair qualification collector: `0.3.5`.
 
-The v0.3.5 additions close the audit's measurement blind spots by collecting, within bounded admitted SRWF targets:
+The existing v0.3.5 visual-repair collector already covers the initial-upload evidence needed for the `0.1.14` diagnosis without a source/version change. For both admitted upload consumers it records the drop-area rect/computed style, direct child structure, `::before` width/height/background size/background image/radius, and select-files geometry. That evidence established that the icon glyphs rendered while the authentic content child remained visually detached. The collector can be reused for the `0.1.15` Owner-browser recheck, but its static presence does not itself prove the repaired cluster geometry.
+
+The v0.3.5 collectors measure, within bounded admitted SRWF targets:
 
 - **every authentic Radio field**, not only a semantic binary role, with visible/hidden distinction from actual geometry;
 - visible `.gchoice` and associated label/card rects, label occupancy delta, current checked state when authentic, and visible pseudo-element selected-cue facts;
@@ -115,10 +119,10 @@ The v0.3.5 additions close the audit's measurement blind spots by collecting, wi
 - representative ordinary field-label typography;
 - local label/helper/error/control geometry chain where authentic consumers exist;
 - Report Card drop-area/pseudo icon/internal child structure;
-- Student Photo initial admission only when authentic GPFUP `gpfup--images-only` configuration exists; otherwise `NOT_PROVEN`;
+- Student Photo initial admission and pseudo-icon geometry when authentic GPFUP `gpfup--images-only` configuration exists; otherwise `NOT_PROVEN`;
 - the visible Tom Select `.ts-control`, distinguished from the source `<select>`;
 - primary-action typography;
-- explicit runtime-only markers for checked/focus/validation/GPAS dynamic/GFPUP post-upload states instead of inferring PASS from latent CSS.
+- explicit runtime-only markers for checked/focus/validation/GPAS dynamic/GPFUP post-upload states instead of inferring PASS from latent CSS.
 
 It intentionally excludes entered values, labels/arbitrary page text, select option contents, filenames, upload URLs, and query data. Static CSS capability does not convert dynamic runtime states into a PASS.
 
@@ -132,10 +136,17 @@ It intentionally excludes entered values, labels/arbitrary page text, select opt
 | `srwf-role-section-school-documents` | مدرسه و مدارک | `src/icons/section-school-documents.svg` |
 | `srwf-role-section-student-photo` | عکس دانش‌آموز | `src/icons/section-student-photo.svg` |
 
+Initial upload glyphs are likewise local presentation assets:
+
+| Initial GPFUP variant | Authentic seam | Local glyph |
+|---|---|---|
+| Report Card | `srwf-role-report-card-upload` + initial `.gpfup:not(.gpfup--has-files)` | `src/icons/report-card-file.svg` |
+| Student Photo | `.gpfup.gpfup--images-only:not(.gpfup--has-files)` | `src/icons/student-photo-upload.svg` |
+
 ## Batch boundary
 
-The previously merged visual-repair batches implement the currently proven presentation set through theme 0.1.13. This documentation-only goal update does not change production CSS, SVG assets, PHP, JavaScript, Gravity Forms/GPFUP behavior, or package version.
+Owner runtime of theme `0.1.14` is retained as historical evidence: both admitted initial GPFUP icon glyphs rendered, but the authentic content remained visually detached from the icon. Theme `0.1.15` is the current static implementation of the Owner-authorized shared initial GPFUP icon + content-cluster repair through theme-local CSS and local SVG assets. It centers only the two admitted initial dropareas, constrains only their authentic direct content child, does not alter GPFUP markup or lifecycle, and does not style Student Photo post-upload/crop composition.
 
-The newly authorized shared initial GPFUP icon/alignment requirement is intentionally left `IMPLEMENTATION_PENDING` for a separate bounded visual repair. It must be implemented only through GTB-owned presentation seams after authentic consumer verification and must not invent Student Photo post-upload/crop lifecycle.
+The broader Owner runtime qualification remains open for the `0.1.15` initial Report Card/Student Photo content-cluster alignment, narrow/mobile wrapping, a real `.gpfup--has-files` transition, PR #21 Select/Tom Select geometry on the current package, exact `320 CSS px`, accessibility states, and other runtime-only obligations. Student Photo post-upload/crop/re-crop/delete composition remains `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` and host-owned.
 
 `STATICALLY_IMPLEMENTED` / `STATICALLY_PROVEN` does **not** mean WordPress/browser production qualification. Exact-head CI and installable packages provide regression/build evidence only; the bounded Owner real-site runtime checklist remains required.

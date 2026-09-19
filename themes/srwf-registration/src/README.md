@@ -1,6 +1,6 @@
 ## SRWF Registration production candidate
 
-Current production package line: **0.1.13**.
+Current production package line: **0.1.15**.
 
 The SRWF Registration implementation is theme-local under `src/`. It is **not production-qualified** until the bounded Owner WordPress/browser checks are completed.
 
@@ -16,6 +16,7 @@ src/
 ├── srwf-registration.css
 └── icons/
     ├── report-card-file.svg
+    ├── student-photo-upload.svg
     ├── section-contact.svg
     ├── section-education.svg
     ├── section-identity.svg
@@ -72,7 +73,7 @@ PR #12 was disproved by Owner runtime because the later content bracket alone di
 
 `wp_enqueue_scripts` → Gravity Flow `enqueue_frontend_scripts()` → `enqueue_form_scripts()` → Gravity Forms `gform_enqueue_scripts` / `gform_form_theme_slug`, before `gravityflow_entry_detail_content_before`.
 
-The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.13 candidate remains `OWNER_RUNTIME_REQUIRED`.
+The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.15 candidate remains `OWNER_RUNTIME_REQUIRED`.
 
 Pinned source/package evidence retained from the qualified host stack:
 
@@ -98,8 +99,10 @@ The 2026-09-19 Owner reconciliation is implementation-driving. The current CSS c
 - **all authentic Radio fields** inside admitted SRWF use cards: content-driven flex wrapping, `12px` gap, label fills its `.gchoice`, min `52px`, `10px` radius, unselected `1px #8690A1`, selected `2px #1D4ED8` + `#EDF1FC` + non-color dot cue;
 - explicit mapped Section Break roles only: `40×40` tile, `10px` radius, `20px` admitted local SVG, `#EDF1FC` tint, `12px` icon-heading gap;
 - shared initial GPFUP family: min `96px`, pad `16px`, `12px` radius, `1px` dashed `#8690A1`, content-driven instruction/select-file/helper hierarchy;
-- explicit Report Card role retains its `24px` file-icon specialization;
-- authentic image-only GPFUP configuration (`gpfup--images-only`) admits the same **initial** Student Photo upload-family presentation without inferring field identity.
+- the two admitted initial GPFUP variants share one `40×40` decorative icon slot with a `24px` local glyph;
+- Owner runtime of 0.1.14 proved both glyphs rendered but disproved the assumption that the host instruction/select-file child would naturally stay aligned with the icon; 0.1.15 therefore centers the icon and authentic direct content child as one shrinkable initial-state cluster while preserving wrapping and host ownership;
+- explicit Report Card role retains its file/document glyph through `icons/report-card-file.svg`;
+- authentic image-only GPFUP configuration (`gpfup--images-only`) uses the same initial icon slot with `icons/student-photo-upload.svg`, without inferring field identity or styling post-upload/crop composition.
 
 The implementation uses intrinsic sizing, wrapping, logical properties, and no field-specific radio or select identity map. Host-configured Gravity Forms columns remain authoritative.
 
@@ -107,7 +110,7 @@ The implementation uses intrinsic sizing, wrapping, logical properties, and no f
 
 - Native Gravity Forms single Select: the documented `--gf-ctrl-select-padding-x` API owns the common inline text/indicator reserve. A direct SRWF-scoped `padding-block-start:14px` is retained only for authentic non-enhanced single-select controls because current public Select API exposes no select-specific vertical-padding token and Owner runtime proved that optical compensation closes the remaining value alignment defect. The rule does not depend on field ID, label text, description state, sub-label placement, or DOM order.
 - GP Advanced Select / Tom Select: only the already-proven `.ts-wrapper > .ts-control` visible control is targeted. Its closed-control box reuses the same `--gf-ctrl-select-padding-x` family token plus the accepted SRWF 52px/1.5 metric family and established SRWF focus visual. The hidden source `<select>` is not treated as a native visible consumer. Tom Select still owns caret drawing, search/filter/results, open/close, selection, keyboard behavior, and synchronization. Authentic post-repair Owner-browser geometry remains `OWNER_RUNTIME_REQUIRED`.
-- GP File Upload Pro — initial state only: shared SRWF upload-family CSS stops at `.gpfup--has-files`. Report Card specialization is explicit; Student Photo initial admission is based only on the authentic GPFUP image-only configuration seam. Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned.
+- GP File Upload Pro — initial state only: shared SRWF upload-family CSS stops at `.gpfup--has-files`. Report Card specialization is explicit through `srwf-role-report-card-upload` and its local document glyph; authentic `gpfup--images-only` Student Photo uses the same decorative icon-slot geometry with its own GTB-owned photo/camera glyph. The 0.1.15 repair additionally constrains only the authentic direct content child inside these two initial dropareas so it does not expand away from the icon. Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned; the theme does not add replacement upload markup or JavaScript lifecycle.
 
 Student Photo post-upload/crop/re-crop/delete structure remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN**. GPFUP owns that lifecycle and crop configuration. No post-upload composition is invented.
 
@@ -119,4 +122,4 @@ The surrounding page color `#F6F8FB` is **HOST_INTEGRATION_REQUIRED** because th
 
 ### Verification boundary
 
-Repository tests verify authority hash integrity, scoping, CSS/API constants, all-radio field-type coverage, Entry Detail exclusion, settings/readiness mutation contracts, diagnostic privacy, PHP/JavaScript syntax, diagnostic visible-consumer fixture behavior, and deterministic package closure. They do not prove computed Owner-site browser layout after 0.1.13, real keyboard behavior, authentic checked/invalid/open/uploaded states, PersianGravity structure, page-background integration, exact 320 CSS px, 200% text resize, increased text spacing, or rendered contrast/target-size acceptance.
+Repository tests verify authority hash integrity, scoping, CSS/API constants, all-radio field-type coverage, shared initial GPFUP icon-slot geometry and bounded content-cluster alignment, local asset closure, Entry Detail exclusion, settings/readiness mutation contracts, diagnostic privacy, PHP/JavaScript syntax, diagnostic visible-consumer fixture behavior, and deterministic package closure. They do not prove computed Owner-site browser layout after 0.1.15, real keyboard behavior, authentic checked/invalid/open/uploaded states, PersianGravity structure, page-background integration, exact 320 CSS px, 200% text resize, increased text spacing, or rendered contrast/target-size acceptance.

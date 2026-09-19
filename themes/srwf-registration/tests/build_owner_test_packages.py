@@ -17,6 +17,7 @@ PRODUCTION_FILES = (
     'srwf-registration-layout.php',
     'srwf-registration.css',
     'icons/report-card-file.svg',
+    'icons/student-photo-upload.svg',
     'icons/section-contact.svg',
     'icons/section-education.svg',
     'icons/section-identity.svg',

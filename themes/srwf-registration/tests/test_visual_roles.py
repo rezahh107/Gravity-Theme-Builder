@@ -12,6 +12,7 @@ FIXTURES = THEME / "tests" / "fixtures" / "semantic-roles-runtime-shapes.md"
 
 RADIO_SCOPE = ".gfield.gfield--type-radio"
 REPORT_ROLE = "srwf-role-report-card-upload"
+STUDENT_PHOTO_UPLOAD_ICON = "student-photo-upload.svg"
 SECTION_ICONS = {
     "srwf-role-section-identity": (
         "section-identity.svg",
@@ -153,7 +154,7 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertNotIn(":nth-child", self.css)
         self.assertNotIn(":nth-of-type", self.css)
 
-    def test_initial_gpfup_family_is_shared_while_report_card_keeps_icon_specialization(self) -> None:
+    def test_initial_gpfup_family_has_shared_icon_slot_and_bounded_glyph_specializations(self) -> None:
         self.assertIn(f"gfield--input-type-fileupload {REPORT_ROLE}", self.fixtures)
         self.assertIn('class="gpfup gpfup--strict gform-theme__no-reset--children"', self.fixtures)
         self.assertIn('class="gpfup gpfup--strict gpfup--images-only gform-theme__no-reset--children"', self.fixtures)
@@ -170,14 +171,45 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertIn("min-inline-size: 0;", shared)
         self.assertIn("flex-wrap: wrap;", shared)
 
-        self.assertIn(".gpfup.gpfup--images-only:not(.gpfup--has-files)", self.css)
+        icon_selector, icon_slot = next(
+            (selector, body)
+            for selector, body in blocks(self.css)
+            if f".gfield.{REPORT_ROLE} .gpfup:not(.gpfup--has-files) .gpfup__droparea::before" in selector
+            and ".gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea::before" in selector
+        )
+        self.assertIn(".srwf-registration-theme_wrapper", icon_selector)
+        self.assertIn("flex: 0 0 40px;", icon_slot)
+        self.assertIn("inline-size: 40px;", icon_slot)
+        self.assertIn("block-size: 40px;", icon_slot)
+        self.assertIn("border-radius: 10px;", icon_slot)
+        self.assertIn("background-color: #F1F5F9;", icon_slot)
+        self.assertIn("background-position: center;", icon_slot)
+        self.assertIn("background-repeat: no-repeat;", icon_slot)
+        self.assertIn("background-size: 24px 24px;", icon_slot)
+        self.assertNotIn("background-image", icon_slot, "shared slot must not collapse glyph identity into one asset")
+
         report_icon = next(
             body
             for selector, body in blocks(self.css)
-            if f".gfield.{REPORT_ROLE} .gpfup:not(.gpfup--has-files) .gpfup__droparea::before" in selector
+            if selector.strip().endswith(f".gfield.{REPORT_ROLE} .gpfup:not(.gpfup--has-files) .gpfup__droparea::before")
+            and "," not in selector
         )
-        self.assertIn('background-image: url("icons/report-card-file.svg");', report_icon)
-        self.assertIn("background-size: 24px 24px;", report_icon)
+        self.assertEqual('background-image: url("icons/report-card-file.svg");', report_icon.strip())
+
+        photo_icon = next(
+            body
+            for selector, body in blocks(self.css)
+            if selector.strip().endswith(".gfield--type-fileupload .gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea::before")
+            and "," not in selector
+        )
+        self.assertEqual(f'background-image: url("icons/{STUDENT_PHOTO_UPLOAD_ICON}");', photo_icon.strip())
+
+        asset = (ICONS / STUDENT_PHOTO_UPLOAD_ICON).read_text(encoding="utf-8")
+        self.assertIn('viewBox="0 0 24 24"', asset)
+        self.assertIn('stroke="#475467"', asset)
+        self.assertIn('<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>', asset)
+        self.assertIn('<circle cx="12" cy="13" r="4"/>', asset)
+        self.assertNotIn("aria-label", asset)
 
     def test_gpfup_post_upload_behavior_remains_host_owned(self) -> None:
         self.assertIn("gpfup--has-files", self.fixtures)
@@ -189,6 +221,9 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertNotIn("crop", selectors)
         self.assertNotIn("preview", selectors)
         self.assertIn(".gpfup:not(.gpfup--has-files) .gpfup__droparea", self.css)
+        for selector, _ in blocks(self.css):
+            if ".gpfup__droparea::before" in selector:
+                self.assertIn(":not(.gpfup--has-files)", selector)
 
     def test_upload_family_is_intrinsically_narrow_safe(self) -> None:
         shared = next(

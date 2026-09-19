@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import unittest
 from pathlib import Path
 
@@ -11,14 +12,59 @@ HISTORICAL = REFERENCE / "SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md"
 VISUAL_AUTHORITY = REFERENCE / "VISUAL_AUTHORITY.md"
 IMPLEMENTATION_MAP = THEME / "IMPLEMENTATION_MAP.md"
 SRC_README = THEME / "src" / "README.md"
+THEME_PHP = THEME / "src" / "srwf-registration-theme.php"
 CSS = THEME / "src" / "srwf-registration.css"
 
 HISTORICAL_BLOB_SHA = "3fac5772cbe356965d98de64950ef0fbec8d7f21"
+HISTORICAL_GPFUP_RUNTIME_VERSION = "0.1.14"
 
 
 def git_blob_sha(path: Path) -> str:
     payload = path.read_bytes()
     return hashlib.sha1(f"blob {len(payload)}\0".encode("ascii") + payload).hexdigest()
+
+
+def theme_version(source: str) -> str:
+    match = re.search(r"const SRWF_REGISTRATION_THEME_VERSION = '([^']+)';", source)
+    if not match:
+        raise AssertionError("SRWF theme version constant not found")
+    return match.group(1)
+
+
+def current_gpfup_provenance_errors(surfaces: dict[str, str], current_version: str) -> list[str]:
+    errors: list[str] = []
+    current_markers = {
+        "implementation_map": f"Current static theme implementation: `{current_version}`.",
+        "current": f"theme `{current_version}` is the current static implementation",
+        "authority": f"Theme `{current_version}` is the current static implementation",
+        "src_readme": f"Current production package line: **{current_version}**.",
+    }
+    for name, marker in current_markers.items():
+        if marker not in surfaces[name]:
+            errors.append(f"{name}: missing current implementation marker {marker}")
+
+    historical_markers = (
+        f"Owner runtime of theme `{HISTORICAL_GPFUP_RUNTIME_VERSION}`",
+        "historical evidence",
+        "glyphs rendered",
+        "visually detached",
+    )
+    for name in ("implementation_map", "current", "authority"):
+        for marker in historical_markers:
+            if marker not in surfaces[name]:
+                errors.append(f"{name}: missing historical runtime marker {marker}")
+
+    stale_current_patterns = (
+        f"Theme `{HISTORICAL_GPFUP_RUNTIME_VERSION}` statically implements",
+        f"Theme {HISTORICAL_GPFUP_RUNTIME_VERSION} statically implements",
+        f"theme `{HISTORICAL_GPFUP_RUNTIME_VERSION}` implements the shared initial GPFUP",
+    )
+    for name in ("implementation_map", "current", "authority"):
+        for pattern in stale_current_patterns:
+            if pattern in surfaces[name]:
+                errors.append(f"{name}: stale current-implementation attribution {pattern}")
+
+    return errors
 
 
 class CurrentOwnerAuthorityTests(unittest.TestCase):
@@ -29,7 +75,15 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         cls.authority = VISUAL_AUTHORITY.read_text(encoding="utf-8")
         cls.implementation_map = IMPLEMENTATION_MAP.read_text(encoding="utf-8")
         cls.src_readme = SRC_README.read_text(encoding="utf-8")
+        cls.theme_php = THEME_PHP.read_text(encoding="utf-8")
         cls.css = CSS.read_text(encoding="utf-8")
+        cls.current_version = theme_version(cls.theme_php)
+        cls.provenance_surfaces = {
+            "implementation_map": cls.implementation_map,
+            "current": cls.current,
+            "authority": cls.authority,
+            "src_readme": cls.src_readme,
+        }
 
     def test_historical_drive_backed_v101_mirror_remains_byte_exact(self) -> None:
         self.assertEqual(HISTORICAL_BLOB_SHA, git_blob_sha(HISTORICAL))
@@ -72,6 +126,8 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
             "visible non-color dot/shape cue",
             "tile: `40px × 40px`",
             "minimum height: `96px`",
+            "every admitted initial upload surface has a visible decorative icon",
+            "visible photo/camera icon",
         )
         for value in required:
             self.assertIn(value, self.current)
@@ -87,14 +143,54 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         ):
             self.assertIn(value, self.current)
 
+    def test_current_implementation_version_is_synchronized_across_authority_surfaces(self) -> None:
+        self.assertEqual("0.1.15", self.current_version)
+        self.assertEqual([], current_gpfup_provenance_errors(self.provenance_surfaces, self.current_version))
+
+    def test_pre_repair_stale_0_1_14_current_attribution_is_rejected(self) -> None:
+        stale = dict(self.provenance_surfaces)
+        stale["implementation_map"] = (
+            "Theme 0.1.14 statically implements the Owner-authorized shared initial GPFUP icon/alignment family.\n"
+            + stale["implementation_map"]
+        )
+        stale["current"] = (
+            "theme `0.1.14` implements the shared initial GPFUP icon/alignment destination.\n"
+            + stale["current"]
+        )
+        stale["authority"] = (
+            "Theme `0.1.14` statically implements the shared initial GPFUP icon/alignment destination.\n"
+            + stale["authority"]
+        )
+        errors = current_gpfup_provenance_errors(stale, self.current_version)
+        self.assertTrue(errors, "pre-repair 0.1.14 current attribution must fail provenance validation")
+        self.assertTrue(any("stale current-implementation attribution" in error for error in errors))
+
+    def test_0_1_14_is_historical_and_0_1_15_runtime_qualification_stays_open(self) -> None:
+        for text in (self.implementation_map, self.current, self.authority):
+            self.assertIn("Owner runtime of theme `0.1.14`", text)
+            self.assertIn("historical evidence", text)
+            self.assertIn("glyphs rendered", text)
+            self.assertIn("visually detached", text)
+            self.assertIn("0.1.15", text)
+            self.assertIn(".gpfup--has-files", text)
+            self.assertIn("narrow/mobile", text)
+        self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
+        self.assertIn("OWNER_RUNTIME_REQUIRED", self.current)
+        self.assertIn("NOT_PROVEN", self.authority)
+        self.assertIn("post-upload/crop", self.implementation_map)
+        self.assertIn("post-upload/crop", self.current)
+        self.assertIn("post-upload/crop", self.authority)
+
     def test_implementation_docs_track_repaired_destination_and_unresolved_boundaries(self) -> None:
         self.assertIn("Production breakpoint | `960 CSS px`", self.implementation_map)
         self.assertIn("HOST_OWNED / OWNER_CONFIGURABLE", self.implementation_map)
         self.assertIn("All Radio choices", self.implementation_map)
         self.assertIn("gpfup--images-only", self.implementation_map)
+        self.assertIn("student-photo-upload.svg", self.implementation_map)
         self.assertIn("Diagnostic package v0.3.5", self.implementation_map)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
-        self.assertIn("0.1.13", self.src_readme)
+        self.assertIn("0.1.15", self.src_readme)
+        self.assertIn("student-photo-upload.svg", self.src_readme)
         self.assertIn("960px", self.src_readme)
         self.assertIn("above-input", self.src_readme)
         self.assertIn("--gf-ctrl-select-padding-x", self.implementation_map)
@@ -112,6 +208,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertIn(".gfield.gfield--type-radio", self.css)
         self.assertNotIn(".gfield.srwf-role-binary-choice .gfield_radio", self.css)
         self.assertIn("background: #EDF1FC", self.css)
+        self.assertIn('background-image: url("icons/student-photo-upload.svg")', self.css)
         self.assertNotIn("#F6F8FB", self.css, "page background must remain host-integration-owned until a safe seam is proven")
         self.assertNotIn("!important", self.css)
 

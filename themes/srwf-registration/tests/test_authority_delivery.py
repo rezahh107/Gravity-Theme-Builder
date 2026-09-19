@@ -30,6 +30,7 @@ ARTIFACT_SHA256 = "436307d4cd6d896e0f280e502901269240dc310ec2e5927e30e1c29643483
 
 EXPECTED_LOCAL_URLS = {
     "icons/report-card-file.svg",
+    "icons/student-photo-upload.svg",
     "icons/section-contact.svg",
     "icons/section-education.svg",
     "icons/section-identity.svg",
@@ -219,7 +220,7 @@ class SrwfAuthorityAndDeliveryTests(unittest.TestCase):
     def test_all_production_local_url_dependencies_resolve_inside_installable_src(self) -> None:
         urls = local_css_urls(self.css)
         self.assertEqual(EXPECTED_LOCAL_URLS, set(urls))
-        self.assertEqual(6, len(urls))
+        self.assertEqual(7, len(urls))
         self.assertEqual([], unresolved_local_urls(CSS, SRC))
 
     def test_missing_referenced_asset_is_detected_by_dependency_closure(self) -> None:
