@@ -162,8 +162,13 @@ harness.button.dispatchEvent({ type: 'click', detail: 1 });
 assertFreshQualification(latestDownload(harness), 840, 'pointer activation');
 
 // A repair collector failure must be visible and must not serialize stale success.
-const staleVisual = harness.context.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V035;
-assert.strictEqual(staleVisual.viewportCssWidth, 840, 'repair failure control did not begin from known evidence');
+// Seed stale evidence explicitly: v0.3.5 intentionally does not rely on a long-lived global
+// success snapshot, so this control proves the final composer clears even injected stale data.
+harness.context.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V035 = {
+    diagnosticVersion: '0.3.5',
+    viewportCssWidth: 840,
+    targetCount: 1
+};
 harness.context.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V035 = () => { throw new Error('forced visual repair failure'); };
 harness.context.innerWidth = 880;
 harness.button.dispatchEvent({ type: 'click', detail: 0 });
