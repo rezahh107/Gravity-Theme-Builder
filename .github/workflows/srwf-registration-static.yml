@@ -28,9 +28,10 @@ jobs:
       - name: Run theme-local deterministic tests
         run: python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
 
-      - name: Check production settings, delivery and authentic-order context regression
+      - name: Check production settings, layout, delivery and authentic-order context regression
         run: |
           php themes/srwf-registration/tests/test_form_settings.php
+          php themes/srwf-registration/tests/test_form_layout.php
           php themes/srwf-registration/tests/test_delivery.php
           php themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 
@@ -41,8 +42,11 @@ jobs:
         run: |
           php -l themes/srwf-registration/src/srwf-registration-theme.php
           php -l themes/srwf-registration/src/srwf-registration-settings.php
+          php -l themes/srwf-registration/src/srwf-registration-layout.php
           php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
           php -l themes/srwf-registration/tests/test_form_settings.php
+          php -l themes/srwf-registration/tests/test_form_layout.php
+          php -l themes/srwf-registration/tests/test_delivery.php
           php -l themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 
   exact-head-qualification:
@@ -69,10 +73,13 @@ jobs:
           node themes/srwf-registration/tests/test_diagnostic_v03.js
           node themes/srwf-registration/tests/test_binary_choice_geometry.js
           node themes/srwf-registration/tests/test_admission_diagnostic_v032.js
+          node themes/srwf-registration/tests/test_qualification_v034.js
+          node themes/srwf-registration/tests/test_diagnostic_download_v034.js
 
-      - name: Check production settings, authentic-order context and diagnostic delivery
+      - name: Check production settings, layout, authentic-order context and diagnostic delivery
         run: |
           php themes/srwf-registration/tests/test_form_settings.php
+          php themes/srwf-registration/tests/test_form_layout.php
           php themes/srwf-registration/tests/test_delivery.php
           php themes/srwf-registration/tests/test_entry_detail_early_sequence.php
           php themes/srwf-registration/tests/test_diagnostic_delivery.php
@@ -81,8 +88,11 @@ jobs:
         run: |
           php -l themes/srwf-registration/src/srwf-registration-theme.php
           php -l themes/srwf-registration/src/srwf-registration-settings.php
+          php -l themes/srwf-registration/src/srwf-registration-layout.php
           php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
           php -l themes/srwf-registration/tests/test_form_settings.php
+          php -l themes/srwf-registration/tests/test_form_layout.php
+          php -l themes/srwf-registration/tests/test_delivery.php
           php -l themes/srwf-registration/tests/test_entry_detail_early_sequence.php
 
       - name: Build and smoke-check exact-Head Owner packages

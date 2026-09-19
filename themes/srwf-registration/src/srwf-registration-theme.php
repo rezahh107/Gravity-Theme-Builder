@@ -2,14 +2,14 @@
 /**
  * Plugin Name: SRWF Registration Gravity Forms Theme
  * Description: Theme-local SRWF Registration presentation for opt-in Gravity Forms.
- * Version: 0.1.8
+ * Version: 0.1.9
  * Text Domain: gravity-theme-builder
  */
 
 defined( 'ABSPATH' ) || exit;
 
 const SRWF_REGISTRATION_THEME_CLASS = 'srwf-registration-theme';
-const SRWF_REGISTRATION_THEME_VERSION = '0.1.8';
+const SRWF_REGISTRATION_THEME_VERSION = '0.1.9';
 const SRWF_REGISTRATION_GRAVITY_FORMS_ORBITAL_STYLE_HANDLE = 'gravity_forms_orbital_theme';
 const SRWF_REGISTRATION_CONTEXT_REGISTRATION = 'registration';
 const SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL = 'gravity_flow_entry_detail';
@@ -147,21 +147,13 @@ function srwf_registration_theme_rendering_context_decision() {
     );
 }
 
-/**
- * Return the current rendering-context classification.
- *
- * @return string
- */
+/** Return the current rendering-context classification. */
 function srwf_registration_theme_rendering_context() {
     $decision = srwf_registration_theme_rendering_context_decision();
     return $decision['renderingContext'];
 }
 
-/**
- * Return whether Registration presentation owns the current render context.
- *
- * @return bool
- */
+/** Return whether Registration presentation owns the current render context. */
 function srwf_registration_theme_is_registration_context_permitted() {
     return SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL !== srwf_registration_theme_rendering_context();
 }
@@ -194,12 +186,7 @@ function srwf_registration_theme_get_admission_decision( $form ) {
     );
 }
 
-/**
- * Return whether the current form and render context admit SRWF presentation.
- *
- * @param array<string,mixed> $form Gravity Forms form object.
- * @return bool
- */
+/** Return whether the current form and render context admit SRWF presentation. */
 function srwf_registration_theme_is_presentation_admitted( $form ) {
     $decision = srwf_registration_theme_get_admission_decision( $form );
     return true === $decision['presentationAdmitted'];
@@ -223,9 +210,6 @@ add_filter( 'gform_form_theme_slug', 'srwf_registration_theme_force_orbital', 10
 
 /**
  * Enqueue SRWF presentation only for an admitted Registration render.
- *
- * The verified Gravity Forms Orbital style handle remains a WordPress style
- * dependency so admitted Registration renders preserve the proven host order.
  *
  * @param array<string,mixed> $form    Gravity Forms form object.
  * @param bool                $is_ajax Whether Gravity Forms is using AJAX submission.

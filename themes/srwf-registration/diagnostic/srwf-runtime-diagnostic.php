@@ -2,14 +2,15 @@
 /**
  * Plugin Name: GTB SRWF Runtime Diagnostic
  * Description: Admin-gated privacy-safe structural/presentation diagnostic for SRWF Registration.
- * Version: 0.3.3
+ * Version: 0.3.4
  */
 
 defined( 'ABSPATH' ) || exit;
 
-const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.3';
+const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.4';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_COLLECTOR_VERSION = '0.3.0';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_ADMISSION_VERSION = '0.3.2';
+const GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION = '0.3.4';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_THEME_CLASS = 'srwf-registration-theme';
 
 /**
@@ -79,6 +80,68 @@ function gtb_srwf_runtime_diagnostic_admission_decision( $form ) {
     );
 }
 
+/** @param mixed $field Gravity Forms field object or array. */
+function gtb_srwf_runtime_diagnostic_field_get( $field, $key ) {
+    if ( is_object( $field ) && isset( $field->{$key} ) ) {
+        return $field->{$key};
+    }
+    return is_array( $field ) && array_key_exists( $key, $field ) ? $field[ $key ] : null;
+}
+
+/**
+ * Capture only non-sensitive Form Layout configuration required for qualification.
+ * No field labels, entered values, submitted data, files, or arbitrary content are emitted.
+ *
+ * @param array<string,mixed> $form Gravity Forms Form Object.
+ * @return array<string,mixed>
+ */
+function gtb_srwf_runtime_diagnostic_form_layout_readiness( $form ) {
+    $expected = array(
+        'labelPlacement'       => 'top_label',
+        'descriptionPlacement' => 'above',
+        'validationPlacement'  => 'above',
+        'subLabelPlacement'    => 'above',
+        'validationSummary'    => true,
+        'requiredIndicator'    => 'asterisk',
+    );
+    $properties = array();
+    $matching = true;
+
+    foreach ( $expected as $property => $target ) {
+        $current = array_key_exists( $property, $form ) ? $form[ $property ] : null;
+        $current = is_bool( $current ) ? $current : ( null === $current ? null : (string) $current );
+        $matches = $current === $target;
+        $matching = $matching && $matches;
+        $properties[ $property ] = array(
+            'expected' => $target,
+            'current'  => $current,
+            'state'    => $matches ? 'MATCHING' : 'NEEDS ATTENTION',
+        );
+    }
+
+    $field_expected = array(
+        'labelPlacement'       => 'top_label',
+        'descriptionPlacement' => 'above',
+        'subLabelPlacement'    => 'above',
+    );
+    $override_count = 0;
+    foreach ( isset( $form['fields'] ) && is_array( $form['fields'] ) ? $form['fields'] : array() as $field ) {
+        foreach ( $field_expected as $property => $target ) {
+            $current = gtb_srwf_runtime_diagnostic_field_get( $field, $property );
+            if ( null === $current || '' === (string) $current || $target === (string) $current ) {
+                continue;
+            }
+            $override_count++;
+        }
+    }
+
+    return array(
+        'state'                         => $matching && 0 === $override_count ? 'READY' : 'NEEDS ATTENTION',
+        'properties'                    => $properties,
+        'conflictingFieldOverrideCount' => $override_count,
+    );
+}
+
 /**
  * Load the local read-only diagnostics for an administrator whenever the SRWF target
  * identity is rendered. Observability remains available when presentation is excluded.
@@ -108,7 +171,7 @@ function gtb_srwf_runtime_diagnostic_enqueue( $form, $is_ajax ) { // phpcs:ignor
         'gtb-srwf-binary-choice-geometry-v033',
         plugins_url( 'assets/binary-choice-geometry.js', __FILE__ ),
         array( 'gtb-srwf-runtime-diagnostic-v03' ),
-        GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION,
+        '0.3.3',
         true
     );
 
@@ -120,16 +183,35 @@ function gtb_srwf_runtime_diagnostic_enqueue( $form, $is_ajax ) { // phpcs:ignor
         true
     );
 
+    wp_enqueue_script(
+        'gtb-srwf-v1-qualification-v034',
+        plugins_url( 'assets/srwf-v1-qualification.js', __FILE__ ),
+        array( 'gtb-srwf-runtime-diagnostic-v03', 'gtb-srwf-binary-choice-geometry-v033' ),
+        GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION,
+        true
+    );
+
     $decision = gtb_srwf_runtime_diagnostic_admission_decision( $form );
     $json     = wp_json_encode( $decision );
-    if ( ! is_string( $json ) ) {
-        return;
+    if ( is_string( $json ) ) {
+        wp_add_inline_script(
+            'gtb-srwf-admission-diagnostic-v032',
+            'window.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS = window.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS || []; window.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS.push(' . $json . ');',
+            'before'
+        );
     }
 
-    wp_add_inline_script(
-        'gtb-srwf-admission-diagnostic-v032',
-        'window.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS = window.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS || []; window.GTB_SRWF_RUNTIME_ADMISSION_DECISIONS.push(' . $json . ');',
-        'before'
-    );
+    $form_id = isset( $form['id'] ) ? (int) $form['id'] : 0;
+    if ( $form_id > 0 ) {
+        $layout_json    = wp_json_encode( gtb_srwf_runtime_diagnostic_form_layout_readiness( $form ) );
+        $form_key_json  = wp_json_encode( (string) $form_id );
+        if ( is_string( $layout_json ) && is_string( $form_key_json ) ) {
+            wp_add_inline_script(
+                'gtb-srwf-v1-qualification-v034',
+                'window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID = window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID || {}; window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID[' . $form_key_json . '] = ' . $layout_json . ';',
+                'before'
+            );
+        }
+    }
 }
 add_action( 'gform_enqueue_scripts', 'gtb_srwf_runtime_diagnostic_enqueue', 30, 2 );

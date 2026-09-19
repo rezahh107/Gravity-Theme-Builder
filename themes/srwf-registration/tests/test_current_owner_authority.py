@@ -80,21 +80,27 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         ):
             self.assertIn(value, self.current)
 
-    def test_implementation_docs_do_not_present_superseded_states_as_current(self) -> None:
+    def test_implementation_docs_track_current_destination_and_unresolved_boundaries(self) -> None:
         self.assertIn("Production breakpoint | `960 CSS px`", self.implementation_map)
         self.assertIn("HOST_OWNED / OWNER_CONFIGURABLE", self.implementation_map)
         self.assertIn("old below-input choice superseded", self.implementation_map)
-        self.assertIn("OWNER_AUTHORIZED / NEXT_VISUAL_BATCH", self.implementation_map)
+        self.assertIn("STATICALLY_IMPLEMENTED", self.implementation_map)
+        self.assertIn("HOST_INTEGRATION_REQUIRED", self.implementation_map)
+        self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
+        self.assertIn("0.1.9", self.src_readme)
         self.assertIn("960px", self.src_readme)
         self.assertIn("above-input", self.src_readme)
-        self.assertNotIn("production breakpoint, desktop short-field pairings, desktop shadow", self.src_readme)
 
-    def test_foundation_batch_did_not_silently_implement_new_visual_destination(self) -> None:
-        self.assertNotIn("@media", self.css)
-        self.assertNotIn("box-shadow", self.css)
-        self.assertNotIn("--gf-form-gap-y", self.css)
-        self.assertIn("production CSS from current main", self.src_readme)
-        self.assertIn("including PR #15's binary-choice row/equal-track behavior, is preserved unchanged", self.src_readme)
+    def test_current_authorized_visual_destination_is_present_without_broad_page_takeover(self) -> None:
+        self.assertIn("@media (min-width: 960px)", self.css)
+        self.assertIn("--gf-form-gap-y: 24px", self.css)
+        self.assertIn("--gf-ctrl-outline-width-focus: 2px", self.css)
+        self.assertIn("max-inline-size: 904px", self.css)
+        self.assertIn("padding-inline: 32px", self.css)
+        self.assertIn("box-shadow: none", self.css)
+        self.assertIn("background: #EDF1FC", self.css)
+        self.assertNotIn("#F6F8FB", self.css, "page background must remain host-integration-owned until a safe seam is proven")
+        self.assertNotIn("!important", self.css)
 
 
 if __name__ == "__main__":

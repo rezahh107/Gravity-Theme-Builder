@@ -35,6 +35,8 @@
                 var result;
                 try {
                     result = pendingResult || capture();
+                    result = api.finalizeQualification(root, result);
+                    root.GTB_SRWF_RUNTIME_DIAGNOSTIC_V03 = result;
                     api.downloadJson(documentObject, root, result);
                 } catch (error) {
                     root.GTB_SRWF_RUNTIME_DIAGNOSTIC_V03 = {
@@ -696,6 +698,36 @@
         }
     }
 
+    function finalizeQualification(view, report) {
+        if (!report || typeof report !== 'object') {
+            return report;
+        }
+        if (!Array.isArray(report.collectorFailures)) {
+            report.collectorFailures = [];
+        }
+        if (Object.prototype.hasOwnProperty.call(report, 'srwfV1Qualification')) {
+            delete report.srwfV1Qualification;
+        }
+
+        var collector = view && view.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034;
+        try {
+            if (typeof collector !== 'function') {
+                throw new Error('v0.3.4 qualification collector unavailable');
+            }
+            var qualification = collector();
+            if (!qualification || typeof qualification !== 'object' || Array.isArray(qualification)) {
+                throw new Error('v0.3.4 qualification collector returned invalid payload');
+            }
+            report.srwfV1Qualification = qualification;
+        } catch (error) {
+            if (view) {
+                view.GTB_SRWF_V1_QUALIFICATION_V034 = null;
+            }
+            report.collectorFailures.push({ collector: 'srwfV1Qualification', state: 'COLLECTOR_FAILED' });
+        }
+        return report;
+    }
+
     function collectConsumers(target, documentObject, view, failures) {
         failures = failures || [];
         return {
@@ -809,6 +841,7 @@
         splitSelectorList: splitSelectorList,
         ensureDownloadControl: ensureDownloadControl,
         downloadJson: downloadJson,
+        finalizeQualification: finalizeQualification,
         run: run
     };
 }));
