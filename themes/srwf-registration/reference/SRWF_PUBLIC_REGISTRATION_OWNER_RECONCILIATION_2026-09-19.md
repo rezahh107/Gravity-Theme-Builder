@@ -1,6 +1,6 @@
 # SRWF Public Registration — Current Owner Reconciliation — 2026-09-19
 
-Status: **CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / OWNER_AUTHORIZED_UPLOAD_ICON_ALIGNMENT_PENDING / RUNTIME_VALIDATION_REQUIRED**
+Status: **CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / GPFUP_INITIAL_ICON_FAMILY_STATICALLY_IMPLEMENTED / RUNTIME_VALIDATION_REQUIRED**
 
 Authority handle: `OWNER:SRWF-2026-09-19`
 
@@ -235,12 +235,13 @@ These are acceptance requirements, not claims that current production CSS has al
 
 ## Visual-repair implementation boundary
 
-The 2026-09-19 visual-fidelity repair statically implements the previously evidenced presentation differences while preserving host ownership and existing admission/isolation boundaries. In particular:
+The 2026-09-19 visual-fidelity repairs statically implement the currently evidenced presentation differences while preserving host ownership and existing admission/isolation boundaries. In particular:
 
-- every authentic SRWF Radio field is now presented through the common card system without semantic-role gating;
+- every authentic SRWF Radio field is presented through the common card system without semantic-role gating;
 - target typography/line-height and section icon-heading gap are represented through supported Theme Framework tokens or bounded SRWF selectors;
-- initial GPFUP surfaces share the authorized upload-family outer geometry, with Report Card icon specialization and image-only Student Photo admission kept bounded;
-- the newly authorized family-wide initial upload icon/alignment goal is **not yet claimed implemented** by this authority-only update;
-- the diagnostic package adds visible-consumer qualification and explicit module-version provenance without fabricating dynamic runtime states.
+- initial GPFUP surfaces share the authorized upload-family outer geometry;
+- theme `0.1.14` statically implements the family-wide initial upload icon/alignment goal through one shared `40×40` decorative icon slot with a `24px` local glyph, retaining the Report Card document glyph and adding the image-only Student Photo photo/camera glyph through the authentic `gpfup--images-only` seam;
+- the implementation stops at `.gpfup--has-files` and does not take over upload/progress/error/remove/preview/crop/persistence or JavaScript lifecycle;
+- diagnostic v0.3.5 already captures the required initial drop-area and `::before` icon geometry for both authentic consumers, so no diagnostic source/version change is required.
 
-This static/automated implementation state is **not** full runtime or production qualification. Authentic Owner runtime evidence is still required for the newly authorized upload icon/alignment goal, checked/keyboard-focused Radio behavior, validation, GPAS dynamic states, GPFUP post-upload states, exact `320 CSS px`, `200%` text resize, text spacing, complete contrast/target-size acceptance, and other runtime-sensitive obligations.
+This static/automated implementation state is **not** full runtime or production qualification. Authentic Owner runtime evidence is still required for Report Card/Student Photo initial icon visibility and alignment, a real `.gpfup--has-files` transition, checked/keyboard-focused Radio behavior, validation, GPAS dynamic states, GPFUP post-upload states, exact `320 CSS px`, `200%` text resize, text spacing, complete contrast/target-size acceptance, and other runtime-sensitive obligations.
