@@ -10,7 +10,8 @@ defined( 'ABSPATH' ) || exit;
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.5';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_COLLECTOR_VERSION = '0.3.0';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_ADMISSION_VERSION = '0.3.2';
-const GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION = '0.3.5';
+const GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION = '0.3.4';
+const GTB_SRWF_RUNTIME_DIAGNOSTIC_VISUAL_REPAIR_VERSION = '0.3.5';
 const GTB_SRWF_RUNTIME_DIAGNOSTIC_THEME_CLASS = 'srwf-registration-theme';
 
 function gtb_srwf_runtime_diagnostic_is_target_form( $form ) {
@@ -93,10 +94,11 @@ function gtb_srwf_runtime_diagnostic_enqueue( $form, $is_ajax ) { // phpcs:ignor
     if ( ! current_user_can( 'manage_options' ) || ! gtb_srwf_runtime_diagnostic_is_target_form( $form ) ) { return; }
 
     wp_enqueue_script( 'gtb-srwf-runtime-diagnostic-v03', plugins_url( 'assets/runtime-diagnostic.js', __FILE__ ), array(), GTB_SRWF_RUNTIME_DIAGNOSTIC_COLLECTOR_VERSION, true );
-    wp_enqueue_script( 'gtb-srwf-radio-card-geometry-v035', plugins_url( 'assets/binary-choice-geometry.js', __FILE__ ), array( 'gtb-srwf-runtime-diagnostic-v03' ), GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION, true );
+    wp_enqueue_script( 'gtb-srwf-radio-card-geometry-v035', plugins_url( 'assets/binary-choice-geometry.js', __FILE__ ), array( 'gtb-srwf-runtime-diagnostic-v03' ), GTB_SRWF_RUNTIME_DIAGNOSTIC_VISUAL_REPAIR_VERSION, true );
     wp_enqueue_script( 'gtb-srwf-admission-diagnostic-v032', plugins_url( 'assets/admission-diagnostic.js', __FILE__ ), array(), GTB_SRWF_RUNTIME_DIAGNOSTIC_ADMISSION_VERSION, true );
-    wp_enqueue_script( 'gtb-srwf-v1-qualification-v035', plugins_url( 'assets/srwf-v1-qualification.js', __FILE__ ), array( 'gtb-srwf-runtime-diagnostic-v03', 'gtb-srwf-radio-card-geometry-v035' ), GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION, true );
-    wp_enqueue_script( 'gtb-srwf-version-provenance-v035', plugins_url( 'assets/version-provenance.js', __FILE__ ), array( 'gtb-srwf-runtime-diagnostic-v03', 'gtb-srwf-radio-card-geometry-v035', 'gtb-srwf-v1-qualification-v035' ), GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION, true );
+    wp_enqueue_script( 'gtb-srwf-v1-qualification-v034', plugins_url( 'assets/srwf-v1-qualification.js', __FILE__ ), array( 'gtb-srwf-runtime-diagnostic-v03', 'gtb-srwf-radio-card-geometry-v035' ), GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION, true );
+    wp_enqueue_script( 'gtb-srwf-visual-repair-qualification-v035', plugins_url( 'assets/visual-repair-qualification.js', __FILE__ ), array( 'gtb-srwf-runtime-diagnostic-v03', 'gtb-srwf-radio-card-geometry-v035', 'gtb-srwf-v1-qualification-v034' ), GTB_SRWF_RUNTIME_DIAGNOSTIC_VISUAL_REPAIR_VERSION, true );
+    wp_enqueue_script( 'gtb-srwf-version-provenance-v035', plugins_url( 'assets/version-provenance.js', __FILE__ ), array( 'gtb-srwf-runtime-diagnostic-v03', 'gtb-srwf-radio-card-geometry-v035', 'gtb-srwf-v1-qualification-v034', 'gtb-srwf-visual-repair-qualification-v035' ), GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION, true );
 
     $decision = gtb_srwf_runtime_diagnostic_admission_decision( $form );
     $json = wp_json_encode( $decision );
@@ -109,7 +111,7 @@ function gtb_srwf_runtime_diagnostic_enqueue( $form, $is_ajax ) { // phpcs:ignor
         $layout_json = wp_json_encode( gtb_srwf_runtime_diagnostic_form_layout_readiness( $form ) );
         $form_key_json = wp_json_encode( (string) $form_id );
         if ( is_string( $layout_json ) && is_string( $form_key_json ) ) {
-            wp_add_inline_script( 'gtb-srwf-v1-qualification-v035', 'window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID = window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID || {}; window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID[' . $form_key_json . '] = ' . $layout_json . ';', 'before' );
+            wp_add_inline_script( 'gtb-srwf-v1-qualification-v034', 'window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID = window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID || {}; window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID[' . $form_key_json . '] = ' . $layout_json . ';', 'before' );
         }
     }
 }
