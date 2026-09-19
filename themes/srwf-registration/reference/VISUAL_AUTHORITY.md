@@ -109,7 +109,7 @@ Current project authority for the resolved SRWF destination is:
 ```text
 authority_handle: OWNER:SRWF-2026-09-19
 path: themes/srwf-registration/reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md
-status: CURRENT_OWNER_PROJECT_AUTHORITY / VISUAL_REPAIR_IMPLEMENTED_STATICALLY / GPFUP_INITIAL_ICON_CONTENT_CLUSTER_STATICALLY_IMPLEMENTED / RUNTIME_VALIDATION_REQUIRED
+status: CURRENT_OWNER_PROJECT_AUTHORITY / MOBILE_RESPONSIVE_POLISH_STATICALLY_IMPLEMENTED / RUNTIME_VALIDATION_REQUIRED
 provenance: direct Owner-supplied project authority for this execution
 immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR
 ```
@@ -133,7 +133,9 @@ No Google Drive revision ID, timestamp, export hash, or immutable upstream blob 
 - the upload-icon alignment goal is presentation-only and must not alter Gravity Forms / GP File Upload Pro core, markup ownership, upload/crop lifecycle, or add-on behavior;
 - current accessibility acceptance requirements.
 
-Owner runtime of theme `0.1.14` is retained as historical evidence: both admitted initial icon glyphs rendered, but the authentic direct content child remained visually detached from the icon. Theme `0.1.15` is the current static implementation of the completed initial GPFUP icon + content-cluster repair: it retains the shared `40×40` icon slot with `24px` glyphs, centers only the two admitted initial dropareas, and constrains their authentic direct content child so icon/instruction/select-file content forms one shrinkable cluster. Static implementation and CI do not establish a real-browser PASS for the resulting `0.1.15` geometry.
+Owner runtime of theme `0.1.14` is retained as historical evidence: both admitted initial icon glyphs rendered, but the authentic direct content child remained visually detached from the icon. Theme `0.1.15` remains the prior static content-cluster repair baseline. Theme `0.1.16` is the current static implementation: it preserves that shared `40×40` icon slot / `24px` glyph family, adds intrinsic narrow-width GPFUP wrapping, and makes Radio card reflow less permissive before labels become cramped. Static implementation and CI do not establish a real-browser PASS for the resulting `0.1.16` geometry.
+
+Diagnostic package `0.3.6` is the current Owner-runtime evidence package. It preserves the existing bounded collectors while adding viewport DPR and the width chain from host ancestors through Gravity Forms containers and the SRWF wrapper to representative text, Radio, initial GPFUP, and submit consumers. It is evidence for locating width loss; it is not authority to override a host container.
 
 ## 5. WHAT vs HOW
 
@@ -161,8 +163,10 @@ Documented/Owner-authorized values still require runtime qualification where con
 
 ## 8. Current batch boundary
 
-The 2026-09-19 visual-fidelity repairs preserve immutable historical authority and host behavior ownership while implementing the current Owner-authorized presentation destination.
+The 2026-09-20 mobile responsive-polish pass preserves immutable historical authority, the exact Owner destination, and host behavior ownership.
 
-Owner runtime of theme `0.1.14` remains historical evidence for the initial upload family: the Report Card and image-only Student Photo icon glyphs rendered, while the host content remained visually detached from the icon. Theme `0.1.15` is the current static implementation: Report Card retains its document glyph, image-only Student Photo retains its local photo/camera glyph, both retain the same icon-slot geometry, and only those two admitted initial dropareas/direct content children receive the bounded content-cluster alignment repair. The implementation stops before `.gpfup--has-files`; it does **not** authorize or implement Student Photo post-upload/crop composition or any takeover of GPFUP behavior.
+Theme `0.1.16` changes only intrinsic presentation behavior: Radio choices use a `9.5rem` basis and flexible label fill so a cramped container stacks before compressing labels, while a sufficiently wide container can still form equal-width rows; initial GPFUP content uses a `13rem` intrinsic basis and can wrap below the shared icon before its text column is squeezed. No device-specific mobile breakpoint, fixed card height, negative-margin breakout, global page-width rule, or `.gpfup--has-files` styling is added. The existing `960 CSS px` transition and desktop `904px` outer destination remain intact.
 
-Final Owner runtime qualification remains open for the `0.1.15` real-browser initial content-cluster alignment, narrow/mobile wrapping, and a real `.gpfup--has-files` transition. Post-upload/crop composition remains `NOT_PROVEN` / host-owned. CI/static success is not production qualification.
+Static source proves the SRWF wrapper itself remains fluid at mobile widths. It does **not** prove which Owner-site WordPress ancestor caused the observed whole-form narrowness. No host integration width override is therefore admitted in this batch. Diagnostic `0.3.6` must first identify the exact constraining ancestor and its computed width/max-width/padding/margin at the real Owner runtime.
+
+Final Owner runtime qualification remains open for theme `0.1.16` + diagnostic `0.3.6` across `320`, `360`, `390`, `393`, `412`, and `430 CSS px`, including no ordinary horizontal scroll, correct Radio stacking/two-column behavior, coherent initial GPFUP wrapping, full-width submit, checked/focus/validation states, and a real `.gpfup--has-files` transition. Post-upload/crop composition remains `NOT_PROVEN` / host-owned. CI/static success is not production qualification.
