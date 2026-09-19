@@ -1,6 +1,6 @@
 ## SRWF Registration production candidate
 
-Current production package line: **0.1.10**.
+Current production package line: **0.1.11**.
 
 The SRWF Registration implementation is theme-local under `src/`. It is **not production-qualified** until the bounded Owner WordPress/browser checks are completed.
 
@@ -72,7 +72,7 @@ PR #12 was disproved by Owner runtime because the later content bracket alone di
 
 `wp_enqueue_scripts` → Gravity Flow `enqueue_frontend_scripts()` → `enqueue_form_scripts()` → Gravity Forms `gform_enqueue_scripts` / `gform_form_theme_slug`, before `gravityflow_entry_detail_content_before`.
 
-The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.10 candidate remains `OWNER_RUNTIME_REQUIRED`.
+The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.11 candidate remains `OWNER_RUNTIME_REQUIRED`.
 
 Pinned source/package evidence retained from the qualified host stack:
 

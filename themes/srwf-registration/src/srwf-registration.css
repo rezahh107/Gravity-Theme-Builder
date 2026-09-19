@@ -145,7 +145,14 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     gap: 12px;
 }
 
+/*
+ * Gravity Forms 3.1.1.1 gives each .gchoice an internal two-track Grid. Because the
+ * authentic radio input is visually hidden out of flow, that Grid can strand the
+ * associated label in the intrinsic first track. Own only this inner formatting
+ * context so the existing 100% label resolves against the full Flex-assigned cell.
+ */
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gchoice {
+    display: block;
     position: relative;
     flex: 1 1 8rem;
     min-inline-size: 0;

@@ -94,7 +94,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertIn("gpfup--images-only", self.implementation_map)
         self.assertIn("Diagnostic package v0.3.5", self.implementation_map)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
-        self.assertIn("0.1.10", self.src_readme)
+        self.assertIn("0.1.11", self.src_readme)
         self.assertIn("960px", self.src_readme)
         self.assertIn("above-input", self.src_readme)
 
