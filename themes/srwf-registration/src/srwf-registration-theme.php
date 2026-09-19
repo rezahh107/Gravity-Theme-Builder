@@ -81,118 +81,138 @@ function srwf_registration_theme_leave_entry_detail_context( $form, $entry ) { /
     srwf_registration_theme_entry_detail_context_depth( -1 );
 }
 
+add_action( 'gravityflow_entry_detail_content_before', 'srwf_registration_theme_enter_entry_detail_context', 0, 2 );
+add_action( 'gravityflow_entry_detail_content_after', 'srwf_registration_theme_leave_entry_detail_context', PHP_INT_MAX, 2 );
+
 /**
- * Classify the current rendering context.
+ * Detect the source-proven Gravity Flow 3.1.0 early Entry Detail enqueue phase.
  *
- * The early Gravity Flow route signal is request-local and source-qualified for the
- * pre-content script enqueue phase. The content bracket remains the authentic later
- * signal for primary-content rendering. Neither signal is persisted in form config.
+ * Gravity Flow calls GFFormDisplay::enqueue_form_scripts() from its own enqueue
+ * callback before the entry-detail content hooks run. The host's own
+ * is_workflow_detail_page() predicate identifies the route; GTB does not parse URLs,
+ * query strings, page IDs, form IDs, or labels. The Gravity Flow post-enqueue actions
+ * bound this early phase so a later independent Registration render in the same
+ * request is not request-wide suppressed.
  *
- * @return array{context:string,evidence:string}
+ * @return bool
  */
-function srwf_registration_theme_rendering_context() {
+function srwf_registration_theme_is_gravity_flow_early_entry_detail_enqueue() {
+    if ( ! function_exists( 'gravity_flow' ) || ! function_exists( 'doing_action' ) || ! function_exists( 'did_action' ) ) {
+        return false;
+    }
+
+    $flow = gravity_flow();
+    if ( ! is_object( $flow ) || ! is_callable( array( $flow, 'is_workflow_detail_page' ) ) || ! $flow->is_workflow_detail_page() ) {
+        return false;
+    }
+
+    if ( doing_action( 'wp_enqueue_scripts' ) ) {
+        if ( ! is_callable( array( $flow, 'look_for_shortcode' ) ) || ! $flow->look_for_shortcode() ) {
+            return false;
+        }
+
+        return 0 === did_action( 'gravityflow_enqueue_frontend_scripts' );
+    }
+
+    if ( doing_action( 'admin_enqueue_scripts' ) ) {
+        return 0 === did_action( 'gravityflow_enqueue_admin_scripts' );
+    }
+
+    return false;
+}
+
+/**
+ * Return the current rendering-context classification and bounded evidence source.
+ *
+ * @return array{renderingContext:string,contextEvidence:string}
+ */
+function srwf_registration_theme_rendering_context_decision() {
     if ( srwf_registration_theme_entry_detail_context_depth() > 0 ) {
         return array(
-            'context'  => SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL,
-            'evidence' => SRWF_REGISTRATION_CONTEXT_EVIDENCE_FLOW_CONTENT,
+            'renderingContext' => SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL,
+            'contextEvidence'  => SRWF_REGISTRATION_CONTEXT_EVIDENCE_FLOW_CONTENT,
         );
     }
 
-    if ( srwf_registration_theme_is_gravity_flow_entry_detail_early() ) {
+    if ( srwf_registration_theme_is_gravity_flow_early_entry_detail_enqueue() ) {
         return array(
-            'context'  => SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL,
-            'evidence' => SRWF_REGISTRATION_CONTEXT_EVIDENCE_FLOW_EARLY_ENQUEUE,
+            'renderingContext' => SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL,
+            'contextEvidence'  => SRWF_REGISTRATION_CONTEXT_EVIDENCE_FLOW_EARLY_ENQUEUE,
         );
     }
 
     return array(
-        'context'  => SRWF_REGISTRATION_CONTEXT_REGISTRATION,
-        'evidence' => SRWF_REGISTRATION_CONTEXT_EVIDENCE_REGISTRATION,
+        'renderingContext' => SRWF_REGISTRATION_CONTEXT_REGISTRATION,
+        'contextEvidence'  => SRWF_REGISTRATION_CONTEXT_EVIDENCE_REGISTRATION,
     );
 }
 
+/** Return the current rendering-context classification. */
+function srwf_registration_theme_rendering_context() {
+    $decision = srwf_registration_theme_rendering_context_decision();
+    return $decision['renderingContext'];
+}
+
+/** Return whether Registration presentation owns the current render context. */
+function srwf_registration_theme_is_registration_context_permitted() {
+    return SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL !== srwf_registration_theme_rendering_context();
+}
+
 /**
- * Return the bounded admission decision for diagnostics and runtime presentation.
+ * Return a bounded, privacy-safe admission decision for the current form/render.
  *
  * @param array<string,mixed> $form Gravity Forms form object.
  * @return array{formIdentityMatched:bool,presentationAdmitted:bool,renderingContext:string,contextEvidence:string,exclusionReason:?string}
  */
 function srwf_registration_theme_get_admission_decision( $form ) {
-    $identity = srwf_registration_theme_is_target_form( $form );
-    $context  = srwf_registration_theme_rendering_context();
+    $identity_matched = srwf_registration_theme_is_target_form( $form );
+    $context_decision = srwf_registration_theme_rendering_context_decision();
+    $context          = $context_decision['renderingContext'];
+    $context_allowed  = SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL !== $context;
 
-    $admitted = $identity && SRWF_REGISTRATION_CONTEXT_REGISTRATION === $context['context'];
-    $reason   = null;
-
-    if ( ! $identity ) {
-        $reason = 'unrelated_form';
-    } elseif ( ! $admitted ) {
-        $reason = $context['context'];
+    $exclusion_reason = null;
+    if ( ! $identity_matched ) {
+        $exclusion_reason = 'unrelated_form';
+    } elseif ( ! $context_allowed ) {
+        $exclusion_reason = 'gravity_flow_entry_detail';
     }
 
     return array(
-        'formIdentityMatched' => $identity,
-        'presentationAdmitted' => $admitted,
-        'renderingContext'     => $context['context'],
-        'contextEvidence'      => $context['evidence'],
-        'exclusionReason'      => $reason,
+        'formIdentityMatched'  => $identity_matched,
+        'presentationAdmitted' => $identity_matched && $context_allowed,
+        'renderingContext'     => $context,
+        'contextEvidence'      => $context_decision['contextEvidence'],
+        'exclusionReason'      => $exclusion_reason,
     );
 }
 
-/**
- * Return whether this form may receive Registration presentation in the current context.
- *
- * @param array<string,mixed> $form Gravity Forms form object.
- * @return bool
- */
+/** Return whether the current form and render context admit SRWF presentation. */
 function srwf_registration_theme_is_presentation_admitted( $form ) {
     $decision = srwf_registration_theme_get_admission_decision( $form );
-
     return true === $decision['presentationAdmitted'];
 }
 
 /**
- * Detect the authentic Gravity Flow workflow-detail route during early enqueue.
+ * Ensure only an admitted SRWF Registration render uses Theme Framework/Orbital.
  *
- * Gravity Flow owns route classification through is_workflow_detail_page(). Guard every
- * dependency because the registration theme must remain independently installable.
- *
- * @return bool
- */
-function srwf_registration_theme_is_gravity_flow_entry_detail_early() {
-    if ( ! class_exists( 'Gravity_Flow' ) || ! is_callable( array( 'Gravity_Flow', 'get_instance' ) ) ) {
-        return false;
-    }
-
-    $gravity_flow = Gravity_Flow::get_instance();
-    if ( ! is_object( $gravity_flow ) || ! is_callable( array( $gravity_flow, 'is_workflow_detail_page' ) ) ) {
-        return false;
-    }
-
-    return (bool) $gravity_flow->is_workflow_detail_page();
-}
-
-/**
- * Force Orbital only for admitted SRWF Registration renders.
- *
- * @param string              $theme Current form theme slug.
- * @param array<string,mixed> $form  Gravity Forms form object.
+ * @param string              $slug Current Gravity Forms theme slug.
+ * @param array<string,mixed> $form Gravity Forms form object.
  * @return string
  */
-function srwf_registration_theme_force_orbital( $theme, $form ) {
-    if ( srwf_registration_theme_is_presentation_admitted( $form ) ) {
-        return 'orbital';
+function srwf_registration_theme_force_orbital( $slug, $form ) {
+    if ( ! srwf_registration_theme_is_presentation_admitted( $form ) ) {
+        return $slug;
     }
 
-    return $theme;
+    return 'orbital';
 }
-add_filter( 'gform_form_theme_slug', 'srwf_registration_theme_force_orbital', 20, 2 );
+add_filter( 'gform_form_theme_slug', 'srwf_registration_theme_force_orbital', 10, 2 );
 
 /**
- * Enqueue the local SRWF stylesheet only for admitted Registration renders.
+ * Enqueue SRWF presentation only for an admitted Registration render.
  *
  * @param array<string,mixed> $form    Gravity Forms form object.
- * @param bool                $is_ajax Whether Gravity Forms considers this an AJAX render.
+ * @param bool                $is_ajax Whether Gravity Forms is using AJAX submission.
  * @return void
  */
 function srwf_registration_theme_enqueue_styles( $form, $is_ajax ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
@@ -209,12 +229,4 @@ function srwf_registration_theme_enqueue_styles( $form, $is_ajax ) { // phpcs:ig
 }
 add_action( 'gform_enqueue_scripts', 'srwf_registration_theme_enqueue_styles', 20, 2 );
 
-/*
- * Gravity Flow exposes the primary Entry Detail content bracket after its early enqueue
- * phase. Retain this authentic later boundary as a second line of context ownership.
- */
-add_action( 'gravityflow_entry_detail_content_before', 'srwf_registration_theme_enter_entry_detail_context', 0, 2 );
-add_action( 'gravityflow_entry_detail_content_after', 'srwf_registration_theme_leave_entry_detail_context', PHP_INT_MAX, 2 );
-
-require_once __DIR__ . '/srwf-registration-layout.php';
 require_once __DIR__ . '/srwf-registration-settings.php';
