@@ -14,6 +14,7 @@
 
         function collectNow() {
             var value = api.collect(root.document, root);
+            root.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V036 = value;
             root.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V035 = value;
             var report = root.GTB_SRWF_RUNTIME_DIAGNOSTIC_V03;
             if (report && typeof report === 'object') {
@@ -22,6 +23,7 @@
             return value;
         }
 
+        root.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V036 = collectNow;
         root.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V035 = collectNow;
         collectNow();
 
@@ -41,11 +43,13 @@
 }(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this), function () {
     'use strict';
 
-    var VERSION = '0.3.5';
+    var VERSION = '0.3.6';
     var TARGET_SELECTOR = '.gform-theme--framework.srwf-registration-theme_wrapper';
     var MAX_TARGETS = 4;
     var MAX_FIELDS = 48;
     var MAX_SCROLL_ANCESTORS = 12;
+    var MAX_WIDTH_ANCESTORS = 12;
+    var MAX_CLASSES = 32;
     var SECTION_ROLES = [
         'srwf-role-section-identity',
         'srwf-role-section-contact',
@@ -88,6 +92,80 @@
             result[property] = String(style[property] || '');
         });
         return result;
+    }
+
+    function safeStructuralId(element) {
+        var id = element && typeof element.id === 'string' ? element.id : '';
+        return /^(?:gform_wrapper_\d+|gform_\d+|field_\d+_\d+|input_\d+_\d+(?:_\d+)?)$/.test(id) ? id : null;
+    }
+
+    function widthSnapshot(element, view, kind) {
+        if (!element) {
+            return null;
+        }
+        return {
+            kind: kind,
+            tag: String(element.tagName || '').toLowerCase(),
+            structuralId: safeStructuralId(element),
+            classes: bounded(element.classList || [], MAX_CLASSES).map(String),
+            rect: rect(element),
+            computed: styleSnapshot(element, view, [
+                'display', 'boxSizing', 'width', 'inlineSize', 'minWidth', 'minInlineSize', 'maxWidth', 'maxInlineSize',
+                'paddingLeft', 'paddingRight', 'marginLeft', 'marginRight', 'overflowX'
+            ])
+        };
+    }
+
+    function firstVisible(wrapper, selector, view) {
+        if (!wrapper || typeof wrapper.querySelectorAll !== 'function') {
+            return null;
+        }
+        var candidates = bounded(wrapper.querySelectorAll(selector), MAX_FIELDS);
+        for (var i = 0; i < candidates.length; i += 1) {
+            if (visible(candidates[i], view)) {
+                return candidates[i];
+            }
+        }
+        return null;
+    }
+
+    function widthChain(wrapper, view) {
+        var gravityForm = wrapper && typeof wrapper.querySelector === 'function' ? wrapper.querySelector('form') : null;
+        var formBody = wrapper && typeof wrapper.querySelector === 'function' ? wrapper.querySelector('.gform-body, .gform_body') : null;
+        var fields = wrapper && typeof wrapper.querySelector === 'function' ? wrapper.querySelector('.gform_fields') : null;
+        var textControl = firstVisible(
+            wrapper,
+            'input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="number"], input:not([type]), textarea',
+            view
+        );
+        var radioGroup = firstVisible(wrapper, '.gfield.gfield--type-radio .gfield_radio', view);
+        var initialDroparea = firstVisible(wrapper, '.gpfup:not(.gpfup--has-files) .gpfup__droparea', view);
+        var submit = firstVisible(wrapper, '.gform-footer .gform_button, .gform_footer .gform_button', view);
+        var ancestors = [];
+        var current = wrapper ? wrapper.parentElement : null;
+        var depth = 0;
+        while (current && depth < MAX_WIDTH_ANCESTORS) {
+            ancestors.push(widthSnapshot(current, view, depth === 0 ? 'immediate-parent' : 'ancestor'));
+            if (String(current.tagName || '').toLowerCase() === 'body') {
+                break;
+            }
+            current = current.parentElement || null;
+            depth += 1;
+        }
+
+        return {
+            wrapper: widthSnapshot(wrapper, view, 'srwf-theme-wrapper'),
+            gravityFormsContainers: [
+                widthSnapshot(gravityForm, view, 'gravity-forms-form'),
+                widthSnapshot(formBody, view, 'gravity-forms-body'),
+                widthSnapshot(fields, view, 'gravity-forms-fields')
+            ].filter(Boolean),
+            ancestors: ancestors.filter(Boolean),
+            representativeTextControl: widthSnapshot(textControl, view, 'representative-text-control'),
+            representativeRadioGroup: widthSnapshot(radioGroup, view, 'representative-radio-group'),
+            representativeInitialUpload: widthSnapshot(initialDroparea, view, 'representative-initial-gpfup-droparea'),
+            submit: widthSnapshot(submit, view, 'submit')
+        };
     }
 
     function visible(element, view) {
@@ -330,6 +408,9 @@
     }
 
     function gpas(wrapper, view) {
+        if (!wrapper || typeof wrapper.querySelector !== 'function') {
+            return null;
+        }
         var control = wrapper.querySelector('.ts-wrapper > .ts-control');
         if (!control) {
             return null;
@@ -344,6 +425,9 @@
     }
 
     function primaryAction(wrapper, view) {
+        if (!wrapper || typeof wrapper.querySelector !== 'function') {
+            return null;
+        }
         var button = wrapper.querySelector('.gform-footer .gform_button, .gform_footer .gform_button');
         return button ? typography(button, view) : null;
     }
@@ -351,6 +435,7 @@
     function targetSnapshot(wrapper, view, documentObject) {
         return {
             shell: { rect: rect(wrapper), horizontalOverflow: visibleOverflow(wrapper, view, documentObject) },
+            widthChain: widthChain(wrapper, view),
             rowRhythm: rowRhythm(wrapper, view),
             representativeFieldLabel: representativeLabel(wrapper, view),
             labelControlChain: labelControlChain(wrapper, view),
@@ -372,10 +457,17 @@
         var wrappers = documentObject && typeof documentObject.querySelectorAll === 'function' ? bounded(documentObject.querySelectorAll(TARGET_SELECTOR), MAX_TARGETS) : [];
         return {
             diagnosticVersion: VERSION,
+            viewportCssWidth: view ? Number(view.innerWidth || 0) : 0,
+            devicePixelRatio: view && Number.isFinite(Number(view.devicePixelRatio)) ? Number(view.devicePixelRatio) : null,
             targetCount: wrappers.length,
             targets: wrappers.map(function (wrapper) { return targetSnapshot(wrapper, view, documentObject); })
         };
     }
 
-    return { VERSION: VERSION, TARGET_SELECTOR: TARGET_SELECTOR, collect: collect };
+    return {
+        VERSION: VERSION,
+        TARGET_SELECTOR: TARGET_SELECTOR,
+        MAX_WIDTH_ANCESTORS: MAX_WIDTH_ANCESTORS,
+        collect: collect
+    };
 }));
