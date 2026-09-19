@@ -201,13 +201,17 @@ function gtb_srwf_runtime_diagnostic_enqueue( $form, $is_ajax ) { // phpcs:ignor
         );
     }
 
-    $layout_json = wp_json_encode( gtb_srwf_runtime_diagnostic_form_layout_readiness( $form ) );
-    if ( is_string( $layout_json ) ) {
-        wp_add_inline_script(
-            'gtb-srwf-v1-qualification-v034',
-            'window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS = ' . $layout_json . ';',
-            'before'
-        );
+    $form_id = isset( $form['id'] ) ? (int) $form['id'] : 0;
+    if ( $form_id > 0 ) {
+        $layout_json    = wp_json_encode( gtb_srwf_runtime_diagnostic_form_layout_readiness( $form ) );
+        $form_key_json  = wp_json_encode( (string) $form_id );
+        if ( is_string( $layout_json ) && is_string( $form_key_json ) ) {
+            wp_add_inline_script(
+                'gtb-srwf-v1-qualification-v034',
+                'window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID = window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID || {}; window.GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID[' . $form_key_json . '] = ' . $layout_json . ';',
+                'before'
+            );
+        }
     }
 }
 add_action( 'gform_enqueue_scripts', 'gtb_srwf_runtime_diagnostic_enqueue', 30, 2 );
