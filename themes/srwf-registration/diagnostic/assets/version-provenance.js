@@ -10,7 +10,8 @@
         structuralCollector: '0.3.0',
         admission: '0.3.2',
         radioCardGeometry: '0.3.5',
-        v1Qualification: '0.3.5',
+        v1Qualification: '0.3.4',
+        visualRepairQualification: '0.3.5',
         provenanceAugmenter: '0.3.5'
     });
 
@@ -25,8 +26,11 @@
             report.radioCardGeometry = root.GTB_SRWF_RADIO_CARD_GEOMETRY_V035;
             report.binaryChoiceGeometry = root.GTB_SRWF_RADIO_CARD_GEOMETRY_V035;
         }
-        if (root.GTB_SRWF_V1_QUALIFICATION_V035) {
-            report.srwfV1Qualification = root.GTB_SRWF_V1_QUALIFICATION_V035;
+        if (root.GTB_SRWF_V1_QUALIFICATION_V034) {
+            report.srwfV1Qualification = root.GTB_SRWF_V1_QUALIFICATION_V034;
+        }
+        if (root.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V035) {
+            report.visualRepairQualification = root.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V035;
         }
         return report;
     }
