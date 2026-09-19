@@ -68,7 +68,7 @@ The exact historical v1.0.1/artifact path remains retrievable. The current Owner
 | Section iconography | `VA:VC-1.0.1` §27 `section_heading_iconography` + `VA:ARTIFACT` + current reconciliation | explicit mapped Section Break tokens + local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
 | Report Card initial GPFUP | `VA:VC-1.0.1` §27 `report_card_upload_initial` + `VA:ARTIFACT` + current reconciliation | shared initial GPFUP family + explicit Report Card `24px` file/document icon | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
 | Report Card `.gpfup--has-files` | `VA:VC-1.0.1` §§19,27 + host-owned GPFUP lifecycle | initial rules stop at authentic `.gpfup--has-files` state | `HOST_OWNED`; runtime recheck pending |
-| Student Photo initial | current Owner upload-family icon/alignment lock + authentic GPFUP image-only runtime/config evidence | current CSS admits the shared initial shell; photo/camera icon specialization is still pending | `OWNER_AUTHORIZED / IMPLEMENTATION_PENDING`; runtime pending after implementation |
+| Student Photo initial | current Owner upload-family icon/alignment lock + authentic GPFUP image-only runtime/config evidence (`gpfup--images-only`) | current CSS admits the shared initial shell; photo/camera icon specialization is still pending | `OWNER_AUTHORIZED / IMPLEMENTATION_PENDING`; runtime pending after implementation |
 | Student Photo post-upload | `VA:VC-1.0.1` §27 + `VA:ARTIFACT` + current reconciliation | none until authentic Photo state/DOM is captured | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN`; crop config `HOST_OWNED` |
 
 ## Gravity Forms Form Presentation Readiness
