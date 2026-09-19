@@ -119,9 +119,27 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     inline-size: 100%;
 }
 
-/* GP Advanced Select / Tom Select: Owner runtime proves .ts-wrapper > .ts-control. */
+/*
+ * GP Advanced Select / Tom Select: Owner runtime proves .ts-wrapper > .ts-control as
+ * the visible closed control. Match the accepted SRWF text-control metrics while
+ * leaving Tom Select responsible for caret drawing, search, open/close, and value state.
+ * The 32px logical end padding mirrors the authentic Gravity Forms select's measured
+ * indicator reserve (12px content padding + 20px indicator space) in the same runtime.
+ */
 .gform-theme--framework.srwf-registration-theme_wrapper .ts-wrapper .ts-control {
+    box-sizing: border-box;
     min-block-size: var(--gf-ctrl-size);
+    padding-block: 0;
+    padding-inline: 12px 32px;
+    line-height: var(--gf-ctrl-line-height);
+}
+
+/* Tom Select exposes focus on its wrapper; project only SRWF's established focus visual. */
+.gform-theme--framework.srwf-registration-theme_wrapper .ts-wrapper.focus .ts-control {
+    border-color: var(--gf-ctrl-border-color-focus);
+    outline: var(--gf-ctrl-outline-width-focus) var(--gf-ctrl-outline-style) var(--gf-ctrl-outline-color-focus);
+    outline-offset: var(--gf-ctrl-outline-offset);
+    box-shadow: none;
 }
 
 .gform-theme--framework.srwf-registration-theme_wrapper input[type="tel"],
