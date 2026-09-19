@@ -46,6 +46,7 @@ REVIEWED_GF_API = {
     "--gf-ctrl-label-font-size-primary",
     "--gf-ctrl-label-font-weight-primary",
     "--gf-ctrl-label-line-height-primary",
+    "--gf-label-space-primary",
     "--gf-ctrl-desc-color",
     "--gf-ctrl-desc-font-size",
     "--gf-ctrl-desc-font-weight",
@@ -54,6 +55,7 @@ REVIEWED_GF_API = {
     "--gf-ctrl-desc-font-size-error",
     "--gf-ctrl-desc-font-weight-error",
     "--gf-ctrl-desc-line-height-error",
+    "--gf-desc-space",
     "--gf-ctrl-btn-bg-color-primary",
     "--gf-ctrl-btn-bg-color-hover-primary",
     "--gf-ctrl-btn-bg-color-focus-primary",
@@ -229,9 +231,13 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
 
     def test_token_enforcement_specificity_outranks_orbital_per_form_scope(self) -> None:
         css = CSS.read_text(encoding="utf-8")
-        token_blocks = gf_token_blocks(css)
-        self.assertEqual(1, len(token_blocks), "expected one SRWF --gf-* enforcement block")
-        selectors = split_selector_list(token_blocks[0][0])
+        root_token_blocks = [
+            (selectors, body)
+            for selectors, body in gf_token_blocks(css)
+            if selectors.strip().startswith(ENFORCED_SCOPE)
+        ]
+        self.assertEqual(1, len(root_token_blocks), "expected one root SRWF --gf-* enforcement block")
+        selectors = split_selector_list(root_token_blocks[0][0])
         self.assertEqual(1, len(selectors))
         self.assertEqual((1, 2, 0), selector_specificity(HOSTILE_ORBITAL_SELECTOR))
         self.assertGreater(selector_specificity(selectors[0]), selector_specificity(HOSTILE_ORBITAL_SELECTOR))
@@ -239,17 +245,26 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertIn(ACTIVATION_CLASS, selectors[0])
         self.assertNotRegex(selectors[0], r"#gform_wrapper_\d+")
 
-    def test_every_reviewed_gf_token_has_single_implementation_source(self) -> None:
+    def test_every_reviewed_gf_token_has_expected_implementation_sources(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         declarations = [name for _, body in css_blocks(css) for name, _ in gf_token_declarations(body)]
         counts = Counter(declarations)
         self.assertEqual(REVIEWED_GF_API, set(counts))
-        self.assertTrue(all(count == 1 for count in counts.values()), f"duplicate --gf declarations: {counts}")
+        self.assertEqual(2, counts["--gf-label-space-primary"], "base 8px plus bounded 6px field override expected")
+        self.assertTrue(
+            all(count == 1 for name, count in counts.items() if name != "--gf-label-space-primary"),
+            f"unexpected duplicate --gf declarations: {counts}",
+        )
 
     def test_all_direct_presentation_selectors_remain_srwf_scoped(self) -> None:
         css = CSS.read_text(encoding="utf-8")
         for selector_group, body in css_blocks(css):
             if gf_token_declarations(body):
+                for selector in split_selector_list(selector_group):
+                    self.assertTrue(
+                        selector.startswith(NARROW_SCOPE) or selector.startswith(ENFORCED_SCOPE),
+                        f"token selector escaped SRWF scope: {selector}",
+                    )
                 continue
             for selector in split_selector_list(selector_group):
                 if selector.startswith("@media"):
@@ -303,12 +318,14 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         for declaration in (
             "--gf-ctrl-line-height: 1.5;",
             "--gf-ctrl-label-line-height-primary: 1.5;",
+            "--gf-label-space-primary: 8px;",
             "--gf-ctrl-desc-font-size: 14px;",
             "--gf-ctrl-desc-font-weight: 400;",
             "--gf-ctrl-desc-line-height: 1.5;",
             "--gf-ctrl-desc-font-size-error: 14px;",
             "--gf-ctrl-desc-font-weight-error: 600;",
             "--gf-ctrl-desc-line-height-error: 1.5;",
+            "--gf-desc-space: 8px;",
             "--gf-ctrl-btn-line-height: 1.5;",
             "--gf-form-gap-y: 24px;",
             "--gf-ctrl-outline-color-focus: #1D4ED8;",
