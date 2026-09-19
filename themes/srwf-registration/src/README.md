@@ -54,13 +54,11 @@ Together these placement values establish the intended **above-input** presentat
 
 Explicit supported field-level placement overrides that conflict with the intended form-level placement are reported as **ATTENTION REQUIRED** and are not silently normalized.
 
-### Required indicator note
+### Required indicator explanation
 
-For an admitted SRWF form using `requiredIndicator=asterisk`, `gform_get_form_filter` inserts one inert localized explanation:
+For `requiredIndicator=asterisk`, Gravity Forms' native required legend is the single explanation surface. GTB does not post-process the generated form HTML, insert a parallel required note, suppress the native legend, or recreate required semantics. Gravity Forms remains authoritative for required state, indicator semantics, ARIA, validation, rerender lifecycle, and legend output.
 
-> فیلدهای دارای * الزامی هستند.
-
-The note is real HTML content, not CSS-generated semantic text. Gravity Forms remains authoritative for required state, native indicators, ARIA, and validation. The insertion is idempotent for repeated filtering of the same generated form string and does not use process-global state, so validation/AJAX rerenders can each render one note. Unrelated forms and excluded Entry Detail renders receive none.
+Unrelated forms and excluded Gravity Flow Entry Detail renders remain outside SRWF presentation ownership; no separate required-explanation path is attached to either surface.
 
 ### Rendering-context ownership boundary
 
