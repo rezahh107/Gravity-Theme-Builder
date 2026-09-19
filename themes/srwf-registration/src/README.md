@@ -1,6 +1,6 @@
 ## SRWF Registration production candidate
 
-Current production package line: **0.1.9**.
+Current production package line: **0.1.10**.
 
 The SRWF Registration implementation is theme-local under `src/`. It is **not production-qualified** until the bounded Owner WordPress/browser checks are completed.
 
@@ -35,11 +35,13 @@ The settings surface uses Gravity Forms' supported `gform_form_settings_menu` an
 
 Activation is stored separately from eight semantic mappings: Gender, Graduation Status, Report Card upload, and five Section Break roles. Numeric field IDs in this admin UI are internal Form Object references only; they are never public CSS identity.
 
-**Save GTB Configuration** validates the mapping, preserves unrelated Custom CSS classes, projects only GTB-owned semantic tokens, and persists through `GFAPI::update_form()`. `Check Again`, ordinary page render, and `Load Recommended SRWF Draft` are read-only. Shared binary roles are never guessed from label/type/order.
+**Save GTB Configuration** validates the mapping, preserves unrelated Custom CSS classes, projects only GTB-owned semantic tokens, and persists through `GFAPI::update_form()`. `Check Again`, ordinary page render, and `Load Recommended SRWF Draft` are read-only. Semantic roles are never guessed from label/type/order.
+
+The current Owner lock does **not** require a semantic mapping to obtain Radio card presentation. Every authentic Gravity Forms Radio field inside an admitted SRWF Registration render uses the same card presentation based on the host field type. Existing binary semantic roles remain compatible configuration data but no longer gate cards.
 
 ### SRWF Form Presentation Readiness
 
-The same GTB Theme page now reports the host-owned Form Layout destination:
+The same GTB Theme page reports the host-owned Form Layout destination:
 
 - Label Placement: `top_label`;
 - Description Placement: `above`;
@@ -70,7 +72,7 @@ PR #12 was disproved by Owner runtime because the later content bracket alone di
 
 `wp_enqueue_scripts` → Gravity Flow `enqueue_frontend_scripts()` → `enqueue_form_scripts()` → Gravity Forms `gform_enqueue_scripts` / `gform_form_theme_slug`, before `gravityflow_entry_detail_content_before`.
 
-The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.9 candidate remains `OWNER_RUNTIME_REQUIRED`.
+The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.10 candidate remains `OWNER_RUNTIME_REQUIRED`.
 
 Pinned source/package evidence retained from the qualified host stack:
 
@@ -78,30 +80,34 @@ Pinned source/package evidence retained from the qualified host stack:
 - Gravity Flow `class-gravity-flow.php` SHA-256: `16666115e37a7704b8331973eba0a0499e039d3fdfc6b47ed8a8e95a41779a79`;
 - Gravity Forms 3.1.1.1 package SHA-256: `542f56ae0747f3661d1474996527298027db3fb8ed3e6469a6391aaabf61069b`.
 
-### Authorized v1 presentation now implemented
+### Authorized v1 visual repair now implemented
 
-The 2026-09-19 Owner reconciliation is implementation-driving. The current CSS implements the safely expressible destination while preserving host behavior ownership:
+The 2026-09-19 Owner reconciliation is implementation-driving. The current CSS closes the evidence-backed visual repair set while preserving host behavior ownership:
 
 - mobile-first fluid shell with `16px` inline padding;
 - desktop threshold at **960px**;
 - desktop border-box card with `904px` outer max width, `32px` inline padding (`840 + 32 + 32`), white surface, `16px` radius, no shadow;
+- target font stack: `Vazirmatn, Vazir, Tahoma, Arial, sans-serif`;
 - title `24px` mobile / `26px` desktop, `700 / 1.5`;
-- section `18px / 700`, field label `15px / 600`, value `16px / 400`, primary action `16px / 700`;
+- section `18px / 700 / 1.5`, field label `15px / 600 / 1.5`, value `16px / 400 / 1.5`, primary action `16px / 700 / 1.5`;
 - helper `14px / 400 / 1.5`, field error `14px / 600 / 1.5`;
+- ordinary controls retain minimum `52px` while line-height is independently `1.5`; Submit retains minimum `56px`, full width, and `1.5` line-height;
 - ordinary field rhythm through documented `--gf-form-gap-y:24px`, with a bounded Section Break offset targeting the authorized `32px` major transition;
-- documented Gravity Forms focus API values `2px solid #1D4ED8`, offset `2px`; binary cards project native radio focus onto the associated label;
-- explicit binary roles only: equal flexible tracks, `12px` gap, minimum `52px`, `10px` radius, `#EDF1FC` selected tint plus non-color border/weight cue;
-- explicit mapped Section Break roles only: `40×40` tile, `10px` radius, `20px` admitted local SVG, `#EDF1FC` tint;
-- explicit Report Card role only: initial GPFUP min `96px`, pad `16px`, `12px` radius, dashed `#8690A1`; `.gpfup--has-files` remains host-owned.
+- documented Gravity Forms focus API values `2px solid #1D4ED8`, offset `2px`; native Radio focus projects onto the visible associated card;
+- **all authentic Radio fields** inside admitted SRWF use cards: content-driven flex wrapping, `12px` gap, label fills its `.gchoice`, min `52px`, `10px` radius, unselected `1px #8690A1`, selected `2px #1D4ED8` + `#EDF1FC` + non-color dot cue;
+- explicit mapped Section Break roles only: `40×40` tile, `10px` radius, `20px` admitted local SVG, `#EDF1FC` tint, `12px` icon-heading gap;
+- shared initial GPFUP family: min `96px`, pad `16px`, `12px` radius, `1px` dashed `#8690A1`, content-driven instruction/select-file/helper hierarchy;
+- explicit Report Card role retains its `24px` file-icon specialization;
+- authentic image-only GPFUP configuration (`gpfup--images-only`) admits the same **initial** Student Photo upload-family presentation without inferring field identity.
 
-The implementation uses intrinsic sizing, wrapping, logical properties, and no binary device breakpoint. Host-configured Gravity Forms columns remain authoritative.
+The implementation uses intrinsic sizing, wrapping, logical properties, and no field-specific radio layout map. Host-configured Gravity Forms columns remain authoritative.
 
 ### Runtime-proven / bounded add-on adapters
 
-- GP Advanced Select / Tom Select: only the already-proven `.ts-wrapper > .ts-control` minimum visual integration is used. Search/filter/results/selection/keyboard/mobile behavior remains add-on-owned.
-- GP File Upload Pro — **Report Card only**: the explicit `srwf-role-report-card-upload` styles only the authentic initial `.gpfup` surface while `:not(.gpfup--has-files)` is true. Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned.
+- GP Advanced Select / Tom Select: only the already-proven `.ts-wrapper > .ts-control` visual consumer is targeted. Search/filter/results/selection/keyboard/mobile behavior remains add-on-owned.
+- GP File Upload Pro — initial state only: shared SRWF upload-family CSS stops at `.gpfup--has-files`. Report Card specialization is explicit; Student Photo initial admission is based only on the authentic GPFUP image-only configuration seam. Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned.
 
-Student Photo post-upload/crop/re-crop/delete structure remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN**. The historical compatibility label is `RUNTIME_REQUIRED / NOT_IMPLEMENTED`. GPFUP owns that lifecycle and crop configuration. No Report Card markup assumption is generalized to Photo.
+Student Photo post-upload/crop/re-crop/delete structure remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN**. GPFUP owns that lifecycle and crop configuration. No post-upload composition is invented.
 
 PersianGravity/Jalali presentation remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN** until an authentic consumer is captured. No selector or adapter is invented.
 
@@ -111,4 +117,4 @@ The surrounding page color `#F6F8FB` is **HOST_INTEGRATION_REQUIRED** because th
 
 ### Verification boundary
 
-Repository tests verify authority hash integrity, scoping, CSS/API constants, semantic-role isolation, Entry Detail exclusion, settings/readiness mutation contracts, diagnostic privacy, PHP syntax, and deterministic package closure. They do not prove computed browser layout, real keyboard behavior, actual upload lifecycle, real validation/AJAX behavior, PersianGravity structure, page-background integration, 200% text, increased text spacing, or rendered contrast on the Owner site.
+Repository tests verify authority hash integrity, scoping, CSS/API constants, all-radio field-type coverage, Entry Detail exclusion, settings/readiness mutation contracts, diagnostic privacy, PHP/JavaScript syntax, diagnostic visible-consumer fixture behavior, and deterministic package closure. They do not prove computed Owner-site browser layout, real keyboard behavior, authentic checked/invalid/open/uploaded states, PersianGravity structure, page-background integration, exact 320 CSS px, 200% text resize, increased text spacing, or rendered contrast/target-size acceptance.
