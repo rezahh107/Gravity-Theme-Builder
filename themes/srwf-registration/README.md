@@ -146,6 +146,12 @@ Also recheck authentic keyboard focus, invalid submission, GPAS open state, GPFU
 
 Page background `#F6F8FB` remains a host-integration responsibility. Student Photo post-upload/crop/re-crop/delete composition remains runtime-dependent / `NOT_PROVEN` and GPFUP-owned. PersianGravity/Jalali presentation also remains runtime-dependent until an authentic consumer is captured.
 
+## Release system
+
+SRWF Registration now has a dedicated manual exact-source release path in `.github/workflows/srwf-registration-release.yml`. It is intentionally SRWF-specific rather than a speculative multi-theme framework. The workflow verifies a full merged `main` source SHA, source version, deterministic qualification/package bytes, release notes, package boundaries, and tag/release identity before any publication; `publish=false` is the default dry-run mode. See `RELEASING.md` for the short Owner/operator procedure and `RELEASE_NOTES.md` for the source-local notes consumed by publication.
+
+The runtime diagnostic remains separate evidence tooling and is not a default production Release asset.
+
 ## Reuse rule
 
-Do not move this scoped shell, authority guard, host requirement, or Radio repair into a shared multi-theme abstraction merely because the mechanism looks reusable. Promote only after a second real theme or a clearly project-wide invariant proves reuse.
+Do not move this scoped shell, authority guard, host requirement, Radio repair, or release workflow into a shared multi-theme abstraction merely because the mechanism looks reusable. Promote only after a second real theme or a clearly project-wide invariant proves reuse.
