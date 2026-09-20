@@ -171,7 +171,7 @@ def selector_specificity(selector: str) -> tuple[int, int, int]:
     index = 0
     while index < len(selector):
         char = selector[index]
-        if char.isspace() or char in ">+~,":
+        if char.isspace() or char in ">+~,,":
             index += 1
             continue
         if char == "#":
@@ -295,15 +295,27 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertIn("inline-size: 100%;", root_body)
         self.assertIn("max-inline-size: 100%;", root_body)
         self.assertIn("padding-inline: 16px;", root_body)
+        self.assertNotIn("padding-block:", root_body)
         self.assertEqual(1, css.count("@media (min-width: 960px)"))
         desktop = re.search(r"@media \(min-width: 960px\).*?\.gform-theme--framework\.srwf-registration-theme_wrapper\s*\{([^}]*)\}", css, re.S)
         self.assertIsNotNone(desktop)
         body = desktop.group(1)
         self.assertIn("max-inline-size: 904px;", body)
+        self.assertIn("padding-block: 32px;", body)
         self.assertIn("padding-inline: 32px;", body)
         self.assertIn("background: #FFFFFF;", body)
         self.assertIn("border-radius: 16px;", body)
-        self.assertIn("box-shadow: none;", body)
+        self.assertNotRegex(body, r"(?m)^\s*border(?:-[a-z-]+)?\s*:")
+        self.assertNotIn("overflow: hidden", body)
+        max_width = int(re.search(r"max-inline-size:\s*(\d+)px;", body).group(1))
+        inline_padding = int(re.search(r"padding-inline:\s*(\d+)px;", body).group(1))
+        self.assertEqual(840, max_width - (2 * inline_padding))
+        shadow = re.search(r"box-shadow:\s*(.*?);", body, re.S)
+        self.assertIsNotNone(shadow)
+        normalized_shadow = " ".join(shadow.group(1).split())
+        self.assertIn("0 0 0 1px #E4E7EC", normalized_shadow)
+        self.assertIn("0 1px 2px rgba(16, 24, 40, 0.04)", normalized_shadow)
+        self.assertIn("0 12px 32px rgba(16, 24, 40, 0.06)", normalized_shadow)
         self.assertNotIn("#F6F8FB", css, "page background remains host integration owned")
 
     def test_title_helper_error_rhythm_and_focus_match_authorized_values(self) -> None:
