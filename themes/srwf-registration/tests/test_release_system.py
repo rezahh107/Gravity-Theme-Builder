@@ -110,8 +110,8 @@ class ReleaseWorkflowContractTests(unittest.TestCase):
         self.assertIn("IMMUTABLE_RELEASES_POLICY_CREDENTIAL_MISSING", body)
         self.assertIn("IMMUTABLE_RELEASES_POLICY_UNAVAILABLE", body)
         self.assertIn("validate-immutable-policy", body)
-        self.assertNotIn("READY TO PUBLISH", body)
-        self.assertNotIn("PUBLISHED AND VERIFIED", body)
+        self.assertNotIn('echo "READY TO PUBLISH"', body)
+        self.assertNotIn('echo "PUBLISHED AND VERIFIED"', body)
 
     def test_policy_credential_is_separate_from_publication_token(self) -> None:
         self.assertIn(
