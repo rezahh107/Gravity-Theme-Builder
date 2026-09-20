@@ -4,20 +4,17 @@ on:
   push:
     branches:
       - release/srwf-registration-v0.1.19-publish
-    paths:
-      - .github/workflows/publish-srwf-registration-0.1.19.yml
 
 permissions:
   contents: write
 
 jobs:
-  release:
-    if: github.event.head_commit.message == 'release: publish SRWF Registration 0.1.19'
-    runs-on: ubuntu-24.04
+  publish:
+    runs-on: ubuntu-latest
     env:
       RELEASE_SHA: 4e5727ec3573bc08395c43a99312f157f062a347
       TAG: srwf-registration-v0.1.19
-      TITLE: SRWF Registration 0.1.19 — Minimal Production Release
+      TITLE: "SRWF Registration 0.1.19 — Minimal Production Release"
       EXPECTED_SHA256: e31c11dfb75131e1cc99cab0f4f0da484ee9c238eaa36443766570ad508728ef
     steps:
       - name: Checkout exact release source
@@ -26,70 +23,37 @@ jobs:
           ref: 4e5727ec3573bc08395c43a99312f157f062a347
           fetch-depth: 0
 
-      - name: Verify release source and tag absence
+      - name: Verify, build, and publish
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+
           test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
-          remote_main="$(git ls-remote origin refs/heads/main | cut -f1)"
-          test "$remote_main" = "$RELEASE_SHA"
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$RELEASE_SHA"
           if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
-            echo "Release tag already exists; refusing to move or recreate it." >&2
+            echo "Tag conflict: $TAG already exists" >&2
             exit 1
           fi
 
-      - name: Build deterministic production package
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf release-dist
+          rm -rf release-dist release-download
           python3 themes/srwf-registration/tests/build_owner_test_packages.py release-dist
           cp release-dist/gtb-srwf-registration-owner-test-0.1.19.zip release-dist/gtb-srwf-registration-0.1.19.zip
           cmp release-dist/gtb-srwf-registration-owner-test-0.1.19.zip release-dist/gtb-srwf-registration-0.1.19.zip
-          actual_sha="$(sha256sum release-dist/gtb-srwf-registration-0.1.19.zip | awk '{print $1}')"
+
+          actual_sha="$(sha256sum release-dist/gtb-srwf-registration-0.1.19.zip | cut -d' ' -f1)"
           test "$actual_sha" = "$EXPECTED_SHA256"
-          (
-            cd release-dist
-            printf '%s  %s\n' "$actual_sha" 'gtb-srwf-registration-0.1.19.zip' > GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt
-          )
+          printf '%s  %s\n' "$actual_sha" 'gtb-srwf-registration-0.1.19.zip' > release-dist/GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt
 
-      - name: Verify production archive boundary
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-          import zipfile
+          unzip -t release-dist/gtb-srwf-registration-0.1.19.zip >/dev/null
+          test "$(unzip -Z1 release-dist/gtb-srwf-registration-0.1.19.zip | grep -v '/$' | wc -l)" -eq 11
+          unzip -Z1 release-dist/gtb-srwf-registration-0.1.19.zip | grep -q '^gtb-srwf-registration/srwf-registration-theme.php$'
+          if unzip -Z1 release-dist/gtb-srwf-registration-0.1.19.zip | grep -E '/(diagnostic|tests|reference)/'; then
+            echo 'Forbidden non-production content found in release ZIP' >&2
+            exit 1
+          fi
 
-          archive = Path('release-dist/gtb-srwf-registration-0.1.19.zip')
-          expected = sorted([
-              'gtb-srwf-registration/icons/report-card-file.svg',
-              'gtb-srwf-registration/icons/section-contact.svg',
-              'gtb-srwf-registration/icons/section-education.svg',
-              'gtb-srwf-registration/icons/section-identity.svg',
-              'gtb-srwf-registration/icons/section-school-documents.svg',
-              'gtb-srwf-registration/icons/section-student-photo.svg',
-              'gtb-srwf-registration/icons/student-photo-upload.svg',
-              'gtb-srwf-registration/srwf-registration-layout.php',
-              'gtb-srwf-registration/srwf-registration-settings.php',
-              'gtb-srwf-registration/srwf-registration-theme.php',
-              'gtb-srwf-registration/srwf-registration.css',
-          ])
-          with zipfile.ZipFile(archive) as zf:
-              names = sorted(n for n in zf.namelist() if not n.endswith('/'))
-              assert names == expected, names
-              php = zf.read('gtb-srwf-registration/srwf-registration-theme.php').decode('utf-8')
-              assert re.search(r'^ \* Version: 0\.1\.19$', php, re.M)
-              assert "const SRWF_REGISTRATION_THEME_VERSION = '0.1.19';" in php
-              assert all('/diagnostic/' not in n and '/tests/' not in n and '/reference/' not in n for n in names)
-          print('PASS: release archive exact production file set/version boundary')
-          PY
-
-      - name: Prepare release notes
-        shell: bash
-        run: |
-          set -euo pipefail
           cat > release-dist/RELEASE_NOTES.md <<'EOF'
           SRWF Registration 0.1.19 is the first minimal production release of the SRWF Registration presentation theme for Gravity Theme Builder.
 
@@ -108,12 +72,6 @@ jobs:
           No license has been selected. License selection remains a separate Owner decision.
           EOF
 
-      - name: Create, verify, and publish GitHub Release
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
           published=0
           cleanup() {
             status=$?
@@ -128,49 +86,32 @@ jobs:
           }
           trap cleanup EXIT
 
-          git tag "$TAG" "$RELEASE_SHA"
-          git push origin "refs/tags/$TAG"
-
           gh release create "$TAG" \
-            --verify-tag \
+            release-dist/gtb-srwf-registration-0.1.19.zip \
+            release-dist/GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt \
+            --target "$RELEASE_SHA" \
             --draft \
             --title "$TITLE" \
             --notes-file release-dist/RELEASE_NOTES.md
 
-          gh release upload "$TAG" \
-            release-dist/gtb-srwf-registration-0.1.19.zip \
-            release-dist/GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt
+          test "$(git ls-remote origin "refs/tags/$TAG" | cut -f1)" = "$RELEASE_SHA"
 
-          tag_sha="$(git ls-remote origin "refs/tags/$TAG" | cut -f1)"
-          test "$tag_sha" = "$RELEASE_SHA"
-
-          rm -rf release-download
           mkdir release-download
-          gh release download "$TAG" \
-            --pattern 'gtb-srwf-registration-0.1.19.zip' \
-            --pattern 'GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt' \
-            --dir release-download
+          gh release download "$TAG" --dir release-download
+          test "$(sha256sum release-download/gtb-srwf-registration-0.1.19.zip | cut -d' ' -f1)" = "$EXPECTED_SHA256"
+          test "$(cat release-download/GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt)" = "$EXPECTED_SHA256  gtb-srwf-registration-0.1.19.zip"
 
-          downloaded_sha="$(sha256sum release-download/gtb-srwf-registration-0.1.19.zip | awk '{print $1}')"
-          test "$downloaded_sha" = "$EXPECTED_SHA256"
-          expected_checksum_line="$EXPECTED_SHA256  gtb-srwf-registration-0.1.19.zip"
-          test "$(cat release-download/GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt)" = "$expected_checksum_line"
-
-          actual_assets="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.assets[].name' | sort)"
           expected_assets="$(printf '%s\n%s\n' 'GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt' 'gtb-srwf-registration-0.1.19.zip' | sort)"
+          actual_assets="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.assets[].name' | sort)"
           test "$actual_assets" = "$expected_assets"
 
           release_id="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.id')"
           gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" -F draft=false >/dev/null
 
-          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '
-            select(.draft == false)
-            | select(.prerelease == false)
-            | select(.tag_name == "srwf-registration-v0.1.19")
-            | select(.name == "SRWF Registration 0.1.19 — Minimal Production Release")
-            | .html_url
-          ' | tee release-url.txt
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.draft')" = 'false'
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.prerelease')" = 'false'
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.name')" = "$TITLE"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.html_url'
 
-          test -s release-url.txt
           published=1
           trap - EXIT
