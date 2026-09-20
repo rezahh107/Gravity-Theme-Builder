@@ -107,7 +107,8 @@ def validate_immutable_releases_policy(http_status: int, response_path: Path) ->
         raise RuntimeError(
             "IMMUTABLE_RELEASES_POLICY_MALFORMED: GitHub policy response does not contain enabled=true"
         )
-    if payload.get("enforced_by_owner") not in {True, False}:
+    enforced_by_owner = payload.get("enforced_by_owner")
+    if type(enforced_by_owner) is not bool:
         raise RuntimeError(
             "IMMUTABLE_RELEASES_POLICY_MALFORMED: GitHub policy response has no boolean enforced_by_owner state"
         )
