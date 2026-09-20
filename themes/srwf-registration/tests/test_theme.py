@@ -48,6 +48,7 @@ REVIEWED_GF_API = {
     "--gf-ctrl-label-font-weight-primary",
     "--gf-ctrl-label-line-height-primary",
     "--gf-label-space-primary",
+    "--gf-label-space-x-secondary",
     "--gf-ctrl-desc-color",
     "--gf-ctrl-desc-font-size",
     "--gf-ctrl-desc-font-weight",

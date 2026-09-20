@@ -1,6 +1,6 @@
 ## SRWF Registration production candidate
 
-Current production package line: **0.1.16**.
+Current production package line: **0.1.17**.
 
 The SRWF Registration implementation is theme-local under `src/`. It is **not production-qualified** until the bounded Owner WordPress/browser checks are completed.
 
@@ -34,15 +34,13 @@ Normal operation does not require the Owner to maintain GTB-owned Custom CSS Cla
 
 The settings surface uses Gravity Forms' supported `gform_form_settings_menu` and `gform_form_settings_page_gtb_theme` seams. There is no top-level GTB admin menu.
 
-Activation is stored separately from eight semantic mappings: Gender, Graduation Status, Report Card upload, and five Section Break roles. Numeric field IDs in this admin UI are internal Form Object references only; they are never public CSS identity.
+Activation is stored separately from explicit semantic mappings. Numeric field IDs in this admin UI are internal Form Object references only; they are never public CSS identity. **Save GTB Configuration** validates the mapping, preserves unrelated Custom CSS classes, projects only GTB-owned semantic tokens, and persists through `GFAPI::update_form()`. Read-only checks never guess semantic roles from label/type/order.
 
-**Save GTB Configuration** validates the mapping, preserves unrelated Custom CSS classes, projects only GTB-owned semantic tokens, and persists through `GFAPI::update_form()`. `Check Again`, ordinary page render, and `Load Recommended SRWF Draft` are read-only. Semantic roles are never guessed from label/type/order.
-
-The current Owner lock does **not** require a semantic mapping to obtain Radio card presentation. Every authentic Gravity Forms Radio field inside an admitted SRWF Registration render uses the same card presentation based on the host field type. Existing binary semantic roles remain compatible configuration data but no longer gate cards.
+The current Owner lock does **not** require a semantic mapping to obtain Radio card presentation. Every authentic Gravity Forms Radio field inside an admitted SRWF Registration render uses the same card presentation based on the host field type. Existing binary semantic roles remain compatible configuration data but do not gate cards.
 
 ### SRWF Form Presentation Readiness
 
-The same GTB Theme page reports the host-owned Form Layout destination:
+The GTB Theme page reports the host-owned Form Layout destination:
 
 - Label Placement: `top_label`;
 - Description Placement: `above`;
@@ -51,92 +49,90 @@ The same GTB Theme page reports the host-owned Form Layout destination:
 - Validation Summary: `true`;
 - Required Field Indicator: `asterisk`.
 
-Together these placement values establish the intended **above-input** presentation where Gravity Forms supports that placement. This supersedes the older below-input placement choice.
-
-**Apply Recommended SRWF Form Layout** is a separate explicit action. It re-reads the current full Form Object at mutation time, computes only the six-property diff, performs no write if already matching, changes only those six properties, calls `GFAPI::update_form()`, then re-reads and verifies persistence. `customRequiredIndicator` and unrelated form properties are preserved.
-
-Explicit supported field-level placement overrides that conflict with the intended form-level placement are reported as **ATTENTION REQUIRED** and are not silently normalized.
-
-### Required indicator explanation
-
-For `requiredIndicator=asterisk`, Gravity Forms' native required legend is the single explanation surface. GTB does not post-process the generated form HTML, insert a parallel required note, suppress the native legend, or recreate required semantics. Gravity Forms remains authoritative for required state, indicator semantics, ARIA, validation, rerender lifecycle, and legend output.
-
-Unrelated forms and excluded Gravity Flow Entry Detail renders remain outside SRWF presentation ownership; no separate required-explanation path is attached to either surface.
+Together these placement values establish the intended **above-input** presentation where Gravity Forms supports it. **Apply Recommended SRWF Form Layout** remains a separate explicit action which re-reads the current Form Object, changes only the admitted properties, persists through `GFAPI::update_form()`, and verifies read-back. Gravity Forms remains authoritative for required state, ARIA, validation, rerender lifecycle, and its native required legend.
 
 ### Rendering-context ownership boundary
 
 The stored `srwf-registration-theme` class establishes form identity only. Presentation is admitted only when the current rendering context permits Registration ownership.
 
-Normal Registration, validation rerenders, and legitimate Registration AJAX renders remain admitted. Gravity Flow Entry Detail remains excluded using the existing source-qualified early enqueue classification plus the authentic `gravityflow_entry_detail_content_before` / `gravityflow_entry_detail_content_after` bracket. GTB does not parse URLs, query strings, page IDs, labels, form IDs, or GPP state. GPP is neither detected nor required.
+Normal Registration, validation rerenders, and legitimate Registration AJAX renders remain admitted. Gravity Flow Entry Detail remains excluded using the source-qualified early enqueue classification plus the authentic `gravityflow_entry_detail_content_before` / `gravityflow_entry_detail_content_after` bracket. GTB does not parse URLs, query strings, page IDs, labels, form IDs, or GPP state.
 
-PR #12 was disproved by Owner runtime because the later content bracket alone did not cover Gravity Flow's early form enqueue. Exact Gravity Flow `3.1.0` and Gravity Forms `3.1.1.1` source qualification established the retained order:
+#### Retained Entry Detail source qualification
 
-`wp_enqueue_scripts` → Gravity Flow `enqueue_frontend_scripts()` → `enqueue_form_scripts()` → Gravity Forms `gform_enqueue_scripts` / `gform_form_theme_slug`, before `gravityflow_entry_detail_content_before`.
+PR #12 established an earlier timing assumption that later Owner runtime evidence disproved. The repaired boundary is based on the qualified source order for Gravity Flow `3.1.0` with Gravity Forms `3.1.1.1`: during `wp_enqueue_scripts`, Gravity Flow `enqueue_frontend_scripts()` reaches Gravity Forms `enqueue_form_scripts()`, which invokes the form-owned `gform_enqueue_scripts` and `gform_form_theme_slug` paths before the later Entry Detail content bracket. `gravityflow_enqueue_frontend_scripts` is the source-proven post-enqueue boundary, while `is_workflow_detail_page()` is the authentic host route predicate.
 
-The repair delegates route identity to `is_workflow_detail_page()` and ends its early phase at `gravityflow_enqueue_frontend_scripts`. That lifecycle is `SOURCE_PROVEN`; this exact 0.1.16 candidate remains `OWNER_RUNTIME_REQUIRED`.
+This timing remains `SOURCE_PROVEN`; fresh browser behavior remains `OWNER_RUNTIME_REQUIRED`. The retained source-qualification identities are `16666115e37a7704b8331973eba0a0499e039d3fdfc6b47ed8a8e95a41779a79`, `ac0573b75831380417a21a455176e25eb746d718bbbd0bb70d6da6f48cba5404`, and `542f56ae0747f3661d1474996527298027db3fb8ed3e6469a6391aaabf61069b`.
 
-Pinned source/package evidence retained from the qualified host stack:
+### Authorized responsive presentation
 
-- Gravity Flow 3.1.0 package SHA-256: `ac0573b75831380417a21a455176e25eb746d718bbbd0bb70d6da6f48cba5404`;
-- Gravity Flow `class-gravity-flow.php` SHA-256: `16666115e37a7704b8331973eba0a0499e039d3fdfc6b47ed8a8e95a41779a79`;
-- Gravity Forms 3.1.1.1 package SHA-256: `542f56ae0747f3661d1474996527298027db3fb8ed3e6469a6391aaabf61069b`.
+Theme `0.1.17` preserves the accepted destination:
 
-### Authorized v1 visual repair and mobile responsive polish
-
-The 2026-09-19 Owner reconciliation remains implementation-driving. Theme `0.1.16` preserves the accepted visual destination and tightens only content/space-driven responsive behavior:
-
-- mobile-first fluid shell with `16px` inline padding;
+- mobile-first fluid SRWF wrapper with canonical `16px` inline padding;
 - desktop threshold at **960px**;
 - desktop border-box card with `904px` outer max width, `32px` inline padding (`840 + 32 + 32`), white surface, `16px` radius, no shadow;
-- target font stack: `Vazirmatn, Vazir, Tahoma, Arial, sans-serif`;
-- title `24px` mobile / `26px` desktop, `700 / 1.5`;
-- section `18px / 700 / 1.5`, field label `15px / 600 / 1.5`, value `16px / 400 / 1.5`, primary action `16px / 700 / 1.5`;
-- helper `14px / 400 / 1.5`, field error `14px / 600 / 1.5`;
-- ordinary controls retain minimum `52px`; Submit retains minimum `56px` and full available form width;
-- ordinary field rhythm remains `24px`; major section rhythm remains `32px`;
-- documented Gravity Forms focus API values remain `2px solid #1D4ED8`, offset `2px`; native Radio focus still projects onto the visible associated card;
-- native/enhanced Select behavior and the previously qualified select-family alignment remain unchanged;
-- **all authentic Radio fields** inside admitted SRWF still use the common card family, but `.gchoice` now uses the intrinsic `9.5rem` basis and a flexible label-fill relationship. This causes a genuinely narrow component to stack before labels are crushed while still allowing short pairs to share a row when enough container width exists. Cards remain minimum-height, not fixed-height;
-- no device-specific media query is added for `320`, `360`, `390`, `393`, `412`, or `430`;
-- explicit mapped Section Break roles remain `40×40` tile, `10px` radius, `20px` local SVG, `#EDF1FC` tint, `12px` icon-heading gap;
-- the shared initial GPFUP family remains min `96px`, pad `16px`, radius `12px`, `1px` dashed `#8690A1`, with one `40×40` icon slot and `24px` glyph for both Report Card and image-only Student Photo;
-- the authentic initial GPFUP direct content child now uses an intrinsic `13rem` basis and `max-inline-size:100%`, so it may wrap below the icon rather than shrink into a tiny text column. The compact horizontal cluster remains possible where the real component width supports it;
-- all GPFUP presentation rules remain limited to `:not(.gpfup--has-files)`. Upload/progress/validation/preview/delete/crop/storage remain host-owned.
+- all authentic Radio fields use the common card family and intrinsic `.gchoice { flex: 1 1 9.5rem; }` wrapping;
+- no device-specific media query for `320`, `360`, `390`, `393`, `412`, or `430`;
+- native/enhanced Select behavior and existing GP Advanced Select / Tom Select presentation remain unchanged;
+- shared initial GPFUP family remains limited to `:not(.gpfup--has-files)`, with its existing `13rem` intrinsic content basis, `student-photo-upload.svg` photo glyph, and existing Report Card glyph;
+- Submit remains full available form width under the existing bounded rule.
 
-The implementation uses intrinsic sizing, wrapping, logical properties, and no field-ID/label/order specialization. Host-configured Gravity Forms columns remain authoritative.
+### Host full-width prerequisite
 
-### Mobile width ownership and diagnostic evidence
+Owner runtime at `390 CSS px` established the intended width chain after the dedicated Registration page was configured through its host theme's native full-width content option. GeneratePress is the currently proven host example; it is not a dependency of GTB.
 
-Static source establishes that the SRWF wrapper itself is `inline-size:100%`, `max-inline-size:100%`, with `16px` inline padding on mobile. Its artificial content cap appears only at `@media (min-width: 960px)` where the Owner-authorized desktop `904px` outer destination applies.
+The product/framework-neutral requirement is:
 
-Therefore theme `0.1.16` does **not** add negative margins, global `html/body` sizing, arbitrary WordPress container overrides, or a page-template breakout to compensate for the Owner-observed narrow mobile screenshot. The exact ancestor that loses width on the real Owner page is a runtime fact, not something source inspection can identify truthfully.
+> The page hosting the SRWF Registration surface must provide the required full-width content area. GTB then owns its canonical `16px` mobile inline gutter.
 
-Install diagnostic package **0.3.6** for the next qualification pass. It adds bounded privacy-safe width-chain evidence:
+In the proven Owner runtime, the host/content chain was `390px`, the SRWF wrapper was `390px` with `16px` inline padding, and the form/ordinary controls/Submit were `358px`; `document.clientWidth` and `scrollWidth` were both `390px`, with no visible overflow among the sampled consumers.
 
-- `window.innerWidth` and `devicePixelRatio`;
-- SRWF wrapper rect and computed width/max-width/padding;
-- immediate Gravity Forms form/body/fields geometry;
-- bounded ancestors up to `body`, including rect and computed width/max-width/padding/margin/overflow;
-- representative text control, Radio group, initial GPFUP droparea, and Submit widths.
+Theme `0.1.17` therefore does **not** add GeneratePress selectors, `.site-content`/page-container overrides, page IDs, negative margins, or viewport breakout logic. Host page layout remains host-owned.
 
-The diagnostic remains admin-gated and does not read field text or values. Its two download controls remain functional but are parked in normal document flow by the final composer so they do not remain fixed over product controls during captures.
+### Radio full-cell repair in 0.1.17
 
-### Runtime-proven / bounded add-on adapters
+After the host width was corrected, Owner runtime isolated a separate repeatable Radio defect: paired `.gchoice` cells measured `173px` while their visible labels measured `161px`; full-row choices measured `358px` while labels measured `346px`. The deficit was exactly `12px` in both cases.
 
-- Native Gravity Forms single Select: the documented `--gf-ctrl-select-padding-x` API owns the common inline text/indicator reserve. A direct SRWF-scoped `padding-block-start:14px` is retained only for authentic non-enhanced single-select controls because current public Select API exposes no select-specific vertical-padding token and Owner runtime proved that optical compensation closes the remaining value alignment defect. The rule does not depend on field ID, label text, description state, sub-label placement, or DOM order.
-- GP Advanced Select / Tom Select: only the already-proven `.ts-wrapper > .ts-control` visible control is targeted. Its closed-control box reuses the same `--gf-ctrl-select-padding-x` family token plus the accepted SRWF 52px/1.5 metric family and established SRWF focus visual. The hidden source `<select>` is not treated as a native visible consumer. Tom Select still owns caret drawing, search/filter/results, open/close, selection, keyboard behavior, and synchronization. Authentic post-repair Owner-browser geometry remains `OWNER_RUNTIME_REQUIRED`.
-- GP File Upload Pro — initial state only: Report Card specialization remains explicit through `srwf-role-report-card-upload` and its local document glyph; authentic `gpfup--images-only` Student Photo uses the same decorative icon-slot geometry with its own GTB-owned photo/camera glyph. Theme `0.1.16` changes only the intrinsic wrapping behavior of their authentic direct content child. Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned; the theme adds no replacement upload markup or JavaScript lifecycle.
+Gravity Forms publishes `--gf-label-space-x-secondary` for the horizontal reserve between a choice input and its secondary inline label, with a `12px` default in the qualified Theme Framework. SRWF deliberately moves the authentic Radio input out of flow and renders its visible circular cue inside the associated label. The normal input-to-label reserve is therefore no longer needed for this presentation.
 
-Student Photo post-upload/crop/re-crop/delete structure remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN**. GPFUP owns that lifecycle and crop configuration. No post-upload composition is invented.
+The repair sets:
 
-PersianGravity/Jalali presentation remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN** until an authentic consumer is captured. No selector or adapter is invented.
+```css
+.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gfield_radio {
+    --gf-label-space-x-secondary: 0;
+    display: flex;
+    flex-flow: row wrap;
+    gap: 12px;
+}
+```
 
-### Intentionally unresolved host boundaries
+This is not a `+12px` width compensation. The explicit `12px` group gap remains the option-to-option spacing authority; `.gchoice` keeps its `9.5rem` intrinsic basis; labels remain content-height driven; the authentic Radio input/label/checked/focus relationship remains intact; selected border/background/cue values are unchanged.
 
-The surrounding page color `#F6F8FB` and any Owner-site mobile page/content width constraint are **HOST_INTEGRATION_REQUIRED** unless a dedicated authenticated SRWF page/integration seam is proven. GTB therefore does not seize `html`, `body`, page IDs, URLs, or unrelated theme wrappers.
+### Add-on presentation boundaries
 
-### Verification boundary
+- **GP File Upload Pro — initial state only**: all GPFUP presentation rules remain limited to `:not(.gpfup--has-files)`. Report Card specialization remains explicit, while Student Photo uses the authentic `gpfup--images-only` initial-state seam.
+- Student Photo post-upload/crop/re-crop/delete structure remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN**.
+- Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned.
+- GP Advanced Select / Tom Select retains its existing visual adapter only; open/close/search/value behavior remains add-on-owned.
 
-Repository tests verify authority hash integrity, SRWF scoping, CSS/API constants, all-radio field-type coverage, intrinsic Radio/GPFUP rules, no fixed radio-card height, no device-width media queries, shared initial GPFUP geometry, local asset closure, Entry Detail exclusion, settings/readiness mutation contracts, diagnostic privacy, diagnostic width-chain structure, PHP/JavaScript syntax, exact-head package closure, and version coherence.
+### Diagnostic / Owner requalification
 
-They do **not** prove the Owner-site ancestor width chain, computed browser layout at `320/360/390/393/412/430 CSS px`, visual balance, real keyboard/checked/invalid/open/uploaded states, PersianGravity structure, page-background integration, `200%` text resize, increased text spacing, or rendered contrast/target-size acceptance. Those remain Owner-runtime qualification obligations for theme `0.1.16` + diagnostic `0.3.6`.
+Diagnostic package **0.3.6** remains current. No diagnostic bump is needed because its existing bounded, admin-gated collectors already provide the width chain, overflow evidence, Radio `labelWidthDeltaPx`, and `allVisibleLabelsFillChoices` result required to requalify this repair.
+
+Static tests and exact-head CI can prove scoping, source contracts, package closure, visual-reference identity, version coherence, and absence of host-layout takeover. They do **not** prove the repaired browser geometry.
+
+The next Owner runtime pass should verify at minimum `360` and `390 CSS px`, and preferably `320 / 360 / 390 / 393 / 412 / 430 CSS px`, confirming:
+
+- host content remains full-width;
+- GTB retains the `16px` mobile gutter;
+- no horizontal overflow;
+- `allVisibleLabelsFillChoices = true`;
+- short choices remain side-by-side where real width permits;
+- larger groups wrap intrinsically;
+- GPFUP / GPAS / Submit do not regress;
+- native checked/focus/validation/conditional Radio behavior remains Gravity Forms-owned.
+
+Student Photo post-upload/crop/re-crop/delete composition remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN** and GPFUP-owned. PersianGravity/Jalali presentation remains runtime-dependent until an authentic consumer is captured.
+
+### Reuse boundary
+
+This Radio repair remains theme-local. It is not a shared multi-theme abstraction, and the host full-width prerequisite does not create a GeneratePress adapter or page-layout subsystem inside GTB.

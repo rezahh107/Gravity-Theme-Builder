@@ -109,12 +109,14 @@ Current project authority for the resolved SRWF destination is:
 ```text
 authority_handle: OWNER:SRWF-2026-09-19
 path: themes/srwf-registration/reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md
-status: CURRENT_OWNER_PROJECT_AUTHORITY / MOBILE_RESPONSIVE_POLISH_STATICALLY_IMPLEMENTED / RUNTIME_VALIDATION_REQUIRED
+status: CURRENT_OWNER_PROJECT_AUTHORITY / RUNTIME_VALIDATION_REQUIRED
 provenance: direct Owner-supplied project authority for this execution
 immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR
 ```
 
 No Google Drive revision ID, timestamp, export hash, or immutable upstream blob has been invented for this newer authority input.
+
+Current implementation/package identity is intentionally not registered in this authority lock. The actual theme source owns version identity, while `IMPLEMENTATION_MAP.md` and `src/README.md` expose the mechanically checked current implementation/package status used for runtime qualification.
 
 `OWNER:SRWF-2026-09-19` supersedes contradictory or unresolved v1.0.1 states only where the reconciliation document explicitly says so. Unchanged v1.0.1 rules remain inherited. The current resolved decisions include:
 
@@ -133,9 +135,13 @@ No Google Drive revision ID, timestamp, export hash, or immutable upstream blob 
 - the upload-icon alignment goal is presentation-only and must not alter Gravity Forms / GP File Upload Pro core, markup ownership, upload/crop lifecycle, or add-on behavior;
 - current accessibility acceptance requirements.
 
-Owner runtime of theme `0.1.14` is retained as historical evidence: both admitted initial icon glyphs rendered, but the authentic direct content child remained visually detached from the icon. Theme `0.1.15` remains the prior static content-cluster repair baseline. Theme `0.1.16` is the current static implementation: it preserves that shared `40×40` icon slot / `24px` glyph family, adds intrinsic narrow-width GPFUP wrapping, and makes Radio card reflow less permissive before labels become cramped. Static implementation and CI do not establish a real-browser PASS for the resulting `0.1.16` geometry.
+Historical evidence: Owner runtime of theme `0.1.14` showed that both admitted initial icon glyphs rendered while the authentic direct content child remained visually detached from the icon.
 
-Diagnostic package `0.3.6` is the current Owner-runtime evidence package. It preserves the existing bounded collectors while adding viewport DPR and the width chain from host ancestors through Gravity Forms containers and the SRWF wrapper to representative text, Radio, initial GPFUP, and submit consumers. It is evidence for locating width loss; it is not authority to override a host container.
+Historical evidence: Theme `0.1.15` was the prior static content-cluster repair baseline.
+
+Historical evidence: Theme `0.1.16` was the mobile responsive-polish implementation for that batch. It preserved the shared `40×40` icon slot / `24px` glyph family, added intrinsic narrow-width GPFUP wrapping, and made Radio card reflow less permissive before labels became cramped. Static implementation and CI did not establish a real-browser PASS for that batch geometry.
+
+Historical evidence: Diagnostic package `0.3.6` added bounded Owner-runtime evidence for viewport DPR and the width chain from host ancestors through Gravity Forms containers and the SRWF wrapper to representative text, Radio, initial GPFUP, and submit consumers. It was evidence for locating width loss, not authority to override a host container. Current diagnostic/package status belongs to the implementation-facing status surfaces rather than this authority registry.
 
 ## 5. WHAT vs HOW
 
@@ -161,12 +167,12 @@ A visual deviation is admissible only when current authority is genuinely ambigu
 
 Documented/Owner-authorized values still require runtime qualification where consumer, cascade, behavior, reflow, contrast, focus, add-on state, or accessibility behavior is runtime-sensitive.
 
-## 8. Current batch boundary
+## 8. Historical 2026-09-20 mobile responsive-polish batch
 
-The 2026-09-20 mobile responsive-polish pass preserves immutable historical authority, the exact Owner destination, and host behavior ownership.
+The 2026-09-20 mobile responsive-polish batch preserved immutable historical authority, the exact Owner destination, and host behavior ownership.
 
-Theme `0.1.16` changes only intrinsic presentation behavior: Radio choices use a `9.5rem` basis and flexible label fill so a cramped container stacks before compressing labels, while a sufficiently wide container can still form equal-width rows; initial GPFUP content uses a `13rem` intrinsic basis and can wrap below the shared icon before its text column is squeezed. No device-specific mobile breakpoint, fixed card height, negative-margin breakout, global page-width rule, or `.gpfup--has-files` styling is added. The existing `960 CSS px` transition and desktop `904px` outer destination remain intact.
+Historical evidence: Theme `0.1.16` represented that batch's mobile responsive-polish implementation. Radio choices used a `9.5rem` basis and flexible label fill so a cramped container stacked before compressing labels, while a sufficiently wide container could still form equal-width rows; initial GPFUP content used a `13rem` intrinsic basis and could wrap below the shared icon before its text column was squeezed. No device-specific mobile breakpoint, fixed card height, negative-margin breakout, global page-width rule, or `.gpfup--has-files` styling was added. The existing `960 CSS px` transition and desktop `904px` outer destination remained intact.
 
-Static source proves the SRWF wrapper itself remains fluid at mobile widths. It does **not** prove which Owner-site WordPress ancestor caused the observed whole-form narrowness. No host integration width override is therefore admitted in this batch. Diagnostic `0.3.6` must first identify the exact constraining ancestor and its computed width/max-width/padding/margin at the real Owner runtime.
+Historical evidence: Static source for that batch established that the SRWF wrapper itself remained fluid at mobile widths but did **not** identify which Owner-site WordPress ancestor caused the observed whole-form narrowness. No host integration width override was admitted on that evidence alone; diagnostic `0.3.6` was added to identify the constraining ancestor and its computed width/max-width/padding/margin at the real Owner runtime.
 
-Final Owner runtime qualification remains open for theme `0.1.16` + diagnostic `0.3.6` across `320`, `360`, `390`, `393`, `412`, and `430 CSS px`, including no ordinary horizontal scroll, correct Radio stacking/two-column behavior, coherent initial GPFUP wrapping, full-width submit, checked/focus/validation states, and a real `.gpfup--has-files` transition. Post-upload/crop composition remains `NOT_PROVEN` / host-owned. CI/static success is not production qualification.
+Current runtime qualification must target the exact current implementation/package identified by `IMPLEMENTATION_MAP.md` and `src/README.md`, using the diagnostic package identified by those implementation-facing surfaces. The required mobile matrix and acceptance remain unchanged: `320`, `360`, `390`, `393`, `412`, and `430 CSS px` where applicable, including no ordinary horizontal scroll, correct Radio stacking/two-column behavior, coherent initial GPFUP wrapping, full-width submit, checked/focus/validation states, and a real `.gpfup--has-files` transition. Post-upload/crop composition remains `NOT_PROVEN` / host-owned. CI/static success is not production qualification.
