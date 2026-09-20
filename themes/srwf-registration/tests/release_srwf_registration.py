@@ -73,6 +73,56 @@ def validate_notes(notes_path: Path, requested_version: str) -> None:
         raise RuntimeError("release notes are unexpectedly empty")
 
 
+def read_json_object(path: Path, error_code: str) -> dict[str, object]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"{error_code}: unable to read valid GitHub JSON from {path}") from exc
+    if not isinstance(payload, dict):
+        raise RuntimeError(f"{error_code}: GitHub response must be a JSON object")
+    return payload
+
+
+def validate_immutable_releases_policy(http_status: int, response_path: Path) -> dict[str, object]:
+    if http_status == 404:
+        raise RuntimeError(
+            "IMMUTABLE_RELEASES_POLICY_DISABLED: GitHub reports immutable releases are not enabled for this repository"
+        )
+    if http_status in {401, 403}:
+        raise RuntimeError(
+            "IMMUTABLE_RELEASES_POLICY_UNAUTHORIZED: policy-read credential cannot read repository immutable-release status"
+        )
+    if http_status != 200:
+        raise RuntimeError(
+            f"IMMUTABLE_RELEASES_POLICY_UNAVAILABLE: GitHub policy-status API returned HTTP {http_status}"
+        )
+
+    payload = read_json_object(response_path, "IMMUTABLE_RELEASES_POLICY_MALFORMED")
+    enabled = payload.get("enabled")
+    if enabled is False:
+        raise RuntimeError(
+            "IMMUTABLE_RELEASES_POLICY_DISABLED: GitHub policy response reports enabled=false"
+        )
+    if enabled is not True:
+        raise RuntimeError(
+            "IMMUTABLE_RELEASES_POLICY_MALFORMED: GitHub policy response does not contain enabled=true"
+        )
+    if payload.get("enforced_by_owner") not in {True, False}:
+        raise RuntimeError(
+            "IMMUTABLE_RELEASES_POLICY_MALFORMED: GitHub policy response has no boolean enforced_by_owner state"
+        )
+    return payload
+
+
+def validate_published_release_immutable(release_json: Path) -> dict[str, object]:
+    payload = read_json_object(release_json, "POST_PUBLISH_RELEASE_STATE_MALFORMED")
+    if payload.get("immutable") is not True:
+        raise RuntimeError(
+            "POST_PUBLISH_NOT_IMMUTABLE: published GitHub Release does not report immutable=true"
+        )
+    return payload
+
+
 def load_source_builder(theme_root: Path) -> ModuleType:
     builder_path = theme_root / "tests" / "build_owner_test_packages.py"
     if not builder_path.is_file():
@@ -192,6 +242,18 @@ def command_validate_notes(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_validate_immutable_policy(args: argparse.Namespace) -> int:
+    payload = validate_immutable_releases_policy(args.http_status, args.response.resolve())
+    print(json.dumps(payload, sort_keys=True))
+    return 0
+
+
+def command_validate_published_immutability(args: argparse.Namespace) -> int:
+    payload = validate_published_release_immutable(args.release_json.resolve())
+    print(json.dumps({"immutable": payload["immutable"]}, sort_keys=True))
+    return 0
+
+
 def command_prepare_assets(args: argparse.Namespace) -> int:
     result = prepare_release_assets(
         args.theme_root.resolve(),
@@ -219,6 +281,15 @@ def build_parser() -> argparse.ArgumentParser:
     notes_parser.add_argument("--notes", type=Path, required=True)
     notes_parser.add_argument("--version", required=True)
     notes_parser.set_defaults(func=command_validate_notes)
+
+    policy_parser = subparsers.add_parser("validate-immutable-policy")
+    policy_parser.add_argument("--http-status", type=int, required=True)
+    policy_parser.add_argument("--response", type=Path, required=True)
+    policy_parser.set_defaults(func=command_validate_immutable_policy)
+
+    published_parser = subparsers.add_parser("validate-published-immutability")
+    published_parser.add_argument("--release-json", type=Path, required=True)
+    published_parser.set_defaults(func=command_validate_published_immutability)
 
     package_parser = subparsers.add_parser("prepare-assets")
     package_parser.add_argument("--theme-root", type=Path, required=True)
