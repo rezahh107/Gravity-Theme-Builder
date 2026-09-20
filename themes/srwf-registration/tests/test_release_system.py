@@ -126,7 +126,7 @@ class ReleaseWorkflowContractTests(unittest.TestCase):
         self.assertIsNotNone(publication)
         self.assertNotIn("SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN", publication.group("body"))
         self.assertIn("GH_TOKEN: ${{ github.token }}", self.workflow)
-        self.assertNotRegex(self.workflow, r"permissions:\n(?:\s+.*\n)*?\s+administration:")
+        self.assertNotRegex(self.workflow, r"(?m)^\s+administration:\s")
 
     def test_caller_cannot_assert_immutability(self) -> None:
         trigger_block = self.workflow.split("permissions:", 1)[0]
