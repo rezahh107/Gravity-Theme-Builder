@@ -18,7 +18,7 @@ Therefore:
 - v1.0.1 remains historical evidence of the earlier decision state, not current destination authority on those points;
 - all v1.0.1 rules not contradicted here remain inherited unless another current Owner decision says otherwise.
 
-Recording a current Owner decision is not runtime proof. All runtime-sensitive claims remain subject to supported WordPress / Gravity Forms / add-on validation.
+Recording a current Owner decision is not runtime proof. All runtime-sensitive claims remain subject to supported WordPress / Gravity Forms / add-on validation. Exact Owner-site/browser acceptance remains `OWNER_RUNTIME_REQUIRED`.
 
 ## Implementation-status ownership
 
