@@ -305,7 +305,9 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertIn("padding-inline: 32px;", body)
         self.assertIn("background: #FFFFFF;", body)
         self.assertIn("border-radius: 16px;", body)
-        self.assertNotRegex(body, r"(?m)^\s*border(?:-[a-z-]+)?\s*:")
+        property_names = re.findall(r"(?m)^\s*([a-z-]+)\s*:", body)
+        layout_border_properties = [name for name in property_names if name.startswith("border") and "radius" not in name]
+        self.assertEqual([], layout_border_properties)
         self.assertNotIn("overflow: hidden", body)
         max_width = int(re.search(r"max-inline-size:\s*(\d+)px;", body).group(1))
         inline_padding = int(re.search(r"padding-inline:\s*(\d+)px;", body).group(1))
