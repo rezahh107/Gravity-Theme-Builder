@@ -20,6 +20,8 @@ const controls = {
 
 const windowObject = {
     document: {
+        readyState: 'complete',
+        addEventListener() { throw new Error('complete-state composer must not defer control parking'); },
         getElementById(id) { return controls[id] || null; }
     },
     GTB_SRWF_RUNTIME_DIAGNOSTIC_V03: { diagnosticVersion: '0.3.0', collectorFailures: [] },
@@ -90,4 +92,4 @@ assert.deepStrictEqual(
 );
 assert.ok(windowObject.GTB_SRWF_RUNTIME_DIAGNOSTIC_V03.collectorFailures.some((item) => item.collector === 'radioCardGeometry'));
 
-console.log('PASS: v0.3.6 provenance composes fresh width evidence, preserves compatibility aliases, fails closed, and parks admin-only diagnostic controls outside fixed overlay positions');
+console.log('PASS: v0.3.6 provenance composes fresh width evidence, preserves compatibility aliases, fails closed, and immediately parks already-created diagnostic controls when DOM readiness is complete');
