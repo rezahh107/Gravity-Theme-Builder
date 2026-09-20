@@ -5,7 +5,9 @@
         return;
     }
 
-    var legacyQualificationCollector = root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034;
+    var legacyQualificationCollector = typeof root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034 === 'function'
+        ? root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034
+        : null;
     var VERSION_MAP = Object.freeze({
         package: '0.3.6',
         structuralCollector: '0.3.0',
@@ -135,12 +137,49 @@
         return qualification;
     }
 
-    parkDiagnosticControls();
+    function installComposerCollectors() {
+        root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034 = collectComposedQualification;
+        root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V035 = collectComposedQualification;
+        root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V036 = collectComposedQualification;
+    }
+
+    function captureLateLegacyCollector() {
+        var collector = root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034;
+        if (typeof collector === 'function' && collector !== collectComposedQualification) {
+            legacyQualificationCollector = collector;
+        }
+    }
+
+    function settleComposerAfterDomReady() {
+        captureLateLegacyCollector();
+        installComposerCollectors();
+        parkDiagnosticControls();
+        try {
+            collectComposedQualification();
+        } catch (error) {
+            root.GTB_SRWF_V1_QUALIFICATION_V035 = null;
+            root.GTB_SRWF_V1_QUALIFICATION_V036 = null;
+        }
+    }
+
+    function installDiagnosticControlParkingLifecycle() {
+        parkDiagnosticControls();
+        if (root.document.readyState !== 'loading' || typeof root.document.addEventListener !== 'function') {
+            return;
+        }
+        root.document.addEventListener('DOMContentLoaded', function () {
+            if (typeof root.setTimeout === 'function') {
+                root.setTimeout(settleComposerAfterDomReady, 0);
+                return;
+            }
+            settleComposerAfterDomReady();
+        }, { once: true });
+    }
+
+    installDiagnosticControlParkingLifecycle();
     root.GTB_SRWF_DIAGNOSTIC_VERSION_MAP_V035 = VERSION_MAP;
     root.GTB_SRWF_DIAGNOSTIC_VERSION_MAP_V036 = VERSION_MAP;
-    root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034 = collectComposedQualification;
-    root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V035 = collectComposedQualification;
-    root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V036 = collectComposedQualification;
+    installComposerCollectors();
 
     try {
         collectComposedQualification();
