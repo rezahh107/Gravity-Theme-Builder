@@ -62,17 +62,25 @@ GTB must style the authentic Gravity Forms layout. GTB does not define a canonic
 
 The `exact_production_breakpoint: NOT_PROVEN` state in v1.0.1 is superseded by the Owner-authorized `960 CSS px` destination. Runtime/browser acceptance at that threshold remains required.
 
-## Desktop card destination
+## Desktop primary-surface destination
 
-- page background: `#F6F8FB` where an authenticated GTB ownership seam exists;
-- card surface: `#FFFFFF`;
+The Owner's 2026-09-20 Desktop Full Width shell decision supersedes the earlier no-shadow desktop-card state while preserving the established width geometry.
+
+- preferred surrounding page canvas: `#F6F8FB`, but only where an authenticated page-shell ownership seam exists;
+- primary form surface: `#FFFFFF`;
 - content max width: `840px`;
-- card internal inline padding: `32px` per side;
+- desktop internal inline padding: `32px` per side;
+- desktop internal block padding: `32px`;
 - resulting desktop outer max width: `904px`;
 - outer radius: `16px`;
-- box shadow: `none`.
+- visible surface boundary: the visual equivalent of `1px #E4E7EC` without consuming content width;
+- restrained depth: `0 1px 2px rgba(16,24,40,0.04), 0 12px 32px rgba(16,24,40,0.06)`.
 
-The prior `desktop_shadow_exact_value: NOT_PROVEN` state is superseded. Page-shell ownership and actual cascade/consumer behavior remain runtime-sensitive implementation facts.
+The width relationship is normative: under the existing border-box wrapper, `904 - 32 - 32 = 840`. A literal inline border must not silently reduce the authentic content box to `838px`. A non-layout-affecting ring/shadow boundary is therefore the preferred implementation when supported.
+
+The previous `box shadow: none` destination is superseded by this decision. The primary wrapper must not add `overflow:hidden` merely to contain rounded visuals because focus indicators, Tom Select dropdowns, GPFUP states, and validation consumers must remain free to paint outside their descendants where the host requires it.
+
+The surrounding page shell remains host-owned unless GTB has a truthful, durable, authenticated page-level seam for the admitted Registration presentation. GTB must not create that canvas by styling generic `html`, `body`, `.site-content`, `.content-area`, `.site-main`, GeneratePress-specific global layout classes, numeric page IDs, viewport breakouts, or negative margins. Where no safe seam exists, `#F6F8FB` is a host integration requirement rather than a reason to weaken or broaden the form-local implementation.
 
 ## Primary Submit
 
@@ -241,15 +249,17 @@ These are acceptance requirements, not claims that current production CSS has al
 
 ## Historical implementation evidence and acceptance boundary
 
-The 2026-09-20 bounded mobile responsive-polish batch preserved every Owner destination above and changed only presentation behavior that was already content/space-driven in intent.
+The earlier 2026-09-20 bounded mobile responsive-polish batch preserved the Owner destinations that were current for that batch and changed only presentation behavior that was already content/space-driven in intent.
 
 - Historical evidence: Owner runtime of theme `0.1.14` showed that both admitted initial GPFUP glyphs rendered while the authentic direct content child remained visually detached from the icon.
 - Historical evidence: Theme `0.1.15` was the prior static icon/content-cluster repair baseline.
 - Historical evidence: Theme `0.1.16` was the mobile responsive-polish implementation for that batch. It increased the common Radio choice intrinsic basis from `8rem` to `9.5rem`; the authentic `.gchoice` became the flexible row-height consumer and its label flexed to fill that row, so narrow real container widths stack before labels are crushed while rows remain content-height driven.
+- Historical evidence: Theme `0.1.17` carried the bounded Radio full-cell repair validated by the Owner at mobile width before the Desktop Full Width shell modernization decision.
 - No 320/360/390/393/412/430 device-specific breakpoint is introduced. The `960 CSS px` desktop transition and `904px` outer desktop cap remain unchanged.
 - Initial Report Card and Student Photo GPFUP retain the common `96px` minimum, `16px` padding, `12px` radius, `1px dashed #8690A1`, `40×40` icon slot, and `24px` glyph. Their authentic direct content child carries an intrinsic `13rem` flex basis with `max-inline-size:100%`, allowing the icon/content cluster to wrap naturally before the text column is squeezed. All rules still stop before `.gpfup--has-files`.
 - No WordPress `html`, `body`, page-template, generic content container, or negative-margin width override is admitted by this authority. The SRWF mobile wrapper destination remains fluid (`inline-size:100%`, `max-inline-size:100%`, `padding-inline:16px`) and gains its `904px` cap only at `min-width:960px`; unexplained whole-form narrowness outside component rules is a host/runtime width-chain question.
+- The 2026-09-20 Desktop Full Width shell modernization is intentionally form-local: it adds desktop block padding, a non-layout-affecting `#E4E7EC` ring, and the approved restrained depth while retaining `904px` outer / `840px` content geometry. No safe authenticated page-shell seam was identified in the existing GTB Registration integration, so the preferred `#F6F8FB` canvas remains a host-side configuration requirement rather than a GTB page takeover.
 - Historical evidence: Diagnostic package `0.3.6` added bounded evidence for `window.innerWidth`, `devicePixelRatio`, SRWF wrapper rect/computed width/padding, immediate Gravity Forms form/body/fields geometry, bounded ancestor rect/computed width/max-width/padding/margin/overflow up to `body`, and representative text-control, Radio-group, initial GPFUP droparea, and submit widths. It remains admin-gated and content/value blind.
 - Diagnostic download controls remain functional but the final composer parks the admin-only controls in normal document flow rather than fixed viewport-overlay positions so qualification captures are not obstructed.
 
-This authority document does not identify the mutable current theme/package target. Authentic Owner runtime evidence remains required for the exact current implementation/package identified by `../IMPLEMENTATION_MAP.md` and `../src/README.md`, using the diagnostic package identified by those implementation-facing surfaces, across the required `320`, `360`, `390`, `393`, `412`, and `430 CSS px` matrix where applicable. Checked/keyboard-focused Radio behavior, validation, authentic GPFUP initial wrapping and `.gpfup--has-files` transition, GPAS dynamic states, `200%` text resize, text spacing, complete contrast/target-size acceptance, and Student Photo post-upload/crop/re-crop/delete composition remain runtime-sensitive. Post-upload/crop/re-crop/delete stays `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` and host-owned.
+This authority document does not identify the mutable current theme/package target. Authentic Owner runtime evidence remains required for the exact current implementation/package identified by `../IMPLEMENTATION_MAP.md` and `../src/README.md`, using the diagnostic package identified by those implementation-facing surfaces. Desktop requalification must cover the `960`, `1024`, representative `1366`/`1440`, and wide-desktop baseline where practical; responsive regression must cover `320`, `360`, `390`, `393`, `412`, and `430 CSS px`. Checked/keyboard-focused Radio behavior, validation, authentic GPFUP initial wrapping and `.gpfup--has-files` transition, GPAS dynamic states, `200%` text resize, text spacing, complete contrast/target-size acceptance, and Student Photo post-upload/crop/re-crop/delete composition remain runtime-sensitive. Post-upload/crop/re-crop/delete stays `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` and host-owned.
