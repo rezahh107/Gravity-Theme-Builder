@@ -1,6 +1,6 @@
 # SRWF Registration Theme
 
-Status: **First reference implementation / current Owner authority admitted / Radio full-cell repair statically implemented through 0.1.17 / Owner runtime requalification required**
+Status: **Desktop Full Width shell statically implemented through 0.1.18 / Owner runtime requalification required**
 
 This directory is the first real theme built with Gravity Theme Builder.
 
@@ -11,7 +11,7 @@ The deliverable is not a new SRWF-inspired design. It is faithful implementation
 Before visual implementation planning or review, read:
 
 1. `reference/VISUAL_AUTHORITY.md`;
-2. `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md` — current Owner project authority for resolved decisions;
+2. `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md` — current Owner project authority for resolved decisions, including the later Desktop Full Width shell decision;
 3. `reference/SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md` — exact historical Drive-backed predecessor retained for provenance/inherited rules;
 4. `reference/README.md`;
 5. run `reference/materialize_reference.sh` and inspect the verified `OWNER_REFERENCE_new_7.html` where composition/state/geometry matters.
@@ -26,104 +26,66 @@ The same configured form can render in Gravity Flow Entry Detail. Registration p
 
 ## Current implementation state
 
-The current theme implementation is `0.1.17`; the current runtime diagnostic is `0.3.6`.
+The current theme implementation is `0.1.18`; the current runtime diagnostic is `0.3.6`.
 
-The statically implemented presentation set preserves:
+Theme `0.1.18` preserves:
 
 - Owner-authorized `16px` mobile inline padding and `320 CSS px` hard acceptance width;
-- the `960px` desktop threshold and `904px` outer / `840px` content desktop destination;
-- helper `14/400/1.5`, ordinary controls minimum `52px`, Submit minimum `56px` and full available width;
-- all authentic SRWF Radio groups using the common card family with content-driven intrinsic reflow;
-- mapped section icon tiles unchanged;
-- the repaired native single-Select and GP Advanced Select / Tom Select presentation family unchanged;
-- Report Card and image-only Student Photo initial GPFUP geometry and intrinsic wrapping unchanged;
+- the `960px` desktop threshold and exact `904px` outer / `840px` content desktop geometry;
+- ordinary controls minimum `52px`, Submit minimum `56px` and full available width;
+- all authentic SRWF Radio groups using the common card family with intrinsic reflow and the 0.1.17 full-cell repair;
+- mapped section icon tiles and authentic Section Break semantics;
+- native Select plus GP Advanced Select / Tom Select presentation/behavior ownership;
+- initial GPFUP family and `.gpfup--has-files` isolation;
 - existing per-form configuration/readiness and Registration-versus-Entry-Detail context isolation.
 
-Owner runtime of theme `0.1.14` remains historical upload-family evidence: both admitted initial icon glyphs rendered, but the authentic direct content child remained visually detached from the icon. Theme `0.1.15` is the prior static cluster repair. Theme `0.1.16` added the bounded intrinsic Radio/GPFUP mobile responsive polish. Theme `0.1.17` adds only the runtime-proven Radio full-cell geometry repair plus implementation-facing evidence updates.
+It modernizes only the desktop primary form shell at and above `960px`:
 
-## Proven host-width requirement
+- `32px` block padding while retaining `32px` inline padding;
+- white `#FFFFFF` primary surface and `16px` radius;
+- non-layout-affecting `1px #E4E7EC` visual ring;
+- restrained depth `0 1px 2px rgba(16,24,40,0.04), 0 12px 32px rgba(16,24,40,0.06)`.
 
-The former whole-form narrowness is no longer an unresolved GTB width problem. The Owner configured the dedicated Registration page through the host theme's native full-width content option. GeneratePress is the currently proven Owner-site example; it is **not** a GTB dependency.
+The ring is implemented as an outer box-shadow layer, not a literal border, so `904 - 32 - 32 = 840` remains intact. The wrapper deliberately does not add `overflow:hidden`; focus outlines, Tom Select dropdowns, GPFUP states, and validation consumers must not be clipped merely to contain rounded-corner visuals.
 
-Fresh Owner runtime at `390 CSS px` proved the intended chain:
+## Fluid Section hierarchy
 
-```text
-viewport / host full-width content: 390px
-→ SRWF wrapper: 390px with 16px inline padding
-→ form / ordinary controls / Submit: 358px
-```
+The theme keeps one dominant white primary form surface. It does not turn Section Breaks or following fields into independent cards.
 
-`document.clientWidth == document.scrollWidth == 390`, with no horizontal scrolling and no visible overflow among the sampled consumers.
+The current Gravity Forms vertical gap is `24px`, while the authentic Section Break has the existing `8px` block-start margin. Together they produce the approved `32px` major section rhythm without inventory-sensitive rules. No `nth-child`, field ID, page ID, label/option text, sibling count, fixed-height section container, or artificial empty cell is used.
 
-The implementation-facing prerequisite is therefore:
+## Host width and desktop canvas boundary
 
-> The page hosting the SRWF Registration surface must provide the required full-width content area; GTB then owns its canonical `16px` mobile inline gutter.
+The former whole-form narrowness is no longer a GTB width problem. The Owner previously configured the dedicated Registration page through the host theme's native full-width content option. GeneratePress is the currently proven host example; it is **not** a GTB dependency.
 
-GTB does not add CSS/PHP for GeneratePress `.site-content`, `.content-area`, `.site-main`, `.inside-article`, `.entry-content`, page IDs, `body` layout, negative-margin breakout, or viewport-width breakout. Host page layout remains host-owned.
+The implementation-facing prerequisite remains:
 
-## Radio full-cell root cause and repair
+> The page hosting the SRWF Registration surface must provide the required full-width content area; GTB then owns its scoped responsive wrapper geometry.
 
-The corrected host width exposed an independent, repeatable Radio defect at `390 CSS px`:
+The preferred surrounding desktop canvas is `#F6F8FB`. Current GTB source does not expose a truthful durable page-level authentication seam for the admitted SRWF Registration page independent of numeric IDs, DOM position, text, or host-theme internals. Therefore 0.1.18 intentionally does not target `html`, `body`, `.site-content`, `.content-area`, `.site-main`, `.inside-article`, `.entry-content`, page IDs, GeneratePress layout classes, negative margins, or viewport breakouts.
 
-- `.gfield_radio`: `358px`;
-- pair gap: `12px`;
-- paired `.gchoice`: `173px` each, visible label/card: `161px` each;
-- full-row `.gchoice`: `358px`, visible label/card: `346px`;
-- diagnostic: `allVisibleLabelsFillChoices: false`.
+The smallest host-side integration requirement is to configure the Registration page/theme so the surrounding desktop canvas is `#F6F8FB` while retaining the already-proven full-width content area. The form-local surface remains complete and isolated without that host canvas.
 
-The exact `12px` deficit matches Gravity Forms' documented secondary-label horizontal reserve, `--gf-label-space-x-secondary`, whose qualified default is `12px`. That reserve normally separates an authentic choice input from its inline label. SRWF intentionally moves the authentic Radio input out of flow and draws the visible circular cue inside the associated label, so the input-to-label reserve is no longer semantically needed in this presentation.
+## Radio full-cell repair retained
 
-Theme `0.1.17` neutralizes only that reserve inside admitted SRWF Radio groups:
+The 0.1.17 repair neutralizes Gravity Forms' documented `--gf-label-space-x-secondary` only inside admitted SRWF Radio groups because the authentic Radio input is moved out of flow and its visible circular cue is rendered inside the associated label. It is not a `+12px` width hack: the explicit `12px` option gap, `.gchoice { flex: 1 1 9.5rem; }`, content-driven card height, and native Radio state relationship remain unchanged.
 
-```css
-.gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gfield_radio {
-    --gf-label-space-x-secondary: 0;
-    display: flex;
-    flex-flow: row wrap;
-    gap: 12px;
-}
-```
+The Owner subsequently confirmed that repair at mobile runtime. Theme 0.1.18 changes no Radio rule and requires only regression requalification as part of the new installable package.
 
-This is deliberately **not** a `+12px` card-width hack. The group still owns an explicit `12px` option gap, `.gchoice` remains `flex: 1 1 9.5rem`, labels remain content-height driven, and no mobile device-specific breakpoint is introduced. The native Radio input remains present and authentic; checked, keyboard, validation, conditional visibility, persistence, and submission remain Gravity Forms-owned. Selected border `#1D4ED8`, selected background `#EDF1FC`, and the non-color circular selected cue are unchanged.
+## Add-on boundaries
 
-## Unchanged adjacent surfaces
+- **GP File Upload Pro**: presentation remains limited to authentic initial states via `:not(.gpfup--has-files)`. Report Card uses `icons/report-card-file.svg`; image-only Student Photo uses `icons/student-photo-upload.svg`. Post-upload/crop/re-crop/delete remains `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` and GPFUP-owned.
+- **GP Advanced Select / Tom Select**: existing visual adapter remains unchanged; open/close/search/results/value behavior remains add-on-owned.
+- **Gravity Flow Entry Detail**: Registration theme admission remains excluded there.
 
-The Radio repair does not alter production rules for:
+## Verification and Owner runtime requalification
 
-- GP File Upload Pro initial or `.gpfup--has-files` behavior;
-- GP Advanced Select / Tom Select;
-- normal text/select controls;
-- Section Break layout/icons;
-- Submit width/behavior;
-- Entry Detail isolation.
+Diagnostic `0.3.6` remains sufficient and is not bumped; no diagnostic source/schema changed.
 
-Diagnostic `0.3.6` remains sufficient and is not bumped: it already records the host/GF/GTB width chain, overflow evidence, per-choice label width delta, and `allVisibleLabelsFillChoices` needed for the next runtime pass.
+Static/exact-head CI can prove the visual-reference hash, CSS scoping, exact breakpoint/shell declarations, 904/840 arithmetic, non-layout ring/depth, absence of host/page takeover, component-rule preservation, version coherence, and deterministic package closure. It does **not** prove visual browser acceptance.
 
-## Owner runtime requalification
-
-Static tests and exact-head CI are necessary regression evidence; they are not final Owner-site/browser qualification.
-
-Requalify exact theme `0.1.17` + diagnostic `0.3.6` at minimum at:
-
-- `360 CSS px`;
-- `390 CSS px`.
-
-Prefer the full matrix: `320 / 360 / 390 / 393 / 412 / 430 CSS px`.
-
-Expected runtime evidence:
-
-- host remains full-width;
-- GTB retains its `16px` inline gutter;
-- no document horizontal overflow;
-- Radio `allVisibleLabelsFillChoices = true`;
-- short choices remain side-by-side where actual component width supports them;
-- larger groups wrap cleanly and intrinsically;
-- selected/unselected visual design remains unchanged;
-- GPFUP / GPAS / Submit do not regress;
-- authentic checked/focus/validation/conditional Radio behavior remains host-owned.
-
-Page background `#F6F8FB` remains a host-integration responsibility where an authenticated ownership seam exists. Student Photo post-upload/crop/re-crop/delete composition remains runtime-dependent / `NOT_PROVEN` and GPFUP-owned. PersianGravity/Jalali presentation also remains runtime-dependent until an authentic consumer is captured.
+Owner runtime should requalify desktop `960`, `1024`, representative `1366`/`1440`, and a wide desktop near the previous `~1859 CSS px` baseline where practical, plus responsive regression at `320 / 360 / 390 / 393 / 412 / 430 CSS px`. Also recheck authentic keyboard focus, invalid submission, GPAS open state, GPFUP post-upload where available, conditional reveal, no horizontal overflow/clipping, and full-width Submit.
 
 ## Reuse rule
 
-Do not move this host requirement or Radio repair into a shared multi-theme abstraction merely because the mechanism looks reusable. Promote only after a second real theme or a clearly project-wide invariant proves reuse.
+Keep this shell theme-local. Do not promote it into shared GTB core, a GeneratePress adapter, or a page-layout subsystem without a second real reuse case or a proven project-wide invariant.
