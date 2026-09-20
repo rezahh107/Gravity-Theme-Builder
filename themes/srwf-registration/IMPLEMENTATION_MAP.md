@@ -41,7 +41,7 @@ Owner runtime of theme `0.1.14` is retained as historical evidence for the initi
 | Helper | `14px / 400 / 1.5` | Gravity Forms description CSS API | `DOCUMENTED / STATICALLY_IMPLEMENTED` |
 | Field error | `14px / 600 / 1.5` | Gravity Forms error-description API | `DOCUMENTED / STATICALLY_IMPLEMENTED`; authentic invalid submission pending |
 | Primary action | `16px / 700 / 1.5`, full available width, min `56px` | Theme Framework tokens + bounded SRWF width enforcement | `STATICALLY_PROVEN`; exact 0.1.18 browser recheck `OWNER_RUNTIME_REQUIRED` |
-| Field-internal spacing | no-helper label→control `8px`; label→helper/error `6px`; final helper/error→control `8px` | `--gf-label-space-primary:8px`, `--gf-desc-space:8px`, bounded `--gf-label-space-primary:6px` for authentic above-input consumers | `OWNER_AUTHORIZED / STATICALLY_PROVEN`; computed browser geometry `OWNER_RUNTIME_REQUIRED` |
+| Field-internal spacing | no-helper label→control `8px`; label→helper/error `6px`; final helper/error→control `8px`; intermediate helper/error spacing remains content/host-driven | `--gf-label-space-primary:8px`, `--gf-desc-space:8px`, bounded `--gf-label-space-primary:6px` for authentic above-input consumers | `OWNER_AUTHORIZED / STATICALLY_PROVEN`; computed browser geometry `OWNER_RUNTIME_REQUIRED` |
 | Visible focus | `2px solid #1D4ED8`, offset `2px`, no intended glow | GF focus API; hidden native Radio focus projects to visible card; desktop wrapper deliberately does not use `overflow:hidden` | `DOCUMENTED / STATICALLY_IMPLEMENTED`; authentic keyboard runtime pending |
 | Native single Select | shared control family + documented `--gf-ctrl-select-padding-x:24px 32px`; retained runtime-proven vertical optical compensation | bounded native-only selector excludes enhanced Tom Select source | unchanged; exact-head browser recheck `OWNER_RUNTIME_REQUIRED` |
 | All Radio choices | every authentic admitted `.gfield--type-radio` uses cards; visible label fills assigned `.gchoice`; `12px` option gap; min `52px`; radius `10px`; unselected `1px #8690A1`; selected `2px #1D4ED8` + `#EDF1FC` + non-color dot cue | `.gfield_radio` keeps intrinsic Flex wrapping; `--gf-label-space-x-secondary:0`; `.gchoice` retains `flex:1 1 9.5rem`; native input/label/checked/focus semantics retained | root cause `OWNER_RUNTIME_PROVEN`; 0.1.17 repair `OWNER_RUNTIME_PROVEN` at mobile; 0.1.18 regression `OWNER_RUNTIME_REQUIRED` |
@@ -102,15 +102,18 @@ The Owner subsequently confirmed the repaired mobile Radio presentation/runtime.
 
 ## Visual-role authority traceability
 
+The exact historical v1.0.1/artifact path remains retrievable. The current Owner reconciliation supersedes only the presentation interpretations it explicitly resolves.
+
 | Requirement | Authority path | Implementation | Current disposition |
 |---|---|---|---|
-| Gender historical binary role | `VA:VC-1.0.1` + `VA:ARTIFACT` + current Owner reconciliation | `srwf-role-binary-choice` may remain configured, but card presentation comes from authentic Radio field type | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED` |
-| Graduation Status / other authentic Radio groups | current all-radio lock | same `.gfield--type-radio` card system automatically covers visible/conditional groups | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; dynamic-state regression pending |
-| Section iconography | current reconciliation + admitted artifact | explicit mapped Section Break tokens + local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED` |
-| Report Card initial GPFUP | current reconciliation + admitted artifact | shared initial family + `icons/report-card-file.svg` + intrinsic content wrapping | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
-| Report Card `.gpfup--has-files` | host-owned GPFUP lifecycle | initial rules stop before authentic has-files state | `HOST_OWNED`; real transition `OWNER_RUNTIME_REQUIRED` |
-| Student Photo initial | current Owner upload-family lock + authentic GPFUP `gpfup--images-only` seam | shared family + `student-photo-upload.svg` | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
-| Student Photo post-upload | current reconciliation | none until authentic post-upload/crop state is captured | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN`; host-owned |
+| Gender historical binary role | `VA:VC-1.0.1` + `VA:ARTIFACT` + current Owner reconciliation | `srwf-role-binary-choice` may remain configured, but card presentation comes from authentic Radio field type | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; 0.1.18 regression pending |
+| Graduation Status historical binary role | current all-radio lock | semantic role no longer gates cards; conditional visibility stays host-owned | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; 0.1.18 regression pending |
+| Other authentic Radio groups | current Owner all-radio lock | same `.gfield--type-radio` card system automatically covers visible/conditional groups | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; 0.1.18 regression pending |
+| Section iconography | `VA:VC-1.0.1` + `VA:ARTIFACT` + `section_heading_iconography` | explicit mapped Section Break tokens + local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
+| Report Card initial GPFUP | `VA:VC-1.0.1` + `VA:ARTIFACT` + `report_card_upload_initial` | shared initial family + `icons/report-card-file.svg` + intrinsic content wrapping | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
+| Report Card `.gpfup--has-files` | `VA:VC-1.0.1` + host-owned GPFUP lifecycle | initial rules stop before authentic has-files state | `HOST_OWNED`; real transition `OWNER_RUNTIME_REQUIRED` |
+| Student Photo initial | current Owner upload-family lock + authentic GPFUP image-only runtime/config evidence | shared initial family + authentic `gpfup--images-only` + `student-photo-upload.svg` | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
+| Student Photo post-upload | `VA:VC-1.0.1` + `VA:ARTIFACT` + current reconciliation | none until authentic Photo post-upload/crop state is captured | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN`; host-owned |
 
 ## Gravity Forms Form Presentation Readiness
 
