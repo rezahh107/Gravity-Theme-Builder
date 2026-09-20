@@ -32,9 +32,6 @@ jobs:
       PUBLISH: ${{ inputs.publish }}
       SOURCE_DIR: source
       AUTOMATION_DIR: release-system
-      BUILDER_OUTPUT: ${{ runner.temp }}/gtb-owner-test-packages
-      RELEASE_DIR: ${{ runner.temp }}/gtb-srwf-release-assets
-      RELEASE_SUMMARY_JSON: ${{ runner.temp }}/gtb-srwf-release-summary.json
       CANDIDATE_ARTIFACT: gtb-srwf-registration-release-candidate-${{ inputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
       GH_TOKEN: ${{ github.token }}
 
@@ -138,20 +135,20 @@ jobs:
 
       - name: Build deterministic exact-source Owner packages
         run: |
-          python3 "$SOURCE_DIR/themes/srwf-registration/tests/build_owner_test_packages.py" "$BUILDER_OUTPUT"
-          cat "$BUILDER_OUTPUT/GTB_SRWF_OWNER_TEST_PACKAGES_SHA256.txt"
+          python3 "$SOURCE_DIR/themes/srwf-registration/tests/build_owner_test_packages.py" "$RUNNER_TEMP/gtb-owner-test-packages"
+          cat "$RUNNER_TEMP/gtb-owner-test-packages/GTB_SRWF_OWNER_TEST_PACKAGES_SHA256.txt"
 
       - name: Prepare canonical production release bytes and checksum
         run: |
           python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
             prepare-assets \
             --theme-root "$SOURCE_DIR/themes/srwf-registration" \
-            --builder-output "$BUILDER_OUTPUT" \
-            --release-dir "$RELEASE_DIR" \
-            --summary-file "$RELEASE_SUMMARY_JSON" \
+            --builder-output "$RUNNER_TEMP/gtb-owner-test-packages" \
+            --release-dir "$RUNNER_TEMP/gtb-srwf-release-assets" \
+            --summary-file "$RUNNER_TEMP/gtb-srwf-release-summary.json" \
             --version "$VERSION"
-          cat "$RELEASE_SUMMARY_JSON"
-          cat "$RELEASE_DIR/GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
+          cat "$RUNNER_TEMP/gtb-srwf-release-summary.json"
+          cat "$RUNNER_TEMP/gtb-srwf-release-assets/GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
 
       - name: Inspect tag and GitHub Release identity without mutation
         shell: bash
@@ -269,7 +266,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          zip="$RELEASE_DIR/gtb-srwf-registration-${VERSION}.zip"
+          zip="$RUNNER_TEMP/gtb-srwf-release-assets/gtb-srwf-registration-${VERSION}.zip"
           zip_sha="$(sha256sum "$zip" | awk '{print $1}')"
           {
             echo "## SRWF Registration verification result"
@@ -295,7 +292,6 @@ jobs:
       VERSION: ${{ inputs.version }}
       SOURCE_SHA: ${{ inputs.source_sha }}
       SOURCE_DIR: source
-      RELEASE_DIR: ${{ runner.temp }}/gtb-srwf-release-assets
       CANDIDATE_ARTIFACT: gtb-srwf-registration-release-candidate-${{ inputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
       GH_TOKEN: ${{ github.token }}
 
@@ -312,7 +308,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.CANDIDATE_ARTIFACT }}
-          path: ${{ env.RELEASE_DIR }}
+          path: ${{ runner.temp }}/gtb-srwf-release-assets
 
       - name: Reconfirm exact source, notes and candidate checksum
         shell: bash
@@ -337,7 +333,7 @@ jobs:
             echo "::error::RELEASE_NOTES_MISSING_BEFORE_PUBLISH: exact source no longer supplies release notes."
             exit 1
           fi
-          cd "$RELEASE_DIR"
+          cd "$RUNNER_TEMP/gtb-srwf-release-assets"
           sha256sum -c "GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
 
       - name: Recheck remote publication conflicts immediately before mutation
@@ -364,8 +360,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          zip="$RELEASE_DIR/gtb-srwf-registration-${VERSION}.zip"
-          checksum="$RELEASE_DIR/GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
+          zip="$RUNNER_TEMP/gtb-srwf-release-assets/gtb-srwf-registration-${VERSION}.zip"
+          checksum="$RUNNER_TEMP/gtb-srwf-release-assets/GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
           notes="$SOURCE_DIR/themes/srwf-registration/RELEASE_NOTES.md"
           gh release create "$TAG_NAME" \
             "$zip" \
@@ -380,7 +376,7 @@ jobs:
         run: |
           set -euo pipefail
           release_json="$RUNNER_TEMP/published-release.json"
-          zip="$RELEASE_DIR/gtb-srwf-registration-${VERSION}.zip"
+          zip="$RUNNER_TEMP/gtb-srwf-release-assets/gtb-srwf-registration-${VERSION}.zip"
           local_zip_sha="$(sha256sum "$zip" | awk '{print $1}')"
 
           git -C "$SOURCE_DIR" fetch --quiet origin "refs/tags/$TAG_NAME:refs/tags/$TAG_NAME"
@@ -418,7 +414,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          zip="$RELEASE_DIR/gtb-srwf-registration-${VERSION}.zip"
+          zip="$RUNNER_TEMP/gtb-srwf-release-assets/gtb-srwf-registration-${VERSION}.zip"
           zip_sha="$(sha256sum "$zip" | awk '{print $1}')"
           {
             echo "## SRWF Registration publication result"
