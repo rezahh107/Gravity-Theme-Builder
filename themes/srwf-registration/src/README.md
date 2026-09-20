@@ -53,6 +53,12 @@ The stored `srwf-registration-theme` class establishes form identity only. Prese
 
 Normal Registration, validation rerenders, and legitimate Registration AJAX renders remain admitted. Gravity Flow Entry Detail remains excluded using the source-qualified early enqueue classification plus the authentic `gravityflow_entry_detail_content_before` / `gravityflow_entry_detail_content_after` bracket. GTB does not parse URLs, query strings, page IDs, labels, form IDs, or GPP state.
 
+#### Retained Entry Detail source qualification
+
+PR #12 established an earlier timing assumption that later Owner runtime evidence disproved. The repaired boundary is based on the qualified source order for Gravity Flow `3.1.0` with Gravity Forms `3.1.1.1`: during `wp_enqueue_scripts`, Gravity Flow `enqueue_frontend_scripts()` reaches Gravity Forms `enqueue_form_scripts()`, which invokes the form-owned `gform_enqueue_scripts` and `gform_form_theme_slug` paths before the later Entry Detail content bracket. `gravityflow_enqueue_frontend_scripts` is the source-proven post-enqueue boundary, while `is_workflow_detail_page()` is the authentic host route predicate.
+
+This timing remains `SOURCE_PROVEN`; fresh browser behavior remains `OWNER_RUNTIME_REQUIRED`. The retained source-qualification identities are `16666115e37a7704b8331973eba0a0499e039d3fdfc6b47ed8a8e95a41779a79`, `ac0573b75831380417a21a455176e25eb746d718bbbd0bb70d6da6f48cba5404`, and `542f56ae0747f3661d1474996527298027db3fb8ed3e6469a6391aaabf61069b`.
+
 ### Authorized responsive and desktop-shell presentation
 
 Theme `0.1.18` preserves the established component system and adds only the Owner-approved Desktop Full Width shell refinement:
