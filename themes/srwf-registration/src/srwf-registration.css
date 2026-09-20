@@ -425,14 +425,10 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
 @media (min-width: 960px) {
     .gform-theme--framework.srwf-registration-theme_wrapper {
         max-inline-size: 904px;
-        padding-block: 32px;
         padding-inline: 32px;
         background: #FFFFFF;
         border-radius: 16px;
-        box-shadow:
-            0 0 0 1px #E4E7EC,
-            0 1px 2px rgba(16, 24, 40, 0.04),
-            0 12px 32px rgba(16, 24, 40, 0.06);
+        box-shadow: none;
     }
 
     head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gform-theme.srwf-registration-theme_wrapper .gform_title {

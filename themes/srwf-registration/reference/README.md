@@ -7,7 +7,7 @@ This directory contains the visual authority package for the first Gravity Theme
 ## Mandatory read order for SRWF visual work
 
 1. `VISUAL_AUTHORITY.md` — authority registry, current-vs-historical interpretation, provenance limits, and deviation gate.
-2. `SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md` — **current Owner-supplied destination authority** for the decisions it resolves, including the direct 2026-09-20 Desktop Full Width shell refinement recorded there.
+2. `SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md` — **current Owner-supplied destination authority** for the decisions it resolves.
 3. `SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md` — exact historical Drive-backed Owner revision retained byte-for-byte for provenance and inherited rules not superseded by the current reconciliation.
 4. `materialize_reference.sh` — reconstructs and verifies the exact approved artifact.
 5. Inspect the materialized `OWNER_REFERENCE_new_7.html` before implementation decisions that depend on composition/state or exact SVG geometry.
@@ -62,7 +62,7 @@ That file is intentionally not rewritten. Its prior `NOT_PROVEN`, `NON_NORMATIVE
 
 ## Current Owner reconciliation
 
-Current project authority for the finalized destination is:
+Current project authority for the newly finalized destination is:
 
 ```text
 authority_handle: OWNER:SRWF-2026-09-19
@@ -71,25 +71,13 @@ provenance: direct Owner-supplied project authority for this execution
 immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR
 ```
 
-No new Drive revision/hash is claimed or fabricated. The current reconciliation resolves, among other items, the `960px` production breakpoint, host-owned desktop pairings, exact title/helper/error/rhythm/focus values, Gravity Forms recommended above-input description/validation/sub-label placement, and the current Desktop Full Width shell destination.
+No new Drive revision/hash is claimed or fabricated. The reconciliation resolves, among other items, the `960px` production breakpoint, host-owned desktop pairings, no-shadow desktop card geometry, exact title/helper/error/rhythm/focus values, and Gravity Forms recommended above-input description/validation/sub-label placement.
 
-The direct 2026-09-20 shell decision supersedes the reconciliation's earlier no-shadow desktop state only for the primary desktop surface. The current desktop destination is:
-
-- `904px` outer max / `840px` authentic content target;
-- `32px` inline and block padding;
-- `#FFFFFF` surface;
-- `16px` radius;
-- non-layout `1px #E4E7EC` boundary;
-- restrained depth `0 1px 2px rgba(16,24,40,0.04)` plus `0 12px 32px rgba(16,24,40,0.06)`;
-- preferred surrounding `#F6F8FB` canvas only where a truthful authenticated page-level seam exists; otherwise the canvas remains host/page configuration.
-
-The byte-preserved v1.0.1 file and admitted HTML payload are not rewritten for this later Owner decision.
-
-Those decisions define **WHAT / acceptance**. They do not prove that the current production CSS or a real Owner browser has qualified them.
+Those decisions define **WHAT / acceptance**. They do not prove that the current production CSS implements them, and this foundation batch intentionally does not perform the broad visual rewrite.
 
 ## Exact-reproduction rule
 
-For this first reference theme, the approved artifact plus current Owner authority define the implementation target. This is not inspiration, a redesign brief, or permission to modernize/simplify the design beyond the explicit current Owner decisions.
+For this first reference theme, the approved artifact plus current Owner authority define the implementation target. This is not inspiration, a redesign brief, or permission to modernize/simplify the design.
 
 ## Behavior firewall
 

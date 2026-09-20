@@ -144,10 +144,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
             "production desktop breakpoint: `960 CSS px`",
             "`desktop_short_field_pairings: HOST_OWNED / OWNER_CONFIGURABLE`",
             "resulting desktop outer max width: `904px`",
-            "card internal block padding: `32px`",
-            "visible boundary: `1px #E4E7EC`",
-            "`0 1px 2px rgba(16,24,40,0.04)`",
-            "`0 12px 32px rgba(16,24,40,0.06)`",
+            "box shadow: `none`",
             "Form title — mobile | `24px` | `700` | `1.5`",
             "Form title — desktop | `26px` | `700` | `1.5`",
             "Section heading | `18px` | `700` | `1.5`",
@@ -289,11 +286,8 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertIn("--gf-ctrl-label-line-height-primary: 1.5", self.css)
         self.assertIn("--gf-ctrl-btn-line-height: 1.5", self.css)
         self.assertIn("max-inline-size: 904px", self.css)
-        self.assertIn("padding-block: 32px", self.css)
         self.assertIn("padding-inline: 32px", self.css)
-        self.assertIn("0 0 0 1px #E4E7EC", self.css)
-        self.assertIn("0 1px 2px rgba(16, 24, 40, 0.04)", self.css)
-        self.assertIn("0 12px 32px rgba(16, 24, 40, 0.06)", self.css)
+        self.assertIn("box-shadow: none", self.css)
         self.assertIn(".gfield.gfield--type-radio", self.css)
         self.assertIn("--gf-label-space-x-secondary: 0", self.css)
         self.assertIn("flex: 1 1 9.5rem", self.css)

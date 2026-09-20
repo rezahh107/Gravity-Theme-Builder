@@ -18,7 +18,7 @@ Therefore:
 - v1.0.1 remains historical evidence of the earlier decision state, not current destination authority on those points;
 - all v1.0.1 rules not contradicted here remain inherited unless another current Owner decision says otherwise.
 
-Recording a current Owner decision is not runtime proof. All runtime-sensitive claims remain subject to supported WordPress / Gravity Forms / add-on validation. Exact Owner-site/browser acceptance remains `OWNER_RUNTIME_REQUIRED`.
+Recording a current Owner decision is not runtime proof. All runtime-sensitive claims remain subject to supported WordPress / Gravity Forms / add-on validation.
 
 ## Implementation-status ownership
 
@@ -64,23 +64,15 @@ The `exact_production_breakpoint: NOT_PROVEN` state in v1.0.1 is superseded by t
 
 ## Desktop card destination
 
-The Owner's direct 2026-09-20 Desktop Full Width shell decision supersedes the earlier no-shadow shell state in this reconciliation only. The byte-preserved historical v1.0.1 source remains unchanged.
-
 - page background: `#F6F8FB` where an authenticated GTB ownership seam exists;
 - card surface: `#FFFFFF`;
 - content max width: `840px`;
 - card internal inline padding: `32px` per side;
-- card internal block padding: `32px`;
 - resulting desktop outer max width: `904px`;
 - outer radius: `16px`;
-- visible boundary: `1px #E4E7EC`, implemented without consuming layout width;
-- restrained depth: `0 1px 2px rgba(16,24,40,0.04)` plus `0 12px 32px rgba(16,24,40,0.06)`.
+- box shadow: `none`.
 
-The boundary must not reduce the authorized `840px` content geometry. A non-layout ring or equivalent is therefore preferred over a literal border under the existing `border-box` wrapper geometry. The implementation must not add `overflow:hidden` merely to contain rounded corners, because focus rings, Tom Select dropdowns, upload UI, or validation consumers must not be clipped.
-
-Repository inspection for this decision found no durable GTB-owned page-level authentication seam that can safely style the surrounding WordPress canvas without generic `html`/`body`/site-container ownership, numeric page identity, or GeneratePress coupling. Therefore `#F6F8FB` remains a host/page configuration requirement until such a truthful seam exists. GTB must not compromise the form-local shell to force the canvas.
-
-The prior `desktop_shadow_exact_value: NOT_PROVEN` and the earlier reconciliation's `box shadow: none` state are superseded for the Desktop Full Width shell by the direct 2026-09-20 Owner decision above. Page-shell ownership and actual cascade/consumer behavior remain runtime-sensitive implementation facts.
+The prior `desktop_shadow_exact_value: NOT_PROVEN` state is superseded. Page-shell ownership and actual cascade/consumer behavior remain runtime-sensitive implementation facts.
 
 ## Primary Submit
 
@@ -115,8 +107,6 @@ The prior non-normative/unresolved form-title, helper, field-error, desktop-titl
 - label → helper/error: `6px`;
 - final helper/error → control: `8px`;
 - text-bearing blocks must remain content-driven rather than fixed-height.
-
-The existing production relationship of Gravity Forms' `24px` field gap plus the bounded `8px` Section Break start margin already expresses the intended `32px` major section rhythm. The Desktop Full Width shell decision does not authorize independent section cards or additional field-count/position-driven spacing.
 
 The prior `NON_NORMATIVE_REFERENCE` resolution states for these rhythms are superseded.
 
@@ -262,4 +252,4 @@ The 2026-09-20 bounded mobile responsive-polish batch preserved every Owner dest
 - Historical evidence: Diagnostic package `0.3.6` added bounded evidence for `window.innerWidth`, `devicePixelRatio`, SRWF wrapper rect/computed width/padding, immediate Gravity Forms form/body/fields geometry, bounded ancestor rect/computed width/max-width/padding/margin/overflow up to `body`, and representative text-control, Radio-group, initial GPFUP droparea, and submit widths. It remains admin-gated and content/value blind.
 - Diagnostic download controls remain functional but the final composer parks the admin-only controls in normal document flow rather than fixed viewport-overlay positions so qualification captures are not obstructed.
 
-This authority document does not identify the mutable current theme/package target. Authentic Owner runtime evidence remains required for the exact current implementation/package identified by `../IMPLEMENTATION_MAP.md` and `../src/README.md`, using the diagnostic package identified by those implementation-facing surfaces. Desktop requalification must cover the new shell at `960`, `1024`, approximately `1366/1440`, and a wide desktop close to the prior `~1859 CSS px` baseline where practical. The required mobile matrix remains `320`, `360`, `390`, `393`, `412`, and `430 CSS px` where applicable, including no ordinary horizontal scroll, correct Radio stacking/two-column behavior, coherent initial GPFUP wrapping, full-width submit, checked/focus/validation states, and a real `.gpfup--has-files` transition. Post-upload/crop composition remains `NOT_PROVEN` / host-owned. CI/static success is not production qualification.
+This authority document does not identify the mutable current theme/package target. Authentic Owner runtime evidence remains required for the exact current implementation/package identified by `../IMPLEMENTATION_MAP.md` and `../src/README.md`, using the diagnostic package identified by those implementation-facing surfaces, across the required `320`, `360`, `390`, `393`, `412`, and `430 CSS px` matrix where applicable. Checked/keyboard-focused Radio behavior, validation, authentic GPFUP initial wrapping and `.gpfup--has-files` transition, GPAS dynamic states, `200%` text resize, text spacing, complete contrast/target-size acceptance, and Student Photo post-upload/crop/re-crop/delete composition remain runtime-sensitive. Post-upload/crop/re-crop/delete stays `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` and host-owned.

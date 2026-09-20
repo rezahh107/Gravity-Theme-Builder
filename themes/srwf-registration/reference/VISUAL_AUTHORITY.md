@@ -118,12 +118,11 @@ No Google Drive revision ID, timestamp, export hash, or immutable upstream blob 
 
 Current implementation/package identity is intentionally not registered in this authority lock. The actual theme source owns version identity, while `IMPLEMENTATION_MAP.md` and `src/README.md` expose the mechanically checked current implementation/package status used for runtime qualification.
 
-`OWNER:SRWF-2026-09-19` supersedes contradictory or unresolved v1.0.1 states only where the reconciliation document explicitly says so. The Owner's direct 2026-09-20 Desktop Full Width shell decision is recorded inside that current reconciliation and supersedes its earlier no-shadow desktop shell state without modifying the byte-preserved historical sources. The current resolved decisions include:
+`OWNER:SRWF-2026-09-19` supersedes contradictory or unresolved v1.0.1 states only where the reconciliation document explicitly says so. Unchanged v1.0.1 rules remain inherited. The current resolved decisions include:
 
 - production desktop breakpoint `960 CSS px`;
 - desktop short-field pairings `HOST_OWNED / OWNER_CONFIGURABLE`, with no canonical pair list;
-- desktop primary surface: preferred host canvas `#F6F8FB` where a truthful authenticated page seam exists; `#FFFFFF` form surface; `840px` content cap; `32px` inline and block padding; `904px` outer max; `16px` radius; non-layout `1px #E4E7EC` boundary; restrained depth `0 1px 2px rgba(16,24,40,0.04)` plus `0 12px 32px rgba(16,24,40,0.06)`;
-- host canvas remains outside GTB when no safe page-level authentication seam exists; generic `html/body/site` or GeneratePress-specific takeover is not authorized;
+- desktop card: `#F6F8FB` page where an authenticated ownership seam exists, `#FFFFFF` surface, `840px` content cap, `32px` inline card padding, `904px` outer max, `16px` radius, no shadow;
 - target family stack `Vazirmatn, Vazir, Tahoma, Arial, sans-serif` plus exact title/section/label/control/helper/error/action typography and line-height;
 - `24px` / `32px` field/section rhythm and the local label/helper/error/control gap chain;
 - exact `:focus-visible` outline geometry;
@@ -141,8 +140,6 @@ Historical evidence: Owner runtime of theme `0.1.14` showed that both admitted i
 Historical evidence: Theme `0.1.15` was the prior static content-cluster repair baseline.
 
 Historical evidence: Theme `0.1.16` was the mobile responsive-polish implementation for that batch. It preserved the shared `40×40` icon slot / `24px` glyph family, added intrinsic narrow-width GPFUP wrapping, and made Radio card reflow less permissive before labels became cramped. Static implementation and CI did not establish a real-browser PASS for that batch geometry.
-
-Historical evidence: Theme `0.1.17` was the Radio full-cell repair baseline; it neutralized the documented Gravity Forms secondary-label horizontal reserve only inside admitted SRWF Radio groups while preserving native state ownership and the explicit `12px` group gap.
 
 Historical evidence: Diagnostic package `0.3.6` added bounded Owner-runtime evidence for viewport DPR and the width chain from host ancestors through Gravity Forms containers and the SRWF wrapper to representative text, Radio, initial GPFUP, and submit consumers. It was evidence for locating width loss, not authority to override a host container. Current diagnostic/package status belongs to the implementation-facing status surfaces rather than this authority registry.
 
@@ -178,4 +175,4 @@ Historical evidence: Theme `0.1.16` represented that batch's mobile responsive-p
 
 Historical evidence: Static source for that batch established that the SRWF wrapper itself remained fluid at mobile widths but did **not** identify which Owner-site WordPress ancestor caused the observed whole-form narrowness. No host integration width override was admitted on that evidence alone; diagnostic `0.3.6` was added to identify the constraining ancestor and its computed width/max-width/padding/margin at the real Owner runtime.
 
-Current runtime qualification must target the exact current implementation/package identified by `IMPLEMENTATION_MAP.md` and `src/README.md`, using the diagnostic package identified by those implementation-facing surfaces. Desktop shell qualification now includes `960`, `1024`, approximately `1366/1440`, and a wide desktop close to the prior `~1859 CSS px` baseline where practical. The required mobile matrix remains `320`, `360`, `390`, `393`, `412`, and `430 CSS px` where applicable, including no ordinary horizontal scroll, correct Radio stacking/two-column behavior, coherent initial GPFUP wrapping, full-width submit, checked/focus/validation states, and a real `.gpfup--has-files` transition. Post-upload/crop composition remains `NOT_PROVEN` / host-owned. CI/static success is not production qualification.
+Current runtime qualification must target the exact current implementation/package identified by `IMPLEMENTATION_MAP.md` and `src/README.md`, using the diagnostic package identified by those implementation-facing surfaces. The required mobile matrix and acceptance remain unchanged: `320`, `360`, `390`, `393`, `412`, and `430 CSS px` where applicable, including no ordinary horizontal scroll, correct Radio stacking/two-column behavior, coherent initial GPFUP wrapping, full-width submit, checked/focus/validation states, and a real `.gpfup--has-files` transition. Post-upload/crop composition remains `NOT_PROVEN` / host-owned. CI/static success is not production qualification.
