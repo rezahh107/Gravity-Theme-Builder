@@ -148,19 +148,22 @@ class OpenableControlMetricTests(unittest.TestCase):
         self.assertIn("boundedQuery(wrapper, '.ts-control', 2)", DIAGNOSTIC)
         self.assertIn("tomSelectEvidence", DIAGNOSTIC)
 
-    def test_out_of_scope_radio_upload_submit_shell_and_background_contracts_stay_intact(self) -> None:
+    def test_unrelated_contracts_include_current_mobile_polish_without_openable_scope_leakage(self) -> None:
         radio = rule_body(RADIO_SELECTOR)
-        self.assertRegex(radio, r"display\s*:\s*block\s*;")
-        self.assertRegex(radio, r"flex\s*:\s*1 1 8rem\s*;")
+        self.assertRegex(radio, r"display\s*:\s*flex\s*;")
+        self.assertRegex(radio, r"flex\s*:\s*1 1 9\.5rem\s*;")
+        self.assertRegex(radio, r"min-inline-size\s*:\s*0\s*;")
 
         upload = rule_body(UPLOAD_SELECTOR)
         self.assertRegex(upload, r"min-block-size\s*:\s*96px\s*;")
         self.assertRegex(upload, r"padding\s*:\s*16px\s*;")
         self.assertRegex(upload, r"border\s*:\s*1px dashed #8690A1\s*;")
+        self.assertRegex(upload, r"flex-wrap\s*:\s*wrap\s*;")
 
         self.assertRegex(CSS, r"(?s)\.gform-footer \.gform_button.*?inline-size:\s*100%;")
         self.assertRegex(CSS, r"(?s)@media \(min-width: 960px\).*?max-inline-size:\s*904px;")
         self.assertRegex(CSS, r"(?s)@media \(min-width: 960px\).*?padding-inline:\s*32px;")
+        self.assertNotRegex(CSS, r"@media[^\{]*(?:320|360|390|393|412|430)px")
         self.assertNotIn("#F6F8FB", CSS)
 
     def test_repair_uses_no_priority_escape_or_global_openable_selector(self) -> None:

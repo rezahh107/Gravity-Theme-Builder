@@ -60,11 +60,12 @@ class RadioCardScopeContractTests(unittest.TestCase):
         )
         self.assertRegex(
             CSS,
-            r"(?s)\.gfield\.gfield--type-radio \.gchoice\s*\{[^}]*flex:\s*1 1 8rem;",
+            r"(?s)\.gfield\.gfield--type-radio \.gchoice\s*\{[^}]*display:\s*flex;[^}]*flex:\s*1 1 9\.5rem;",
         )
         self.assertNotIn("grid-template-columns", "\n".join(
             selector for selector in selectors(CSS) if RADIO_SCOPE in selector
         ))
+        self.assertNotRegex(CSS, r"@media[^\{]*(?:320|360|390|393|412|430)px")
 
     def test_no_durable_numeric_text_or_position_identity(self) -> None:
         self.assertNotRegex(CSS, r"#(?:field|input|choice|label|gform_wrapper|gform)_\d+")

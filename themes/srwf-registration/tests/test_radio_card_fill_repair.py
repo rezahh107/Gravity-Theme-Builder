@@ -33,26 +33,27 @@ def fill_contract_closed(css: str) -> bool:
     choice = rule_body(css, CHOICE_SELECTOR)
     label = rule_body(css, LABEL_SELECTOR)
     return (
-        re.search(r"\bdisplay\s*:\s*block\s*;", choice) is not None
+        re.search(r"\bdisplay\s*:\s*flex\s*;", choice) is not None
         and re.search(r"\binline-size\s*:\s*100%\s*;", label) is not None
+        and re.search(r"\bflex\s*:\s*1 1 auto\s*;", label) is not None
     )
 
 
 class RadioCardFillRepairTests(unittest.TestCase):
     def test_pre_repair_choice_rule_fails_root_cause_contract(self) -> None:
         current_choice = rule_body(CSS, CHOICE_SELECTOR)
-        pre_repair_choice = re.sub(r"\n\s*display\s*:\s*block\s*;", "", current_choice, count=1)
+        pre_repair_choice = re.sub(r"\n\s*display\s*:\s*flex\s*;", "", current_choice, count=1)
         pre_repair = CSS.replace(current_choice, pre_repair_choice, 1)
         self.assertFalse(fill_contract_closed(pre_repair))
         self.assertTrue(fill_contract_closed(CSS))
 
-    def test_srwf_radio_choice_neutralizes_gravity_forms_two_track_grid(self) -> None:
+    def test_srwf_radio_choice_neutralizes_gravity_forms_two_track_grid_and_reflows_intrinsically(self) -> None:
         body = rule_body(CSS, CHOICE_SELECTOR)
-        self.assertRegex(body, r"\bdisplay\s*:\s*block\s*;")
+        self.assertRegex(body, r"\bdisplay\s*:\s*flex\s*;")
         self.assertNotRegex(body, r"display\s*:\s*(?:inline-)?grid")
         self.assertNotIn("grid-template-columns", body)
         self.assertRegex(body, r"\bposition\s*:\s*relative\s*;")
-        self.assertRegex(body, r"\bflex\s*:\s*1 1 8rem\s*;")
+        self.assertRegex(body, r"\bflex\s*:\s*1 1 9\.5rem\s*;")
         self.assertRegex(body, r"\bmin-inline-size\s*:\s*0\s*;")
 
     def test_group_flex_wrap_strategy_is_unchanged(self) -> None:
@@ -61,12 +62,14 @@ class RadioCardFillRepairTests(unittest.TestCase):
         self.assertRegex(body, r"\bflex-flow\s*:\s*row wrap\s*;")
         self.assertRegex(body, r"\bgap\s*:\s*12px\s*;")
 
-    def test_visible_associated_label_fills_full_choice_cell(self) -> None:
+    def test_visible_associated_label_fills_full_choice_cell_and_row_height(self) -> None:
         body = rule_body(CSS, LABEL_SELECTOR)
         self.assertRegex(body, r"\bdisplay\s*:\s*flex\s*;")
+        self.assertRegex(body, r"\bflex\s*:\s*1 1 auto\s*;")
         self.assertRegex(body, r"\binline-size\s*:\s*100%\s*;")
         self.assertRegex(body, r"\bmin-inline-size\s*:\s*0\s*;")
         self.assertRegex(body, r"\bmin-block-size\s*:\s*52px\s*;")
+        self.assertNotRegex(body, r"(?m)^\s*(?:height|block-size)\s*:")
 
     def test_selected_and_unselected_card_language_is_unchanged(self) -> None:
         base = rule_body(CSS, LABEL_SELECTOR)
@@ -118,7 +121,7 @@ class RadioCardFillRepairTests(unittest.TestCase):
         ):
             self.assertNotIn(property_name, body)
 
-    def test_entry_detail_exclusion_and_diagnostic_version_are_unchanged(self) -> None:
+    def test_entry_detail_exclusion_and_radio_geometry_diagnostic_version_are_unchanged(self) -> None:
         self.assertIn("SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL", THEME_PHP)
         self.assertIn("'exclusionReason'      => $exclusion_reason", THEME_PHP)
         self.assertIn("'gravity_flow_entry_detail'", THEME_PHP)

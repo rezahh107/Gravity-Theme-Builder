@@ -178,11 +178,13 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
  * authentic radio input is visually hidden out of flow, that Grid can strand the
  * associated label in the intrinsic first track. Own only this inner formatting
  * context so the existing 100% label resolves against the full Flex-assigned cell.
+ * A 9.5rem intrinsic basis makes roughly 288px of real component width stack while
+ * allowing two short choices once roughly 328px is genuinely available.
  */
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gchoice {
-    display: block;
+    display: flex;
     position: relative;
-    flex: 1 1 8rem;
+    flex: 1 1 9.5rem;
     min-inline-size: 0;
 }
 
@@ -197,6 +199,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gchoice label {
     box-sizing: border-box;
     display: flex;
+    flex: 1 1 auto;
     align-items: center;
     justify-content: center;
     gap: 8px;
@@ -312,7 +315,7 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
     min-inline-size: 0;
     padding: 16px;
     column-gap: 12px;
-    row-gap: 4px;
+    row-gap: 12px;
     border: 1px dashed #8690A1;
     border-radius: 12px;
     background: #FAFBFC;
@@ -329,6 +332,8 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
  * select-files content inside an anonymous direct child that otherwise expands away
  * from the decorative pseudo-icon. Center only the two admitted initial variants as
  * one shrinkable cluster; GPFUP keeps the real button, text, and upload lifecycle.
+ * The child's intrinsic basis makes it wrap below the 40px icon before its text column
+ * is crushed, while preserving the compact horizontal cluster when space supports it.
  */
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea,
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea {
@@ -337,10 +342,10 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
 
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.srwf-role-report-card-upload .gpfup:not(.gpfup--has-files) .gpfup__droparea > div,
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea > div {
-    flex: 0 1 auto;
+    flex: 0 1 13rem;
     inline-size: auto;
     min-inline-size: 0;
-    max-inline-size: calc(100% - 52px);
+    max-inline-size: 100%;
 }
 
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield--type-fileupload .gpfup:not(.gpfup--has-files) .gpfup__select-files {

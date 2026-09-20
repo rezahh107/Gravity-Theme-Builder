@@ -14,9 +14,13 @@ IMPLEMENTATION_MAP = THEME / "IMPLEMENTATION_MAP.md"
 SRC_README = THEME / "src" / "README.md"
 THEME_PHP = THEME / "src" / "srwf-registration-theme.php"
 CSS = THEME / "src" / "srwf-registration.css"
+DIAGNOSTIC_PHP = THEME / "diagnostic" / "srwf-runtime-diagnostic.php"
+VISUAL_DIAGNOSTIC = THEME / "diagnostic" / "assets" / "visual-repair-qualification.js"
 
 HISTORICAL_BLOB_SHA = "3fac5772cbe356965d98de64950ef0fbec8d7f21"
 HISTORICAL_GPFUP_RUNTIME_VERSION = "0.1.14"
+CURRENT_THEME_VERSION = "0.1.16"
+CURRENT_DIAGNOSTIC_VERSION = "0.3.6"
 
 
 def git_blob_sha(path: Path) -> str:
@@ -77,6 +81,8 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         cls.src_readme = SRC_README.read_text(encoding="utf-8")
         cls.theme_php = THEME_PHP.read_text(encoding="utf-8")
         cls.css = CSS.read_text(encoding="utf-8")
+        cls.diagnostic_php = DIAGNOSTIC_PHP.read_text(encoding="utf-8")
+        cls.visual_diagnostic = VISUAL_DIAGNOSTIC.read_text(encoding="utf-8")
         cls.current_version = theme_version(cls.theme_php)
         cls.provenance_surfaces = {
             "implementation_map": cls.implementation_map,
@@ -87,7 +93,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
 
     def test_historical_drive_backed_v101_mirror_remains_byte_exact(self) -> None:
         self.assertEqual(HISTORICAL_BLOB_SHA, git_blob_sha(HISTORICAL))
-        self.assertIn("upstream_revision_id: \"3\"", self.authority)
+        self.assertIn('upstream_revision_id: "3"', self.authority)
         self.assertIn("032750fc4ae763b45b2fb136fc56b4543f38b9638617563d4082993a0cf54f58", self.authority)
         self.assertIn("exact historical predecessor", self.authority)
 
@@ -144,8 +150,11 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
             self.assertIn(value, self.current)
 
     def test_current_implementation_version_is_synchronized_across_authority_surfaces(self) -> None:
-        self.assertEqual("0.1.15", self.current_version)
+        self.assertEqual(CURRENT_THEME_VERSION, self.current_version)
         self.assertEqual([], current_gpfup_provenance_errors(self.provenance_surfaces, self.current_version))
+        self.assertIn(f"Version: {CURRENT_DIAGNOSTIC_VERSION}", self.diagnostic_php)
+        self.assertIn(f"const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '{CURRENT_DIAGNOSTIC_VERSION}';", self.diagnostic_php)
+        self.assertIn(f"var VERSION = '{CURRENT_DIAGNOSTIC_VERSION}';", self.visual_diagnostic)
 
     def test_pre_repair_stale_0_1_14_current_attribution_is_rejected(self) -> None:
         stale = dict(self.provenance_surfaces)
@@ -165,31 +174,34 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertTrue(errors, "pre-repair 0.1.14 current attribution must fail provenance validation")
         self.assertTrue(any("stale current-implementation attribution" in error for error in errors))
 
-    def test_0_1_14_is_historical_and_0_1_15_runtime_qualification_stays_open(self) -> None:
+    def test_historical_upload_evidence_and_current_runtime_qualification_stay_distinct(self) -> None:
         for text in (self.implementation_map, self.current, self.authority):
             self.assertIn("Owner runtime of theme `0.1.14`", text)
             self.assertIn("historical evidence", text)
             self.assertIn("glyphs rendered", text)
             self.assertIn("visually detached", text)
             self.assertIn("0.1.15", text)
+            self.assertIn("0.1.16", text)
             self.assertIn(".gpfup--has-files", text)
-            self.assertIn("narrow/mobile", text)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.current)
         self.assertIn("NOT_PROVEN", self.authority)
-        self.assertIn("post-upload/crop", self.implementation_map)
-        self.assertIn("post-upload/crop", self.current)
-        self.assertIn("post-upload/crop", self.authority)
+        self.assertIn("post-upload/crop", self.implementation_map.lower())
+        self.assertIn("post-upload/crop", self.current.lower())
+        self.assertIn("post-upload/crop", self.authority.lower())
 
-    def test_implementation_docs_track_repaired_destination_and_unresolved_boundaries(self) -> None:
+    def test_implementation_docs_track_mobile_polish_and_unresolved_host_width(self) -> None:
         self.assertIn("Production breakpoint | `960 CSS px`", self.implementation_map)
         self.assertIn("HOST_OWNED / OWNER_CONFIGURABLE", self.implementation_map)
         self.assertIn("All Radio choices", self.implementation_map)
         self.assertIn("gpfup--images-only", self.implementation_map)
         self.assertIn("student-photo-upload.svg", self.implementation_map)
-        self.assertIn("Diagnostic package v0.3.5", self.implementation_map)
+        self.assertIn("Diagnostic package v0.3.6", self.implementation_map)
+        self.assertIn("devicePixelRatio", self.implementation_map)
+        self.assertIn("HOST_INTEGRATION_REQUIRED", self.implementation_map)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
-        self.assertIn("0.1.15", self.src_readme)
+        self.assertIn(CURRENT_THEME_VERSION, self.src_readme)
+        self.assertIn(CURRENT_DIAGNOSTIC_VERSION, self.src_readme)
         self.assertIn("student-photo-upload.svg", self.src_readme)
         self.assertIn("960px", self.src_readme)
         self.assertIn("above-input", self.src_readme)
@@ -197,6 +209,8 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
 
     def test_current_authorized_visual_destination_is_present_without_broad_page_takeover(self) -> None:
         self.assertIn("@media (min-width: 960px)", self.css)
+        self.assertEqual(1, self.css.count("@media (min-width: 960px)"))
+        self.assertNotRegex(self.css, r"@media[^\{]*(?:320|360|390|393|412|430)px")
         self.assertIn("--gf-form-gap-y: 24px", self.css)
         self.assertIn("--gf-ctrl-line-height: 1.5", self.css)
         self.assertIn("--gf-ctrl-select-padding-x: 24px 32px", self.css)
@@ -206,10 +220,12 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertIn("padding-inline: 32px", self.css)
         self.assertIn("box-shadow: none", self.css)
         self.assertIn(".gfield.gfield--type-radio", self.css)
+        self.assertIn("flex: 1 1 9.5rem", self.css)
         self.assertNotIn(".gfield.srwf-role-binary-choice .gfield_radio", self.css)
         self.assertIn("background: #EDF1FC", self.css)
         self.assertIn('background-image: url("icons/student-photo-upload.svg")', self.css)
         self.assertNotIn("#F6F8FB", self.css, "page background must remain host-integration-owned until a safe seam is proven")
+        self.assertNotRegex(self.css, r"(?m)^\s*(?:html|body)\s*\{")
         self.assertNotIn("!important", self.css)
 
 

@@ -5,16 +5,36 @@
         return;
     }
 
-    var legacyQualificationCollector = root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034;
+    var legacyQualificationCollector = typeof root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034 === 'function'
+        ? root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034
+        : null;
     var VERSION_MAP = Object.freeze({
-        package: '0.3.5',
+        package: '0.3.6',
         structuralCollector: '0.3.0',
         admission: '0.3.2',
         v1QualificationCore: '0.3.4',
         radioCardGeometry: '0.3.5',
-        visualRepairQualification: '0.3.5',
-        finalQualificationComposer: '0.3.5'
+        visualRepairQualification: '0.3.6',
+        finalQualificationComposer: '0.3.6'
     });
+
+    function parkDiagnosticControls() {
+        if (typeof root.document.getElementById !== 'function') {
+            return;
+        }
+        ['gtb-srwf-download-report', 'gtb-srwf-download-admission-report'].forEach(function (id) {
+            var button = root.document.getElementById(id);
+            if (!button || !button.style) {
+                return;
+            }
+            button.style.position = 'static';
+            button.style.left = 'auto';
+            button.style.bottom = 'auto';
+            button.style.zIndex = 'auto';
+            button.style.display = 'inline-block';
+            button.style.margin = '12px';
+        });
+    }
 
     function appendFailure(report, collector) {
         if (!report || typeof report !== 'object') {
@@ -44,6 +64,7 @@
 
         root.GTB_SRWF_RADIO_CARD_GEOMETRY_V035 = null;
         root.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V035 = null;
+        root.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V036 = null;
 
         try {
             if (typeof root.GTB_SRWF_COLLECT_RADIO_CARD_GEOMETRY_V035 !== 'function') {
@@ -61,16 +82,18 @@
         }
 
         try {
-            if (typeof root.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V035 !== 'function') {
+            var visualCollector = root.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V036 || root.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V035;
+            if (typeof visualCollector !== 'function') {
                 throw new Error('visual repair collector unavailable');
             }
-            visual = root.GTB_SRWF_COLLECT_VISUAL_REPAIR_QUALIFICATION_V035();
+            visual = visualCollector();
             if (!visual || typeof visual !== 'object' || Array.isArray(visual)) {
                 throw new Error('visual repair collector returned invalid payload');
             }
         } catch (error) {
             visual = null;
             root.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V035 = null;
+            root.GTB_SRWF_VISUAL_REPAIR_QUALIFICATION_V036 = null;
             failures.push({ collector: 'visualRepairQualification', state: 'COLLECTOR_FAILED' });
             appendFailure(report, 'visualRepairQualification');
         }
@@ -100,6 +123,7 @@
 
         root.GTB_SRWF_V1_QUALIFICATION_V034 = qualification;
         root.GTB_SRWF_V1_QUALIFICATION_V035 = qualification;
+        root.GTB_SRWF_V1_QUALIFICATION_V036 = qualification;
 
         if (report && typeof report === 'object') {
             report.packageVersion = VERSION_MAP.package;
@@ -113,13 +137,54 @@
         return qualification;
     }
 
+    function installComposerCollectors() {
+        root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034 = collectComposedQualification;
+        root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V035 = collectComposedQualification;
+        root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V036 = collectComposedQualification;
+    }
+
+    function captureLateLegacyCollector() {
+        var collector = root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034;
+        if (typeof collector === 'function' && collector !== collectComposedQualification) {
+            legacyQualificationCollector = collector;
+        }
+    }
+
+    function settleComposerAfterDomReady() {
+        captureLateLegacyCollector();
+        installComposerCollectors();
+        parkDiagnosticControls();
+        try {
+            collectComposedQualification();
+        } catch (error) {
+            root.GTB_SRWF_V1_QUALIFICATION_V035 = null;
+            root.GTB_SRWF_V1_QUALIFICATION_V036 = null;
+        }
+    }
+
+    function installDiagnosticControlParkingLifecycle() {
+        parkDiagnosticControls();
+        if (root.document.readyState !== 'loading' || typeof root.document.addEventListener !== 'function') {
+            return;
+        }
+        root.document.addEventListener('DOMContentLoaded', function () {
+            if (typeof root.setTimeout === 'function') {
+                root.setTimeout(settleComposerAfterDomReady, 0);
+                return;
+            }
+            settleComposerAfterDomReady();
+        }, { once: true });
+    }
+
+    installDiagnosticControlParkingLifecycle();
     root.GTB_SRWF_DIAGNOSTIC_VERSION_MAP_V035 = VERSION_MAP;
-    root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V034 = collectComposedQualification;
-    root.GTB_SRWF_COLLECT_V1_QUALIFICATION_V035 = collectComposedQualification;
+    root.GTB_SRWF_DIAGNOSTIC_VERSION_MAP_V036 = VERSION_MAP;
+    installComposerCollectors();
 
     try {
         collectComposedQualification();
     } catch (error) {
         root.GTB_SRWF_V1_QUALIFICATION_V035 = null;
+        root.GTB_SRWF_V1_QUALIFICATION_V036 = null;
     }
 }(typeof window !== 'undefined' ? window : this));

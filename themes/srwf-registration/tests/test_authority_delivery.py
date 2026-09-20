@@ -238,8 +238,8 @@ class SrwfAuthorityAndDeliveryTests(unittest.TestCase):
         for dependency in EXPECTED_LOCAL_URLS:
             self.assertIn(Path(dependency).name, self.src_readme)
         self.assertIn("GP File Upload Pro — initial state only", self.src_readme)
-        self.assertIn("shared SRWF upload-family CSS stops at `.gpfup--has-files`", self.src_readme)
-        self.assertIn("Report Card specialization is explicit", self.src_readme)
+        self.assertIn("all GPFUP presentation rules remain limited to `:not(.gpfup--has-files)`", self.src_readme)
+        self.assertIn("Report Card specialization remains explicit", self.src_readme)
         self.assertIn("gpfup--images-only", self.src_readme)
         self.assertIn("Student Photo post-upload/crop/re-crop/delete structure", self.src_readme)
         self.assertIn("OWNER_RUNTIME_REQUIRED / NOT_PROVEN", self.src_readme)

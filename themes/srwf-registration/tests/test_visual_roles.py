@@ -83,6 +83,7 @@ class SrwfVisualRoleTests(unittest.TestCase):
         label_block = next(body for selector, body in blocks(self.css) if selector.endswith(f"{RADIO_SCOPE} .gchoice label"))
         self.assertIn("inline-size: 100%;", label_block)
         self.assertIn("min-block-size: 52px;", label_block)
+        self.assertNotRegex(label_block, r"(?m)^\s*(?:block-size|height):")
         self.assertIn("border: 1px solid #8690A1;", label_block)
         self.assertIn("border-radius: 10px;", label_block)
         self.assertIn("overflow-wrap: anywhere;", label_block)
@@ -110,13 +111,17 @@ class SrwfVisualRoleTests(unittest.TestCase):
     def test_radio_layout_is_content_driven_wrap_safe_and_not_binary_count_specific(self) -> None:
         row = next(body for selector, body in blocks(self.css) if selector.endswith(f"{RADIO_SCOPE} .gfield_radio"))
         choice = next(body for selector, body in blocks(self.css) if selector.endswith(f"{RADIO_SCOPE} .gchoice"))
+        label = next(body for selector, body in blocks(self.css) if selector.endswith(f"{RADIO_SCOPE} .gchoice label"))
         self.assertIn("display: flex;", row)
         self.assertIn("flex-flow: row wrap;", row)
         self.assertIn("gap: 12px;", row)
-        self.assertIn("flex: 1 1 8rem;", choice)
+        self.assertIn("display: flex;", choice)
+        self.assertIn("flex: 1 1 9.5rem;", choice)
         self.assertIn("min-inline-size: 0;", choice)
+        self.assertIn("flex: 1 1 auto;", label)
         self.assertNotIn("grid-template-columns", self.css)
         self.assertEqual(1, self.css.count("@media (min-width: 960px)"))
+        self.assertNotRegex(self.css, r"@media[^\{]*(?:320|360|390|393|412|430)px")
 
     def test_presentation_identity_avoids_ids_labels_option_text_and_dom_position(self) -> None:
         for label in ("جنسیت", "وضعیت فارغ‌التحصیلی", "بارگذاری کارنامه", "هویت دانش‌آموز"):
@@ -170,6 +175,7 @@ class SrwfVisualRoleTests(unittest.TestCase):
         self.assertIn("border-radius: 12px;", shared)
         self.assertIn("min-inline-size: 0;", shared)
         self.assertIn("flex-wrap: wrap;", shared)
+        self.assertIn("row-gap: 12px;", shared)
 
         icon_selector, icon_slot = next(
             (selector, body)
@@ -231,10 +237,20 @@ class SrwfVisualRoleTests(unittest.TestCase):
             for selector, body in blocks(self.css)
             if selector.endswith(".gfield--type-fileupload .gpfup:not(.gpfup--has-files) .gpfup__droparea")
         )
+        child = next(
+            body
+            for selector, body in blocks(self.css)
+            if f".gfield.{REPORT_ROLE} .gpfup:not(.gpfup--has-files) .gpfup__droparea > div" in selector
+            and ".gpfup.gpfup--images-only:not(.gpfup--has-files) .gpfup__droparea > div" in selector
+        )
         self.assertIn("box-sizing: border-box;", shared)
         self.assertIn("display: flex;", shared)
         self.assertIn("min-inline-size: 0;", shared)
         self.assertNotIn("inline-size: 840px", shared)
+        self.assertIn("flex: 0 1 13rem;", child)
+        self.assertIn("max-inline-size: 100%;", child)
+        self.assertNotIn("calc(100% - 52px)", child)
+        self.assertNotRegex(shared, r"(?m)^\s*(?:block-size|height):")
 
     def test_no_production_javascript_or_behavior_takeover_added(self) -> None:
         self.assertEqual([], list((THEME / "src").glob("**/*.js")))

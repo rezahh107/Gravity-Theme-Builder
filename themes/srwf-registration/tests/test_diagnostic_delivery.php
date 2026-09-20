@@ -21,11 +21,11 @@ function srwf_registration_theme_get_admission_decision( $form ) { global $produ
 function check( $condition, $message ) { if ( ! $condition ) { fwrite( STDERR, "FAIL: $message\n" ); exit( 1 ); } }
 require __DIR__ . '/../diagnostic/srwf-runtime-diagnostic.php';
 
-check( GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION === '0.3.5', 'unexpected diagnostic package version' );
+check( GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION === '0.3.6', 'unexpected diagnostic package version' );
 check( GTB_SRWF_RUNTIME_DIAGNOSTIC_COLLECTOR_VERSION === '0.3.0', 'existing structural collector version changed' );
 check( GTB_SRWF_RUNTIME_DIAGNOSTIC_ADMISSION_VERSION === '0.3.2', 'existing admission collector version changed' );
 check( GTB_SRWF_RUNTIME_DIAGNOSTIC_QUALIFICATION_VERSION === '0.3.4', 'existing qualification core version changed' );
-check( GTB_SRWF_RUNTIME_DIAGNOSTIC_VISUAL_REPAIR_VERSION === '0.3.5', 'visual repair diagnostic version missing' );
+check( GTB_SRWF_RUNTIME_DIAGNOSTIC_VISUAL_REPAIR_VERSION === '0.3.6', 'visual repair diagnostic version missing' );
 
 $form = array(
     'id' => 11,
@@ -56,7 +56,7 @@ check( $scripts[0]['ver'] === '0.3.0' && $scripts[0]['footer'] === true, 'wrong 
 check( $scripts[1]['handle'] === 'gtb-srwf-radio-card-geometry-v035', 'wrong radio geometry diagnostic handle' );
 check( $scripts[1]['src'] === 'https://example.test/plugins/diag/assets/binary-choice-geometry.js', 'radio geometry diagnostic asset path changed' );
 check( $scripts[1]['deps'] === array( 'gtb-srwf-runtime-diagnostic-v03' ), 'radio geometry collector must load after structural diagnostic' );
-check( $scripts[1]['ver'] === '0.3.5' && $scripts[1]['footer'] === true, 'wrong radio geometry collector metadata' );
+check( $scripts[1]['ver'] === '0.3.6' && $scripts[1]['footer'] === true, 'wrong radio geometry cache-bust metadata' );
 check( $scripts[2]['handle'] === 'gtb-srwf-admission-diagnostic-v032', 'wrong admission diagnostic handle' );
 check( $scripts[2]['ver'] === '0.3.2' && $scripts[2]['footer'] === true, 'wrong admission diagnostic metadata' );
 check( $scripts[3]['handle'] === 'gtb-srwf-v1-qualification-v034', 'v1 qualification core missing' );
@@ -66,11 +66,11 @@ check( $scripts[3]['ver'] === '0.3.4' && $scripts[3]['footer'] === true, 'wrong 
 check( $scripts[4]['handle'] === 'gtb-srwf-visual-repair-qualification-v035', 'visual repair collector missing' );
 check( $scripts[4]['src'] === 'https://example.test/plugins/diag/assets/visual-repair-qualification.js', 'visual repair asset path changed' );
 check( $scripts[4]['deps'] === array( 'gtb-srwf-runtime-diagnostic-v03', 'gtb-srwf-radio-card-geometry-v035', 'gtb-srwf-v1-qualification-v034' ), 'visual repair collector ordering changed' );
-check( $scripts[4]['ver'] === '0.3.5' && $scripts[4]['footer'] === true, 'wrong visual repair metadata' );
+check( $scripts[4]['ver'] === '0.3.6' && $scripts[4]['footer'] === true, 'wrong visual repair metadata' );
 check( $scripts[5]['handle'] === 'gtb-srwf-version-provenance-v035', 'final qualification composer missing' );
 check( $scripts[5]['src'] === 'https://example.test/plugins/diag/assets/version-provenance.js', 'qualification composer asset path changed' );
 check( $scripts[5]['deps'] === array( 'gtb-srwf-runtime-diagnostic-v03', 'gtb-srwf-radio-card-geometry-v035', 'gtb-srwf-v1-qualification-v034', 'gtb-srwf-visual-repair-qualification-v035' ), 'qualification composer must load after all component collectors' );
-check( $scripts[5]['ver'] === '0.3.5' && $scripts[5]['footer'] === true, 'wrong qualification composer metadata' );
+check( $scripts[5]['ver'] === '0.3.6' && $scripts[5]['footer'] === true, 'wrong qualification composer metadata' );
 
 check( count( $inline_scripts ) === 2, 'normal target missing bounded inline diagnostic payloads' );
 check( $inline_scripts[0]['handle'] === 'gtb-srwf-admission-diagnostic-v032' && $inline_scripts[0]['position'] === 'before', 'admission payload attached to wrong script' );
@@ -112,4 +112,4 @@ check( strpos( $inline_scripts[0]['data'], '"exclusionReason":"gravity_flow_entr
 check( strpos( $inline_scripts[1]['data'], 'GTB_SRWF_RUNTIME_FORM_LAYOUT_READINESS_BY_FORM_ID["11"]' ) !== false, 'context-excluded target readiness lost per-form binding' );
 
 check( array_filter( $hooks, fn( $h ) => $h[0] === 'gform_enqueue_scripts' && $h[1] === 'gtb_srwf_runtime_diagnostic_enqueue' && $h[2] === 30 && $h[3] === 2 ) !== array(), 'diagnostic delivery hook missing' );
-echo "PASS: diagnostic v0.3.5 composition, provenance, and per-target bounded delivery contract\n";
+echo "PASS: diagnostic v0.3.6 composition, width-evidence provenance, and per-target bounded delivery contract\n";

@@ -6,13 +6,13 @@ The repository is intentionally **design-authority driven**: an approved visual 
 
 ## Status
 
-**First reference implementation active / SRWF visual repair statically implemented / Owner runtime qualification still open.**
+**First reference implementation active / SRWF mobile responsive polish statically implemented / Owner runtime qualification still open.**
 
 The first reference implementation is:
 
 - `SRWF Registration` — a real-world RTL/Persian public registration form theme.
 
-SRWF is the first proving ground for the system, not a special case that defines every future theme. The current theme implementation is `0.1.15`; automated/static qualification is green on the merged implementation, but that does not by itself establish production-browser qualification.
+SRWF is the first proving ground for the system, not a special case that defines every future theme. The current theme implementation is `0.1.16`; diagnostic `0.3.6` adds the mobile width-chain evidence needed for the next Owner qualification pass. Automated/static qualification is necessary evidence, but it does not by itself establish production-browser qualification.
 
 ## Current first implementation target
 
@@ -27,23 +27,23 @@ For the authoritative interpretation of this current target, read:
 3. `themes/srwf-registration/reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md`
 4. `themes/srwf-registration/AGENTS.md` before implementation or visual-analysis work
 
-The admitted `OWNER_REFERENCE_new_7.html` design is the implementation target itself. Do not redesign, reinterpret, modernize, simplify, embellish, or substitute it.
+The admitted `OWNER_REFERENCE_new_7.html` design is the historical composition/state/geometry reference where it has not been superseded by the current Owner reconciliation. Do not use it to roll back a newer explicit Owner decision.
 
 Gravity Forms Theme Framework and inspected runtime evidence determine **HOW** that approved design is implemented; they do not redefine **WHAT** the first deliverable should look like.
 
-Any summary of the repository's **current goals, first milestone, or first deliverable** should preserve this fact.
-
 ## Current implementation reality
 
-The merged SRWF work currently includes:
+The SRWF work currently includes:
 
 - native per-form GTB configuration/readiness;
 - Registration-versus-Gravity-Flow-Entry-Detail presentation isolation;
 - the Owner-authorized responsive shell, typography, spacing, focus, Submit, section-icon, and all-Radio card presentation;
 - the repaired native Select / GP Advanced Select presentation family;
-- the shared initial GPFUP icon/content-cluster presentation for Report Card and image-only Student Photo in theme `0.1.15`.
+- the shared initial GPFUP icon/content-cluster presentation for Report Card and image-only Student Photo;
+- theme `0.1.16` intrinsic Radio and initial-GPFUP narrow-width reflow, without device-specific mobile breakpoints or post-upload behavior takeover;
+- diagnostic `0.3.6` evidence for viewport/DPR, host/GF/GTB width chain, and representative control widths.
 
-Remaining work is evidence-driven runtime qualification on the exact current package, including responsive/accessibility states and authentic dynamic add-on states. Page-background ownership still requires an authentic host seam; Student Photo post-upload/crop composition and PersianGravity presentation remain runtime-dependent and must not be guessed.
+Remaining work is evidence-driven runtime qualification on the exact current packages, including the `320/360/390/393/412/430 CSS px` mobile matrix, responsive/accessibility states, and authentic dynamic add-on states. The Owner-observed narrow whole-form column has **not** been worked around with global page/container CSS: the exact constraining host ancestor must first be identified by diagnostic evidence. Page-background ownership still requires an authentic host seam; Student Photo post-upload/crop composition and PersianGravity presentation remain runtime-dependent and must not be guessed.
 
 ## Core approach
 

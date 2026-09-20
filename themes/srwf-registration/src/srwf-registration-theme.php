@@ -2,14 +2,14 @@
 /**
  * Plugin Name: SRWF Registration Gravity Forms Theme
  * Description: Theme-local SRWF Registration presentation for opt-in Gravity Forms.
- * Version: 0.1.15
+ * Version: 0.1.16
  * Text Domain: gravity-theme-builder
  */
 
 defined( 'ABSPATH' ) || exit;
 
 const SRWF_REGISTRATION_THEME_CLASS = 'srwf-registration-theme';
-const SRWF_REGISTRATION_THEME_VERSION = '0.1.15';
+const SRWF_REGISTRATION_THEME_VERSION = '0.1.16';
 const SRWF_REGISTRATION_GRAVITY_FORMS_ORBITAL_STYLE_HANDLE = 'gravity_forms_orbital_theme';
 const SRWF_REGISTRATION_CONTEXT_REGISTRATION = 'registration';
 const SRWF_REGISTRATION_CONTEXT_GRAVITY_FLOW_ENTRY_DETAIL = 'gravity_flow_entry_detail';
