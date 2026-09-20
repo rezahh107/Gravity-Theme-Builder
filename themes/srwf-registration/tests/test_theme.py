@@ -171,7 +171,7 @@ def selector_specificity(selector: str) -> tuple[int, int, int]:
     index = 0
     while index < len(selector):
         char = selector[index]
-        if char.isspace() or char in ">+~,,":
+        if char.isspace() or char in ">+~,":
             index += 1
             continue
         if char == "#":
