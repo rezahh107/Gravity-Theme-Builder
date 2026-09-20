@@ -1,6 +1,6 @@
 ## SRWF Registration production candidate
 
-Current production package line: **0.1.18**.
+Current production package line: **0.1.19**.
 
 The SRWF Registration implementation is theme-local under `src/`. It is **not production-qualified** until the bounded Owner WordPress/browser checks are completed.
 
@@ -63,29 +63,40 @@ PR #12 established an earlier timing assumption that later Owner runtime evidenc
 
 This timing remains `SOURCE_PROVEN`; fresh browser behavior remains `OWNER_RUNTIME_REQUIRED`. The retained source-qualification identities are `16666115e37a7704b8331973eba0a0499e039d3fdfc6b47ed8a8e95a41779a79`, `ac0573b75831380417a21a455176e25eb746d718bbbd0bb70d6da6f48cba5404`, and `542f56ae0747f3661d1474996527298027db3fb8ed3e6469a6391aaabf61069b`.
 
-### Authorized responsive presentation
+### Authority chain and Desktop Full Width shell in 0.1.19
 
-Theme `0.1.18` preserves the admitted destination:
+`OWNER:SRWF-2026-09-19` remains the base current Owner reconciliation for unaffected decisions.
 
-- mobile-first fluid SRWF wrapper with canonical `16px` inline padding;
-- desktop threshold at **960px**;
-- desktop border-box card with `904px` outer max width, `32px` inline padding (`840 + 32 + 32`), white surface, `16px` radius, and no visual-depth shadow;
-- no unauthorized `32px` desktop block padding;
-- all authentic Radio fields use the common card family and intrinsic `.gchoice { flex: 1 1 9.5rem; }` wrapping;
-- no device-specific media query for `320`, `360`, `390`, `393`, `412`, or `430`;
-- native/enhanced Select behavior and existing GP Advanced Select / Tom Select presentation remain unchanged;
-- shared initial GPFUP family remains limited to `:not(.gpfup--has-files)`, with its existing `13rem` intrinsic content basis, `student-photo-upload.svg` photo glyph, and existing Report Card glyph;
-- Submit remains full available form width under the existing bounded rule.
+The Desktop Full Width shell is separately admitted under:
 
-The preferred surrounding `#F6F8FB` page canvas remains host-owned unless a separately authenticated page-level GTB ownership seam exists. Theme `0.1.18` does **not** add GeneratePress selectors, `.site-content`/page-container overrides, page IDs, negative margins, or viewport breakout logic.
+```text
+authority_handle: OWNER:SRWF-2026-09-20-DESKTOP-SHELL
+path: ../reference/SRWF_DESKTOP_SHELL_OWNER_DECISION_2026-09-20.md
+status: CURRENT_OWNER_SCOPE_AUTHORITY / DESKTOP_SHELL_APPROVED / RUNTIME_QUALIFICATION_REQUIRED
+```
 
-### Authority/provenance repair in 0.1.18
+The handle is registered in `../reference/VISUAL_AUTHORITY.md`. It is direct Owner-supplied current project authority, not implementation prose and not a fabricated immutable Drive artifact. It supersedes `OWNER:SRWF-2026-09-19` only where the two conflict inside the bounded desktop-shell scope.
 
-PR #28 starting Head `88dd1ae253edcd4bb7b09a76994b8915c57c5bc7` contained an unsupported later desktop-shell authority supersession: prose inserted into the current `OWNER:SRWF-2026-09-19` reconciliation asserted a direct `2026-09-20` Owner shell decision, then CSS/tests consumed the inserted values.
+Theme `0.1.19` consumes that admitted destination at the existing **960px** desktop threshold:
 
-Theme `0.1.18` retains its package version while repairing that authority boundary. No independently registered/admitted later Owner source was found. The current admitted authority therefore remains `OWNER:SRWF-2026-09-19`, and production CSS restores the no-depth desktop shell. Deterministic qualification now rejects a later-dated direct Owner supersession unless the claim explicitly resolves to a separately registered/admitted Owner authority handle.
+- mobile-first fluid wrapper remains `16px` inline padding below the threshold;
+- desktop outer max remains `904px`;
+- desktop inline padding remains `32px` per side, preserving the authentic `840px` content target (`904 - 32 - 32`);
+- desktop block padding is `32px`;
+- primary surface remains `#FFFFFF` with `16px` radius;
+- boundary is a non-layout `1px #E4E7EC` ring, so it does not consume content width;
+- restrained depth is `0 1px 2px rgba(16,24,40,0.04)` plus `0 12px 32px rgba(16,24,40,0.06)`;
+- no literal layout-consuming border or `overflow:hidden` is introduced;
+- one dominant form surface remains; Section Breaks are not turned into independent cards;
+- no device-specific media query is added for `320`, `360`, `390`, `393`, `412`, or `430`.
 
-This provenance guard is not a new visual authority source; it prevents implementation prose from creating one.
+The preferred surrounding `#F6F8FB` page canvas remains host-owned because GTB still has no separately authenticated page-level seam that would justify taking over `html`, `body`, generic site containers, page IDs, or GeneratePress internals. GeneratePress Full Width remains a proven host configuration example, not a GTB dependency.
+
+### Historical authority/provenance repair in 0.1.18
+
+Theme `0.1.18` remains the PR #28 authority/provenance repair. It removed an unsupported self-authored later desktop-shell supersession, restored the then-admitted no-depth shell, and added the deterministic provenance guard.
+
+That guard remains active in `0.1.19`: a later-dated direct Owner supersession is accepted only when it resolves to a separately registered/admitted Owner authority handle. The new desktop-shell decision passes because `OWNER:SRWF-2026-09-20-DESKTOP-SHELL` is now separately recorded and registered; unknown handles and fabricated implementation prose still fail qualification.
 
 ### Host full-width prerequisite
 
@@ -122,19 +133,20 @@ This is not a `+12px` width compensation. The explicit `12px` group gap remains 
 - Student Photo post-upload/crop/re-crop/delete structure remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN**.
 - Upload/progress/validation/preview/delete/crop/storage remain GPFUP-owned.
 - GP Advanced Select / Tom Select retains its existing visual adapter only; open/close/search/value behavior remains add-on-owned.
+- Submit remains full available content width with the current `56px` minimum and action styling.
 
 ### Diagnostic / Owner requalification
 
 Diagnostic package **0.3.6** remains current. No diagnostic bump is needed because diagnostic source/schema is unchanged.
 
-Static tests and exact-head CI can prove scoping, source contracts, package closure, visual-reference identity, version coherence, authority provenance, restored shell declarations, and absence of host-layout takeover. They do **not** prove real browser rendering.
+Static tests and exact-head CI can prove scoping, source contracts, package closure, visual-reference identity, version coherence, authority provenance, shell declarations, and absence of host-layout takeover. They do **not** prove real browser rendering.
 
 The required Owner runtime pass remains desktop `960`, `1024`, approximately `1366/1440`, and a wide desktop where practical, plus responsive `320 / 360 / 390 / 393 / 412 / 430 CSS px`. Also recheck authentic keyboard focus, invalid submission, GPAS open state, GPFUP post-upload state where available, and conditional reveal.
 
-Until that exact package is exercised in the Owner browser, `OWNER_RUNTIME_REQUALIFICATION: NOT_PROVEN`.
+Until exact theme `0.1.19` + diagnostic `0.3.6` are exercised in the Owner browser, `OWNER_RUNTIME_REQUALIFICATION: NOT_PROVEN`.
 
 Student Photo post-upload/crop/re-crop/delete composition remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN** and GPFUP-owned. PersianGravity/Jalali presentation remains runtime-dependent until an authentic consumer is captured.
 
 ### Reuse boundary
 
-The authority/provenance repair and retained Radio repair remain theme-local. The host full-width prerequisite does not create a GeneratePress adapter or page-layout subsystem inside GTB.
+The scoped desktop-shell implementation, provenance guard, and retained Radio repair remain theme-local. The host full-width prerequisite does not create a GeneratePress adapter or page-layout subsystem inside GTB.

@@ -8,6 +8,8 @@ THEME = Path(__file__).resolve().parents[1]
 CSS = (THEME / "src" / "srwf-registration.css").read_text(encoding="utf-8")
 PHP = (THEME / "src" / "srwf-registration-theme.php").read_text(encoding="utf-8")
 DIAGNOSTIC = (THEME / "diagnostic" / "srwf-runtime-diagnostic.php").read_text(encoding="utf-8")
+AUTHORITY = (THEME / "reference" / "VISUAL_AUTHORITY.md").read_text(encoding="utf-8")
+SHELL_AUTHORITY = (THEME / "reference" / "SRWF_DESKTOP_SHELL_OWNER_DECISION_2026-09-20.md").read_text(encoding="utf-8")
 
 
 def strip_comments(css: str) -> str:
@@ -21,8 +23,18 @@ def block(pattern: str, css: str = CSS) -> str:
     return match.group(1)
 
 
-class DesktopShellAuthorityRestoreTests(unittest.TestCase):
-    def test_desktop_shell_restores_verified_904_840_no_depth_contract(self) -> None:
+class DesktopShellModernizationTests(unittest.TestCase):
+    def test_desktop_shell_authority_is_registered_before_implementation(self) -> None:
+        self.assertIn("authority_handle: OWNER:SRWF-2026-09-20-DESKTOP-SHELL", AUTHORITY)
+        self.assertIn(
+            "path: themes/srwf-registration/reference/SRWF_DESKTOP_SHELL_OWNER_DECISION_2026-09-20.md",
+            AUTHORITY,
+        )
+        self.assertIn("Authority handle: `OWNER:SRWF-2026-09-20-DESKTOP-SHELL`", SHELL_AUTHORITY)
+        self.assertIn("CURRENT_OWNER_SCOPE_AUTHORITY", SHELL_AUTHORITY)
+        self.assertIn("DESKTOP_SHELL_APPROVED", SHELL_AUTHORITY)
+
+    def test_desktop_shell_preserves_904_840_geometry_and_adds_approved_surface(self) -> None:
         root = block(r"\.gform-theme--framework\.srwf-registration-theme_wrapper\s*\{([^}]*)\}")
         self.assertIn("box-sizing: border-box;", root)
         self.assertIn("padding-inline: 16px;", root)
@@ -37,7 +49,7 @@ class DesktopShellAuthorityRestoreTests(unittest.TestCase):
         self.assertEqual(904, max_width)
         self.assertEqual(32, inline_padding)
         self.assertEqual(840, max_width - (2 * inline_padding))
-        self.assertNotIn("padding-block: 32px;", desktop)
+        self.assertIn("padding-block: 32px;", desktop)
         self.assertIn("background: #FFFFFF;", desktop)
         self.assertIn("border-radius: 16px;", desktop)
         self.assertNotRegex(desktop, r"(?m)^\s*border\s*:")
@@ -46,10 +58,10 @@ class DesktopShellAuthorityRestoreTests(unittest.TestCase):
         shadow_match = re.search(r"box-shadow:\s*([^;]+);", desktop, re.S)
         self.assertIsNotNone(shadow_match)
         shadow = " ".join(shadow_match.group(1).split())
-        self.assertIn(shadow, {"none", "0 0 0 1px #E4E7EC"})
-        self.assertNotIn("rgba(", shadow)
-        self.assertNotIn("0 1px 2px", shadow)
-        self.assertNotIn("0 12px 32px", shadow)
+        self.assertIn("0 0 0 1px #E4E7EC", shadow)
+        self.assertIn("0 1px 2px rgba(16, 24, 40, 0.04)", shadow)
+        self.assertIn("0 12px 32px rgba(16, 24, 40, 0.06)", shadow)
+        self.assertEqual(2, shadow.count("rgba("))
 
     def test_mobile_breakpoint_and_host_ownership_are_unchanged(self) -> None:
         clean = strip_comments(CSS)
@@ -89,9 +101,9 @@ class DesktopShellAuthorityRestoreTests(unittest.TestCase):
         self.assertIn("padding-inline: var(--gf-ctrl-select-padding-x);", CSS)
         self.assertRegex(CSS, r"(?s)\.gform-footer \.gform_button.*?inline-size:\s*100%;")
 
-    def test_theme_version_is_retained_without_diagnostic_bump(self) -> None:
-        self.assertIn("Version: 0.1.18", PHP)
-        self.assertIn("SRWF_REGISTRATION_THEME_VERSION = '0.1.18'", PHP)
+    def test_theme_version_advances_without_diagnostic_bump(self) -> None:
+        self.assertIn("Version: 0.1.19", PHP)
+        self.assertIn("SRWF_REGISTRATION_THEME_VERSION = '0.1.19'", PHP)
         self.assertIn("Version: 0.3.6", DIAGNOSTIC)
         self.assertIn("GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '0.3.6'", DIAGNOSTIC)
 

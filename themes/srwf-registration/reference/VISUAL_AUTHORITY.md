@@ -100,11 +100,11 @@ visual_authority_registry:
 
 The exact section-icon and report-card file-icon **geometry** is supplied by `VA:ARTIFACT`; Section 27 of `VA:VC-1.0.1` made those named artifact fragments implementation-driving.
 
-The unresolved values recorded inside v1.0.1 are preserved there as **historical decision state**. They are not current where the Owner reconciliation below explicitly supersedes them.
+The unresolved values recorded inside v1.0.1 are preserved there as **historical decision state**. They are not current where a registered current Owner authority below explicitly supersedes them.
 
-## 4. Current Owner-supplied reconciliation
+## 4. Registered current Owner authorities
 
-Current project authority for the resolved SRWF destination is:
+Current base project authority for the resolved SRWF destination is:
 
 ```text
 authority_handle: OWNER:SRWF-2026-09-19
@@ -114,15 +114,26 @@ provenance: direct Owner-supplied project authority for this execution
 immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR
 ```
 
-No Google Drive revision ID, timestamp, export hash, or immutable upstream blob has been invented for this newer authority input.
+The later scoped Desktop Full Width shell authority is separately registered as:
+
+```text
+authority_handle: OWNER:SRWF-2026-09-20-DESKTOP-SHELL
+path: themes/srwf-registration/reference/SRWF_DESKTOP_SHELL_OWNER_DECISION_2026-09-20.md
+status: CURRENT_OWNER_SCOPE_AUTHORITY / DESKTOP_SHELL_APPROVED / RUNTIME_QUALIFICATION_REQUIRED
+provenance: direct Owner-supplied current project authority recorded after review of the real Full Width desktop runtime baseline
+immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR
+scope: SRWF Registration Desktop Full Width shell/background/surface presentation only
+supersedes: OWNER:SRWF-2026-09-19 only where the two conflict inside that bounded desktop-shell scope
+```
+
+No Google Drive revision ID, timestamp, export hash, or immutable upstream blob has been invented for either direct current Owner authority input.
 
 Current implementation/package identity is intentionally not registered in this authority lock. The actual theme source owns version identity, while `IMPLEMENTATION_MAP.md` and `src/README.md` expose the mechanically checked current implementation/package status used for runtime qualification.
 
-`OWNER:SRWF-2026-09-19` supersedes contradictory or unresolved v1.0.1 states only where the reconciliation document explicitly says so. Unchanged v1.0.1 rules remain inherited. The current resolved decisions include:
+`OWNER:SRWF-2026-09-19` remains implementation-driving for unaffected decisions. Its resolved decisions include:
 
 - production desktop breakpoint `960 CSS px`;
 - desktop short-field pairings `HOST_OWNED / OWNER_CONFIGURABLE`, with no canonical pair list;
-- desktop card: `#F6F8FB` page where an authenticated ownership seam exists, `#FFFFFF` surface, `840px` content cap, `32px` inline card padding, `904px` outer max, `16px` radius, no shadow;
 - target family stack `Vazirmatn, Vazir, Tahoma, Arial, sans-serif` plus exact title/section/label/control/helper/error/action typography and line-height;
 - `24px` / `32px` field/section rhythm and the local label/helper/error/control gap chain;
 - exact `:focus-visible` outline geometry;
@@ -135,6 +146,17 @@ Current implementation/package identity is intentionally not registered in this 
 - the upload-icon alignment goal is presentation-only and must not alter Gravity Forms / GP File Upload Pro core, markup ownership, upload/crop lifecycle, or add-on behavior;
 - current accessibility acceptance requirements.
 
+`OWNER:SRWF-2026-09-20-DESKTOP-SHELL` supersedes the prior no-depth desktop-card state only within its registered scope. The current Desktop Full Width shell destination is:
+
+- desktop threshold remains `960 CSS px`;
+- `904px` outer max and `840px` authentic content target;
+- `32px` inline padding per side plus `32px` block padding;
+- `#FFFFFF` primary surface with `16px` radius;
+- non-layout `1px #E4E7EC` visible boundary;
+- restrained depth `0 1px 2px rgba(16,24,40,0.04)` plus `0 12px 32px rgba(16,24,40,0.06)`;
+- preferred surrounding desktop canvas `#F6F8FB`, remaining host-owned unless a truthful authenticated GTB page-level seam exists;
+- no generic page/GeneratePress takeover, no `overflow:hidden` clipping convenience, and no independent Section-card composition.
+
 Historical evidence: Owner runtime of theme `0.1.14` showed that both admitted initial icon glyphs rendered while the authentic direct content child remained visually detached from the icon.
 
 Historical evidence: Theme `0.1.15` was the prior static content-cluster repair baseline.
@@ -146,7 +168,9 @@ Historical evidence: Diagnostic package `0.3.6` added bounded Owner-runtime evid
 ## 5. WHAT vs HOW
 
 ```text
-VA:ARTIFACT + exact historical contract provenance + OWNER:SRWF-2026-09-19
+VA:ARTIFACT + exact historical contract provenance
++ OWNER:SRWF-2026-09-19
++ OWNER:SRWF-2026-09-20-DESKTOP-SHELL for its bounded desktop-shell scope
         → WHAT / current destination
 
 Canonical Gravity Forms engineering reference

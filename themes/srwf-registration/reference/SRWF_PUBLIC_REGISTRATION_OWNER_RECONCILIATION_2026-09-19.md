@@ -4,7 +4,7 @@ Status: **CURRENT_OWNER_PROJECT_AUTHORITY / RUNTIME_VALIDATION_REQUIRED**
 
 Authority handle: `OWNER:SRWF-2026-09-19`
 
-This document records the current Owner-supplied SRWF Registration destination for Gravity Theme Builder. It is the current project authority for the decisions enumerated here and supersedes contradictory or unresolved states in the exact historical `SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md` mirror.
+This document records the current Owner-supplied SRWF Registration destination for Gravity Theme Builder. It is the base current project authority for the decisions enumerated here and supersedes contradictory or unresolved states in the exact historical `SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md` mirror. A later separately registered scoped Owner authority may supersede this document only within its explicit scope.
 
 ## Provenance and preservation rule
 
@@ -62,7 +62,9 @@ GTB must style the authentic Gravity Forms layout. GTB does not define a canonic
 
 The `exact_production_breakpoint: NOT_PROVEN` state in v1.0.1 is superseded by the Owner-authorized `960 CSS px` destination. Runtime/browser acceptance at that threshold remains required.
 
-## Desktop card destination
+## Desktop card destination — base state and registered scoped supersession
+
+The original `OWNER:SRWF-2026-09-19` desktop-card state was:
 
 - page background: `#F6F8FB` where an authenticated GTB ownership seam exists;
 - card surface: `#FFFFFF`;
@@ -72,7 +74,11 @@ The `exact_production_breakpoint: NOT_PROVEN` state in v1.0.1 is superseded by t
 - outer radius: `16px`;
 - box shadow: `none`.
 
-The prior `desktop_shadow_exact_value: NOT_PROVEN` state is superseded. Page-shell ownership and actual cascade/consumer behavior remain runtime-sensitive implementation facts.
+Direct Owner decision 2026-09-20 under the separately registered authority handle `OWNER:SRWF-2026-09-20-DESKTOP-SHELL` supersedes only the conflicting desktop-shell values above. Its admitted source is `SRWF_DESKTOP_SHELL_OWNER_DECISION_2026-09-20.md` and the registration is in `VISUAL_AUTHORITY.md`.
+
+Within that bounded desktop-shell scope, the current destination preserves the `960px` threshold, `904px` outer / `840px` content geometry, `32px` inline padding, `#FFFFFF` surface, and `16px` radius, and adds `32px` block padding, a non-layout `1px #E4E7EC` boundary, and restrained depth equivalent to `0 1px 2px rgba(16,24,40,0.04)` plus `0 12px 32px rgba(16,24,40,0.06)`. The preferred surrounding `#F6F8FB` canvas remains host-owned unless an authenticated GTB page-level seam exists.
+
+The boundary must not reduce the authorized `840px` content geometry, and the shell must not add `overflow:hidden` merely to contain rounded corners. Page-shell ownership and actual cascade/consumer behavior remain runtime-sensitive implementation facts.
 
 ## Primary Submit
 

@@ -8,6 +8,7 @@ from pathlib import Path
 THEME = Path(__file__).resolve().parents[1]
 REFERENCE = THEME / "reference"
 CURRENT = REFERENCE / "SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md"
+DESKTOP_SHELL_AUTHORITY = REFERENCE / "SRWF_DESKTOP_SHELL_OWNER_DECISION_2026-09-20.md"
 HISTORICAL = REFERENCE / "SRWF_PUBLIC_REGISTRATION_VISUAL_UX_CONTRACT_v1.0.1.md"
 VISUAL_AUTHORITY = REFERENCE / "VISUAL_AUTHORITY.md"
 IMPLEMENTATION_MAP = THEME / "IMPLEMENTATION_MAP.md"
@@ -109,6 +110,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.current = CURRENT.read_text(encoding="utf-8")
+        cls.desktop_shell_authority = DESKTOP_SHELL_AUTHORITY.read_text(encoding="utf-8")
         cls.historical = HISTORICAL.read_text(encoding="utf-8")
         cls.authority = VISUAL_AUTHORITY.read_text(encoding="utf-8")
         cls.implementation_map = IMPLEMENTATION_MAP.read_text(encoding="utf-8")
@@ -139,8 +141,13 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertNotIn("upstream_export_sha256:", self.current)
         self.assertIn("immutable_upstream_drive_revision: NOT_AVAILABLE_TO_EXECUTOR", self.authority)
 
-    def test_current_owner_destination_includes_visual_repair_lock(self) -> None:
-        required = (
+        self.assertIn("OWNER:SRWF-2026-09-20-DESKTOP-SHELL", self.desktop_shell_authority)
+        self.assertIn("CURRENT_OWNER_SCOPE_AUTHORITY", self.desktop_shell_authority)
+        self.assertIn("direct Owner decision", self.desktop_shell_authority)
+        self.assertIn("not represented as an immutable historical Google Drive artifact", self.desktop_shell_authority)
+
+    def test_current_owner_destination_includes_visual_repair_lock_and_scoped_shell_supersession(self) -> None:
+        base_required = (
             "production desktop breakpoint: `960 CSS px`",
             "`desktop_short_field_pairings: HOST_OWNED / OWNER_CONFIGURABLE`",
             "resulting desktop outer max width: `904px`",
@@ -169,7 +176,16 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
             "every admitted initial upload surface has a visible decorative icon",
             "visible photo/camera icon",
         )
-        for value in required:
+        for value in base_required:
+            self.assertIn(value, self.current)
+
+        for value in (
+            "OWNER:SRWF-2026-09-20-DESKTOP-SHELL",
+            "`32px` block padding",
+            "non-layout `1px #E4E7EC` boundary",
+            "0 1px 2px rgba(16,24,40,0.04)",
+            "0 12px 32px rgba(16,24,40,0.06)",
+        ):
             self.assertIn(value, self.current)
 
     def test_current_authority_preserves_host_owned_boundaries(self) -> None:
@@ -182,6 +198,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
             "GTB owns appearance only",
         ):
             self.assertIn(value, self.current)
+        self.assertIn("Page/background ownership remains host-owned", self.desktop_shell_authority)
 
     def test_current_implementation_version_is_derived_and_synchronized_only_on_implementation_surfaces(self) -> None:
         self.assertEqual([], implementation_status_errors(self.theme_php, self.surfaces))
@@ -287,7 +304,12 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertIn("--gf-ctrl-btn-line-height: 1.5", self.css)
         self.assertIn("max-inline-size: 904px", self.css)
         self.assertIn("padding-inline: 32px", self.css)
-        self.assertIn("box-shadow: none", self.css)
+        self.assertIn("padding-block: 32px", self.css)
+        self.assertIn("0 0 0 1px #E4E7EC", self.css)
+        self.assertIn("0 1px 2px rgba(16, 24, 40, 0.04)", self.css)
+        self.assertIn("0 12px 32px rgba(16, 24, 40, 0.06)", self.css)
+        self.assertNotRegex(self.css, r"(?s)@media \(min-width: 960px\).*?\.srwf-registration-theme_wrapper\s*\{[^}]*\bborder\s*:")
+        self.assertNotIn("overflow: hidden", self.css)
         self.assertIn(".gfield.gfield--type-radio", self.css)
         self.assertIn("--gf-label-space-x-secondary: 0", self.css)
         self.assertIn("flex: 1 1 9.5rem", self.css)

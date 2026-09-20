@@ -8,7 +8,12 @@ from pathlib import Path
 THEME = Path(__file__).resolve().parents[1]
 REFERENCE = THEME / "reference"
 CURRENT = (REFERENCE / "SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md").read_text(encoding="utf-8")
+DESKTOP_SHELL = (REFERENCE / "SRWF_DESKTOP_SHELL_OWNER_DECISION_2026-09-20.md").read_text(encoding="utf-8")
 AUTHORITY = (REFERENCE / "VISUAL_AUTHORITY.md").read_text(encoding="utf-8")
+IMPLEMENTATION_MAP = (THEME / "IMPLEMENTATION_MAP.md").read_text(encoding="utf-8")
+
+BASE_HANDLE = "OWNER:SRWF-2026-09-19"
+DESKTOP_SHELL_HANDLE = "OWNER:SRWF-2026-09-20-DESKTOP-SHELL"
 
 AUTHORITY_HANDLE_RE = re.compile(
     r"authority_handle:\s*`?(OWNER:SRWF-(\d{4}-\d{2}-\d{2})[A-Z0-9:._-]*)`?",
@@ -65,29 +70,72 @@ def unregistered_later_owner_supersessions(reconciliation_text: str, authority_t
 
 
 class OwnerAuthorityProvenanceGateTests(unittest.TestCase):
-    def test_current_registered_owner_authority_passes(self) -> None:
+    def test_existing_registered_owner_authority_remains_valid(self) -> None:
         registered = registered_owner_authorities(AUTHORITY)
-        self.assertIn("OWNER:SRWF-2026-09-19", registered)
-        self.assertEqual(date(2026, 9, 19), registered["OWNER:SRWF-2026-09-19"])
+        self.assertIn(BASE_HANDLE, registered)
+        self.assertEqual(date(2026, 9, 19), registered[BASE_HANDLE])
         self.assertIn(
             "path: themes/srwf-registration/reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md",
             AUTHORITY,
         )
+
+    def test_desktop_shell_owner_authority_is_separately_registered_and_valid(self) -> None:
+        registered = registered_owner_authorities(AUTHORITY)
+        self.assertIn(DESKTOP_SHELL_HANDLE, registered)
+        self.assertEqual(date(2026, 9, 20), registered[DESKTOP_SHELL_HANDLE])
+        self.assertIn(f"Authority handle: `{DESKTOP_SHELL_HANDLE}`", DESKTOP_SHELL)
+        self.assertIn("CURRENT_OWNER_SCOPE_AUTHORITY", DESKTOP_SHELL)
+        self.assertIn("DESKTOP_SHELL_APPROVED", DESKTOP_SHELL)
+        self.assertIn("RUNTIME_QUALIFICATION_REQUIRED", DESKTOP_SHELL)
+        self.assertIn("direct Owner decision", DESKTOP_SHELL)
+        self.assertIn(
+            "path: themes/srwf-registration/reference/SRWF_DESKTOP_SHELL_OWNER_DECISION_2026-09-20.md",
+            AUTHORITY,
+        )
+
+    def test_registered_later_shell_supersession_passes_only_with_registered_handle(self) -> None:
+        self.assertIn(
+            f"Direct Owner decision 2026-09-20 under the separately registered authority handle `{DESKTOP_SHELL_HANDLE}`",
+            CURRENT,
+        )
         self.assertEqual([], unregistered_later_owner_supersessions(CURRENT, AUTHORITY))
 
-    def test_unregistered_later_direct_owner_supersession_is_rejected(self) -> None:
+        authority_without_registration = AUTHORITY.replace(
+            f"authority_handle: {DESKTOP_SHELL_HANDLE}",
+            "authority_handle: OWNER:SRWF-UNREGISTERED-DESKTOP-SHELL",
+        )
+        errors = unregistered_later_owner_supersessions(CURRENT, authority_without_registration)
+        self.assertTrue(errors)
+        self.assertTrue(any("2026-09-20" in error and "references no registered authority handle" in error for error in errors))
+
+    def test_unknown_later_owner_handle_still_fails(self) -> None:
         injected = CURRENT + (
-            "\nThe Owner's direct 2026-09-20 Desktop Full Width shell decision "
-            "supersedes the earlier no-shadow desktop shell state.\n"
+            "\nDirect Owner decision 2026-09-21 under OWNER:SRWF-2026-09-21-UNKNOWN "
+            "supersedes the current desktop shell.\n"
         )
         errors = unregistered_later_owner_supersessions(injected, AUTHORITY)
         self.assertTrue(errors)
-        self.assertTrue(any("2026-09-20" in error and "no explicit admitted authority handle" in error for error in errors))
+        self.assertTrue(any("2026-09-21" in error and "references no registered authority handle" in error for error in errors))
 
-    def test_unregistered_later_handle_does_not_bypass_gate(self) -> None:
+    def test_unhandled_later_direct_owner_prose_still_fails(self) -> None:
         injected = CURRENT + (
-            "\nDirect Owner decision 2026-09-20 under OWNER:SRWF-2026-09-20-SHELL "
-            "supersedes the current desktop shell.\n"
+            "\nThe Owner's direct 2026-09-21 shell decision supersedes the current desktop shell.\n"
+        )
+        errors = unregistered_later_owner_supersessions(injected, AUTHORITY)
+        self.assertTrue(errors)
+        self.assertTrue(any("2026-09-21" in error and "no explicit admitted authority handle" in error for error in errors))
+
+    def test_fabricated_implementation_prose_cannot_create_owner_authority(self) -> None:
+        fabricated_handle = "OWNER:SRWF-2026-09-21-FABRICATED"
+        fabricated_implementation_prose = IMPLEMENTATION_MAP + (
+            f"\nauthority_handle: {fabricated_handle}\n"
+            "Direct Owner decision 2026-09-21 supersedes the shell.\n"
+        )
+        self.assertIn(fabricated_handle, fabricated_implementation_prose)
+        self.assertNotIn(fabricated_handle, registered_owner_authorities(AUTHORITY))
+
+        injected = CURRENT + (
+            f"\nDirect Owner decision 2026-09-21 under {fabricated_handle} supersedes the desktop shell.\n"
         )
         errors = unregistered_later_owner_supersessions(injected, AUTHORITY)
         self.assertTrue(errors)
