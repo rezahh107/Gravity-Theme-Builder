@@ -7,10 +7,12 @@ on:
     paths:
       - 'themes/srwf-registration/**'
       - '.github/workflows/srwf-registration-static.yml'
+      - '.github/workflows/srwf-registration-release.yml'
   pull_request:
     paths:
       - 'themes/srwf-registration/**'
       - '.github/workflows/srwf-registration-static.yml'
+      - '.github/workflows/srwf-registration-release.yml'
 
 permissions:
   contents: read
