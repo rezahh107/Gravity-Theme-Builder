@@ -1,0 +1,507 @@
+name: SRWF Registration Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'SRWF Registration version already present in the requested source (example: 0.1.20)'
+        required: true
+        type: string
+      source_sha:
+        description: 'Exact full 40-character merged commit SHA to release'
+        required: true
+        type: string
+      publish:
+        description: 'Publish the immutable tag and GitHub Release after every gate passes'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  verify-and-build:
+    name: Verify and build exact SRWF source
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VERSION: ${{ inputs.version }}
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      PUBLISH: ${{ inputs.publish }}
+      SOURCE_DIR: source
+      AUTOMATION_DIR: release-system
+      BUILDER_OUTPUT: ${{ runner.temp }}/gtb-owner-test-packages
+      RELEASE_DIR: ${{ runner.temp }}/gtb-srwf-release-assets
+      RELEASE_SUMMARY_JSON: ${{ runner.temp }}/gtb-srwf-release-summary.json
+      CANDIDATE_ARTIFACT: gtb-srwf-registration-release-candidate-${{ inputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Validate manual release inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::RELEASE_WORKFLOW_REF_NOT_MAIN: run this workflow from the main branch."
+            exit 1
+          fi
+          if [[ ! "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::INVALID_SOURCE_SHA: source_sha must be a full 40-character lowercase Git commit SHA."
+            exit 1
+          fi
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::INVALID_VERSION: version must use x.y.z numeric format."
+            exit 1
+          fi
+
+      - name: Checkout release-system code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: ${{ env.AUTOMATION_DIR }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Checkout exact requested source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_sha }}
+          path: ${{ env.SOURCE_DIR }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exact source identity and merged-main ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual_sha="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
+          if [[ "$actual_sha" != "$SOURCE_SHA" ]]; then
+            echo "::error::SOURCE_SHA_MISMATCH: checkout resolved $actual_sha instead of $SOURCE_SHA."
+            exit 1
+          fi
+          git -C "$SOURCE_DIR" fetch --quiet --no-tags origin '+refs/heads/main:refs/remotes/origin/main'
+          if ! git -C "$SOURCE_DIR" merge-base --is-ancestor "$SOURCE_SHA" refs/remotes/origin/main; then
+            echo "::error::SOURCE_NOT_MERGED_TO_MAIN: $SOURCE_SHA is not reachable from current origin/main."
+            exit 1
+          fi
+
+      - name: Verify requested version against exact source
+        run: |
+          python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            validate-version \
+            --theme-root "$SOURCE_DIR/themes/srwf-registration" \
+            --version "$VERSION"
+
+      - name: Verify admitted visual reference
+        working-directory: ${{ env.SOURCE_DIR }}
+        run: bash themes/srwf-registration/reference/materialize_reference.sh "$RUNNER_TEMP/OWNER_REFERENCE_new_7.html"
+
+      - name: Run full theme-local deterministic tests
+        working-directory: ${{ env.SOURCE_DIR }}
+        run: python3 -m unittest discover -s themes/srwf-registration/tests -p 'test_*.py' -v
+
+      - name: Run explicit diagnostic JavaScript fixtures
+        working-directory: ${{ env.SOURCE_DIR }}
+        run: |
+          node themes/srwf-registration/tests/test_diagnostic_v03.js
+          node themes/srwf-registration/tests/test_binary_choice_geometry.js
+          node themes/srwf-registration/tests/test_admission_diagnostic_v032.js
+          node themes/srwf-registration/tests/test_qualification_v034.js
+          node themes/srwf-registration/tests/test_diagnostic_download_v036.js
+          node themes/srwf-registration/tests/test_diagnostic_control_lifecycle_v036.js
+          node themes/srwf-registration/tests/test_visual_repair_qualification_v036.js
+          node themes/srwf-registration/tests/test_version_provenance_v036.js
+
+      - name: Check production settings, layout, authentic-order context and diagnostic delivery
+        working-directory: ${{ env.SOURCE_DIR }}
+        run: |
+          php themes/srwf-registration/tests/test_form_settings.php
+          php themes/srwf-registration/tests/test_form_layout.php
+          php themes/srwf-registration/tests/test_delivery.php
+          php themes/srwf-registration/tests/test_entry_detail_early_sequence.php
+          php themes/srwf-registration/tests/test_diagnostic_delivery.php
+
+      - name: Check PHP syntax
+        working-directory: ${{ env.SOURCE_DIR }}
+        run: |
+          php -l themes/srwf-registration/src/srwf-registration-theme.php
+          php -l themes/srwf-registration/src/srwf-registration-settings.php
+          php -l themes/srwf-registration/src/srwf-registration-layout.php
+          php -l themes/srwf-registration/diagnostic/srwf-runtime-diagnostic.php
+          php -l themes/srwf-registration/tests/test_form_settings.php
+          php -l themes/srwf-registration/tests/test_form_layout.php
+          php -l themes/srwf-registration/tests/test_delivery.php
+          php -l themes/srwf-registration/tests/test_entry_detail_early_sequence.php
+          php -l themes/srwf-registration/tests/test_diagnostic_delivery.php
+
+      - name: Build deterministic exact-source Owner packages
+        run: |
+          python3 "$SOURCE_DIR/themes/srwf-registration/tests/build_owner_test_packages.py" "$BUILDER_OUTPUT"
+          cat "$BUILDER_OUTPUT/GTB_SRWF_OWNER_TEST_PACKAGES_SHA256.txt"
+
+      - name: Prepare canonical production release bytes and checksum
+        run: |
+          python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            prepare-assets \
+            --theme-root "$SOURCE_DIR/themes/srwf-registration" \
+            --builder-output "$BUILDER_OUTPUT" \
+            --release-dir "$RELEASE_DIR" \
+            --summary-file "$RELEASE_SUMMARY_JSON" \
+            --version "$VERSION"
+          cat "$RELEASE_SUMMARY_JSON"
+          cat "$RELEASE_DIR/GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
+
+      - name: Inspect tag and GitHub Release identity without mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="srwf-registration-v${VERSION}"
+          tag_exists=false
+          tag_sha=""
+          release_exists=false
+          release_json="$RUNNER_TEMP/existing-release.json"
+
+          if git -C "$SOURCE_DIR" ls-remote --exit-code --refs origin "refs/tags/$tag" > "$RUNNER_TEMP/tag-ref.txt" 2>/dev/null; then
+            tag_exists=true
+            git -C "$SOURCE_DIR" fetch --quiet origin "refs/tags/$tag:refs/tags/$tag"
+            tag_sha="$(git -C "$SOURCE_DIR" rev-list -n 1 "$tag")"
+          fi
+
+          if gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" > "$release_json" 2> "$RUNNER_TEMP/release-query.err"; then
+            release_exists=true
+          else
+            if ! grep -q 'HTTP 404' "$RUNNER_TEMP/release-query.err"; then
+              cat "$RUNNER_TEMP/release-query.err" >&2
+              echo "::error::RELEASE_LOOKUP_FAILED: unable to establish remote release state safely."
+              exit 1
+            fi
+            rm -f "$release_json"
+          fi
+
+          {
+            echo "TAG_NAME=$tag"
+            echo "TAG_EXISTS=$tag_exists"
+            echo "TAG_SHA=$tag_sha"
+            echo "RELEASE_EXISTS=$release_exists"
+            echo "EXISTING_RELEASE_JSON=$release_json"
+          } >> "$GITHUB_ENV"
+
+          if [[ "$tag_exists" == true && "$tag_sha" != "$SOURCE_SHA" ]]; then
+            echo "::error::TAG_SHA_MISMATCH: $tag already points to $tag_sha, not requested $SOURCE_SHA."
+            exit 1
+          fi
+          if [[ "$tag_exists" == false && "$release_exists" == true ]]; then
+            echo "::error::ORPHANED_RELEASE_CONFLICT: a GitHub Release exists for $tag while the tag is absent."
+            exit 1
+          fi
+          if [[ "$PUBLISH" == true && "$VERSION" == "0.1.19" ]]; then
+            echo "::error::PROTECTED_HISTORICAL_RELEASE: SRWF Registration 0.1.19 must never be republished or rewritten."
+            exit 1
+          fi
+          if [[ "$PUBLISH" == true && "$tag_exists" == true ]]; then
+            if [[ "$release_exists" == true ]]; then
+              echo "::error::ALREADY_RELEASED: $tag already has a GitHub Release; this workflow will not mutate it."
+            else
+              echo "::error::EXISTING_TAG_REQUIRES_OWNER_REVIEW: $tag already exists; publication will not reuse or mutate it automatically."
+            fi
+            exit 1
+          fi
+
+      - name: Validate exact-source release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          notes="$SOURCE_DIR/themes/srwf-registration/RELEASE_NOTES.md"
+          if [[ -f "$notes" ]]; then
+            python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+              validate-notes \
+              --notes "$notes" \
+              --version "$VERSION"
+            exit 0
+          fi
+
+          if [[ "$PUBLISH" == false && "$VERSION" == "0.1.19" && "$TAG_EXISTS" == true && "$TAG_SHA" == "$SOURCE_SHA" && "$RELEASE_EXISTS" == true ]]; then
+            body="$(jq -r '.body // empty' "$EXISTING_RELEASE_JSON")"
+            if [[ -z "${body//[[:space:]]/}" ]]; then
+              echo "::error::HISTORICAL_RELEASE_NOTES_EMPTY: existing 0.1.19 release has no usable published notes."
+              exit 1
+            fi
+            echo "HISTORICAL_NOTES_EXCEPTION=true" >> "$GITHUB_ENV"
+            echo "Historical dry-run exception: 0.1.19 predates source-local RELEASE_NOTES.md; existing published notes were verified read-only."
+            exit 0
+          fi
+
+          echo "::error::RELEASE_NOTES_MISSING: exact source must contain themes/srwf-registration/RELEASE_NOTES.md."
+          exit 1
+
+      - name: Prove GitHub-native Immutable Releases policy for readiness
+        shell: bash
+        env:
+          SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN: ${{ secrets.SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ "$TAG_EXISTS" == true || "$RELEASE_EXISTS" == true ]]; then
+            echo "Existing remote release identity is read-only/conflicting, so no new publication-readiness claim requires policy admission."
+            exit 0
+          fi
+          if [[ -z "${SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN:-}" ]]; then
+            echo "::error::IMMUTABLE_RELEASES_POLICY_CREDENTIAL_MISSING: configure a dedicated repository Administration: read credential before a new release can become READY TO PUBLISH."
+            exit 1
+          fi
+
+          policy_json="$RUNNER_TEMP/immutable-releases-policy.json"
+          set +e
+          http_status="$(curl --silent --show-error \
+            --output "$policy_json" \
+            --write-out '%{http_code}' \
+            --header 'Accept: application/vnd.github+json' \
+            --header "Authorization: Bearer ${SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN}" \
+            --header 'X-GitHub-Api-Version: 2026-03-10' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/immutable-releases")"
+          curl_status=$?
+          set -e
+          if [[ "$curl_status" -ne 0 ]]; then
+            echo "::error::IMMUTABLE_RELEASES_POLICY_UNAVAILABLE: GitHub policy-status API request failed before a trustworthy HTTP response was received."
+            exit 1
+          fi
+
+          python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            validate-immutable-policy \
+            --http-status "$http_status" \
+            --response "$policy_json"
+
+      - name: Evaluate publication readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$PUBLISH" == false && "$TAG_EXISTS" == true && "$RELEASE_EXISTS" == true ]]; then
+            echo "FINAL_STATUS=ALREADY RELEASED — NO MUTATION" >> "$GITHUB_ENV"
+            echo "ALREADY RELEASED — NO MUTATION"
+          elif [[ "$TAG_EXISTS" == true ]]; then
+            echo "::error::EXISTING_TAG_REQUIRES_OWNER_REVIEW: tag exists without a release; not ready to publish automatically."
+            exit 1
+          elif [[ "$PUBLISH" == true ]]; then
+            echo "FINAL_STATUS=VERIFIED FOR PUBLICATION" >> "$GITHUB_ENV"
+            echo "VERIFIED FOR PUBLICATION"
+          else
+            echo "FINAL_STATUS=READY TO PUBLISH" >> "$GITHUB_ENV"
+            echo "READY TO PUBLISH"
+          fi
+
+      - name: Upload verified production candidate artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ${{ env.CANDIDATE_ARTIFACT }}
+          path: |
+            ${{ runner.temp }}/gtb-srwf-release-assets/gtb-srwf-registration-${{ inputs.version }}.zip
+            ${{ runner.temp }}/gtb-srwf-release-assets/GTB_SRWF_REGISTRATION_${{ inputs.version }}_SHA256.txt
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Verification summary
+        if: ${{ success() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip="$RELEASE_DIR/gtb-srwf-registration-${VERSION}.zip"
+          zip_sha="$(sha256sum "$zip" | awk '{print $1}')"
+          {
+            echo "## SRWF Registration verification result"
+            echo
+            echo "- Status: **${FINAL_STATUS:-VERIFIED}**"
+            echo "- Version: \`$VERSION\`"
+            echo "- Source SHA: \`$SOURCE_SHA\`"
+            echo "- Tag: \`srwf-registration-v${VERSION}\`"
+            echo "- Production ZIP SHA-256: \`$zip_sha\`"
+            echo "- Publish requested: \`$PUBLISH\`"
+            echo "- This job token has repository contents permission: \`read\`"
+            echo "- Diagnostic package included in candidate artifact: \`false\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish:
+    name: Publish and verify SRWF GitHub Release
+    if: ${{ inputs.publish }}
+    needs: verify-and-build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      SOURCE_DIR: source
+      RELEASE_DIR: ${{ runner.temp }}/gtb-srwf-release-assets
+      CANDIDATE_ARTIFACT: gtb-srwf-registration-release-candidate-${{ inputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout exact requested source read-only
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_sha }}
+          path: ${{ env.SOURCE_DIR }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Download verified production candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.CANDIDATE_ARTIFACT }}
+          path: ${{ env.RELEASE_DIR }}
+
+      - name: Reconfirm immutable source, notes and candidate checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$VERSION" == "0.1.19" ]]; then
+            echo "::error::PROTECTED_HISTORICAL_RELEASE: SRWF Registration 0.1.19 cannot be published by this workflow."
+            exit 1
+          fi
+          actual_sha="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
+          if [[ "$actual_sha" != "$SOURCE_SHA" ]]; then
+            echo "::error::SOURCE_SHA_MISMATCH_BEFORE_PUBLISH: checkout resolved $actual_sha instead of $SOURCE_SHA."
+            exit 1
+          fi
+          git -C "$SOURCE_DIR" fetch --quiet --no-tags origin '+refs/heads/main:refs/remotes/origin/main'
+          if ! git -C "$SOURCE_DIR" merge-base --is-ancestor "$SOURCE_SHA" refs/remotes/origin/main; then
+            echo "::error::SOURCE_NOT_MERGED_TO_MAIN_BEFORE_PUBLISH: $SOURCE_SHA is no longer reachable from current origin/main."
+            exit 1
+          fi
+          notes="$SOURCE_DIR/themes/srwf-registration/RELEASE_NOTES.md"
+          if [[ ! -f "$notes" ]]; then
+            echo "::error::RELEASE_NOTES_MISSING_BEFORE_PUBLISH: exact source no longer supplies release notes."
+            exit 1
+          fi
+          cd "$RELEASE_DIR"
+          sha256sum -c "GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
+
+      - name: Recheck remote publication conflicts immediately before mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="srwf-registration-v${VERSION}"
+          if git -C "$SOURCE_DIR" ls-remote --exit-code --refs origin "refs/tags/$tag" > /dev/null 2>&1; then
+            echo "::error::TAG_APPEARED_BEFORE_PUBLISH: $tag now exists; refusing to reuse or mutate it."
+            exit 1
+          fi
+          if gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" > /dev/null 2> "$RUNNER_TEMP/release-query.err"; then
+            echo "::error::RELEASE_APPEARED_BEFORE_PUBLISH: a GitHub Release now exists for $tag."
+            exit 1
+          fi
+          if ! grep -q 'HTTP 404' "$RUNNER_TEMP/release-query.err"; then
+            cat "$RUNNER_TEMP/release-query.err" >&2
+            echo "::error::RELEASE_LOOKUP_FAILED_BEFORE_PUBLISH: unable to establish remote release state safely."
+            exit 1
+          fi
+          echo "TAG_NAME=$tag" >> "$GITHUB_ENV"
+
+      - name: Reprove GitHub-native Immutable Releases policy immediately before mutation
+        shell: bash
+        env:
+          SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN: ${{ secrets.SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN:-}" ]]; then
+            echo "::error::IMMUTABLE_RELEASES_POLICY_CREDENTIAL_MISSING: publication requires a dedicated repository Administration: read credential."
+            exit 1
+          fi
+
+          policy_json="$RUNNER_TEMP/immutable-releases-policy-before-publish.json"
+          set +e
+          http_status="$(curl --silent --show-error \
+            --output "$policy_json" \
+            --write-out '%{http_code}' \
+            --header 'Accept: application/vnd.github+json' \
+            --header "Authorization: Bearer ${SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN}" \
+            --header 'X-GitHub-Api-Version: 2026-03-10' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/immutable-releases")"
+          curl_status=$?
+          set -e
+          if [[ "$curl_status" -ne 0 ]]; then
+            echo "::error::IMMUTABLE_RELEASES_POLICY_UNAVAILABLE: GitHub policy-status API request failed immediately before publication."
+            exit 1
+          fi
+
+          python3 "$SOURCE_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            validate-immutable-policy \
+            --http-status "$http_status" \
+            --response "$policy_json"
+
+      - name: Publish exact tag and GitHub Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip="$RELEASE_DIR/gtb-srwf-registration-${VERSION}.zip"
+          checksum="$RELEASE_DIR/GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
+          notes="$SOURCE_DIR/themes/srwf-registration/RELEASE_NOTES.md"
+          gh release create "$TAG_NAME" \
+            "$zip" \
+            "$checksum" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$SOURCE_SHA" \
+            --title "SRWF Registration ${VERSION}" \
+            --notes-file "$notes"
+
+      - name: Verify published remote state and uploaded ZIP digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_json="$RUNNER_TEMP/published-release.json"
+          zip="$RELEASE_DIR/gtb-srwf-registration-${VERSION}.zip"
+          local_zip_sha="$(sha256sum "$zip" | awk '{print $1}')"
+
+          git -C "$SOURCE_DIR" fetch --quiet origin "refs/tags/$TAG_NAME:refs/tags/$TAG_NAME"
+          remote_tag_sha="$(git -C "$SOURCE_DIR" rev-list -n 1 "$TAG_NAME")"
+          if [[ "$remote_tag_sha" != "$SOURCE_SHA" ]]; then
+            echo "::error::POST_PUBLISH_TAG_MISMATCH: $TAG_NAME resolves to $remote_tag_sha instead of $SOURCE_SHA."
+            exit 1
+          fi
+
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG_NAME" > "$release_json"
+          if [[ "$(jq -r '.draft' "$release_json")" != false ]]; then
+            echo "::error::POST_PUBLISH_DRAFT: published release is unexpectedly a draft."
+            exit 1
+          fi
+          if [[ "$(jq -r '.prerelease' "$release_json")" != false ]]; then
+            echo "::error::POST_PUBLISH_PRERELEASE: published release is unexpectedly a prerelease."
+            exit 1
+          fi
+          if ! python3 "$SOURCE_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            validate-published-immutability \
+            --release-json "$release_json"; then
+            echo "::error::POST_PUBLISH_NOT_IMMUTABLE: published release failed immutable-state verification."
+            exit 1
+          fi
+
+          mapfile -t asset_names < <(jq -r '.assets[].name' "$release_json" | sort)
+          expected_assets=("GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt" "gtb-srwf-registration-${VERSION}.zip")
+          if [[ "${asset_names[*]}" != "${expected_assets[*]}" ]]; then
+            printf 'Observed assets: %s\n' "${asset_names[*]}" >&2
+            echo "::error::POST_PUBLISH_ASSET_SET_MISMATCH: release assets are not the exact production ZIP + checksum pair."
+            exit 1
+          fi
+
+          remote_zip_digest="$(jq -r --arg name "$(basename "$zip")" '.assets[] | select(.name == $name) | .digest // empty' "$release_json")"
+          if [[ "$remote_zip_digest" != "sha256:${local_zip_sha}" ]]; then
+            echo "::error::POST_PUBLISH_ZIP_DIGEST_MISMATCH: remote=$remote_zip_digest local=sha256:${local_zip_sha}."
+            exit 1
+          fi
+
+      - name: Publication summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip="$RELEASE_DIR/gtb-srwf-registration-${VERSION}.zip"
+          zip_sha="$(sha256sum "$zip" | awk '{print $1}')"
+          {
+            echo "## SRWF Registration publication result"
+            echo
+            echo "- Status: **PUBLISHED AND VERIFIED**"
+            echo "- Version: \`$VERSION\`"
+            echo "- Source SHA: \`$SOURCE_SHA\`"
+            echo "- Tag: \`$TAG_NAME\`"
+            echo "- Production ZIP SHA-256: \`$zip_sha\`"
+            echo "- GitHub Release immutable: \`true\`"
+            echo "- Release assets: production ZIP + checksum only"
+          } >> "$GITHUB_STEP_SUMMARY"
