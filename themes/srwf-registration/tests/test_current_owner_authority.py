@@ -19,8 +19,36 @@ VISUAL_DIAGNOSTIC = THEME / "diagnostic" / "assets" / "visual-repair-qualificati
 
 HISTORICAL_BLOB_SHA = "3fac5772cbe356965d98de64950ef0fbec8d7f21"
 HISTORICAL_GPFUP_RUNTIME_VERSION = "0.1.14"
-CURRENT_THEME_VERSION = "0.1.17"
 CURRENT_DIAGNOSTIC_VERSION = "0.3.6"
+VERSION_PATTERN = r"[0-9]+\.[0-9]+\.[0-9]+"
+
+IMPLEMENTATION_VERSION_PATTERNS = {
+    "implementation_map": re.compile(r"Current static theme implementation: `([^`]+)`\."),
+    "src_readme": re.compile(r"Current production package line: \*\*([^*]+)\*\*\."),
+}
+
+AUTHORITY_CURRENT_PACKAGE_PATTERNS = (
+    re.compile(
+        rf"\btheme\s+`?{VERSION_PATTERN}`?\s+(?:is|remains)\s+the\s+current\s+(?:static\s+)?implementation\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        rf"\b(?:current|final)\s+Owner[- ]runtime\s+qualification\b.*\btheme\s+`?{VERSION_PATTERN}`?",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        rf"\bAuthentic\s+Owner\s+runtime\s+evidence\b.*\brequired\b.*\btheme\s+`?{VERSION_PATTERN}`?",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        rf"\bdiagnostic\s+package\s+`?{VERSION_PATTERN}`?\s+(?:is|remains)\s+the\s+current\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        rf"\bcurrent\s+(?:theme|production\s+package|implementation\s+package)\b.*`?{VERSION_PATTERN}`?",
+        re.IGNORECASE,
+    ),
+)
 
 
 def git_blob_sha(path: Path) -> str:
@@ -35,40 +63,45 @@ def theme_version(source: str) -> str:
     return match.group(1)
 
 
-def current_gpfup_provenance_errors(surfaces: dict[str, str], current_version: str) -> list[str]:
+def next_patch_version(version: str) -> str:
+    major, minor, patch = (int(part) for part in version.split("."))
+    return f"{major}.{minor}.{patch + 1}"
+
+
+def implementation_status_errors(theme_source: str, surfaces: dict[str, str]) -> list[str]:
+    current_version = theme_version(theme_source)
     errors: list[str] = []
-    # Current package/version truth belongs in implementation-facing surfaces. The
-    # visual-authority files remain immutable/historical provenance unless an Owner
-    # decision itself changes them.
-    current_markers = {
-        "implementation_map": f"Current static theme implementation: `{current_version}`.",
-        "src_readme": f"Current production package line: **{current_version}**.",
-    }
-    for name, marker in current_markers.items():
-        if marker not in surfaces[name]:
-            errors.append(f"{name}: missing current implementation marker {marker}")
+    for name, pattern in IMPLEMENTATION_VERSION_PATTERNS.items():
+        matches = pattern.findall(surfaces[name])
+        if len(matches) != 1:
+            errors.append(f"{name}: expected exactly one current implementation/package marker, found {matches}")
+            continue
+        if matches[0] != current_version:
+            errors.append(
+                f"{name}: current implementation/package marker {matches[0]} does not match theme source {current_version}"
+            )
+    return errors
 
-    historical_markers = (
-        f"Owner runtime of theme `{HISTORICAL_GPFUP_RUNTIME_VERSION}`",
-        "historical evidence",
-        "glyphs rendered",
-        "visually detached",
-    )
-    for name in ("implementation_map", "current", "authority"):
-        for marker in historical_markers:
-            if marker not in surfaces[name]:
-                errors.append(f"{name}: missing historical runtime marker {marker}")
 
-    stale_current_patterns = (
-        f"Theme `{HISTORICAL_GPFUP_RUNTIME_VERSION}` statically implements",
-        f"Theme {HISTORICAL_GPFUP_RUNTIME_VERSION} statically implements",
-        f"theme `{HISTORICAL_GPFUP_RUNTIME_VERSION}` implements the shared initial GPFUP",
-    )
-    for name in ("implementation_map", "current", "authority"):
-        for pattern in stale_current_patterns:
-            if pattern in surfaces[name]:
-                errors.append(f"{name}: stale current-implementation attribution {pattern}")
+def authority_current_package_claims(surface_name: str, text: str) -> list[str]:
+    errors: list[str] = []
+    for line_number, raw_line in enumerate(text.splitlines(), start=1):
+        line = " ".join(raw_line.split())
+        if not line:
+            continue
+        if re.match(r"^(?:[-*]\s*)?Historical evidence:", line, re.IGNORECASE):
+            continue
+        for pattern in AUTHORITY_CURRENT_PACKAGE_PATTERNS:
+            if pattern.search(line):
+                errors.append(f"{surface_name}:{line_number}: mutable current-package claim: {line}")
+                break
+    return errors
 
+
+def authority_boundary_errors(surfaces: dict[str, str]) -> list[str]:
+    errors: list[str] = []
+    errors.extend(authority_current_package_claims("current", surfaces["current"]))
+    errors.extend(authority_current_package_claims("authority", surfaces["authority"]))
     return errors
 
 
@@ -85,7 +118,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         cls.diagnostic_php = DIAGNOSTIC_PHP.read_text(encoding="utf-8")
         cls.visual_diagnostic = VISUAL_DIAGNOSTIC.read_text(encoding="utf-8")
         cls.current_version = theme_version(cls.theme_php)
-        cls.provenance_surfaces = {
+        cls.surfaces = {
             "implementation_map": cls.implementation_map,
             "current": cls.current,
             "authority": cls.authority,
@@ -150,35 +183,67 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         ):
             self.assertIn(value, self.current)
 
-    def test_current_implementation_version_is_synchronized_across_implementation_surfaces(self) -> None:
-        self.assertEqual(CURRENT_THEME_VERSION, self.current_version)
-        self.assertEqual([], current_gpfup_provenance_errors(self.provenance_surfaces, self.current_version))
+    def test_current_implementation_version_is_derived_and_synchronized_only_on_implementation_surfaces(self) -> None:
+        self.assertEqual([], implementation_status_errors(self.theme_php, self.surfaces))
         self.assertIn(f"Version: {CURRENT_DIAGNOSTIC_VERSION}", self.diagnostic_php)
         self.assertIn(f"const GTB_SRWF_RUNTIME_DIAGNOSTIC_VERSION = '{CURRENT_DIAGNOSTIC_VERSION}';", self.diagnostic_php)
         self.assertIn(f"var VERSION = '{CURRENT_DIAGNOSTIC_VERSION}';", self.visual_diagnostic)
 
-    def test_pre_repair_stale_0_1_14_current_attribution_is_rejected(self) -> None:
-        stale = dict(self.provenance_surfaces)
-        stale["implementation_map"] = (
-            "Theme 0.1.14 statically implements the Owner-authorized shared initial GPFUP icon/alignment family.\n"
-            + stale["implementation_map"]
+    def test_future_theme_version_drift_is_rejected_without_a_second_version_registry(self) -> None:
+        hypothetical_version = next_patch_version(self.current_version)
+        mutated_theme_source = self.theme_php.replace(
+            f"Version: {self.current_version}", f"Version: {hypothetical_version}"
+        ).replace(
+            f"SRWF_REGISTRATION_THEME_VERSION = '{self.current_version}'",
+            f"SRWF_REGISTRATION_THEME_VERSION = '{hypothetical_version}'",
         )
-        stale["current"] = (
-            "theme `0.1.14` implements the shared initial GPFUP icon/alignment destination.\n"
-            + stale["current"]
+        self.assertEqual(hypothetical_version, theme_version(mutated_theme_source))
+        errors = implementation_status_errors(mutated_theme_source, self.surfaces)
+        self.assertTrue(any(error.startswith("implementation_map:") for error in errors))
+        self.assertTrue(any(error.startswith("src_readme:") for error in errors))
+
+    def test_authority_surfaces_do_not_own_mutable_current_package_identity(self) -> None:
+        self.assertEqual([], authority_boundary_errors(self.surfaces))
+        self.assertIn("does **not** own mutable current theme/package identity", self.current)
+        self.assertIn("Current implementation/package identity is intentionally not registered", self.authority)
+        for text in (self.current, self.authority):
+            self.assertIn("IMPLEMENTATION_MAP.md", text)
+            self.assertIn("src/README.md", text)
+        self.assertNotIn("MOBILE_RESPONSIVE_POLISH_STATICALLY_IMPLEMENTED", self.current.splitlines()[1])
+        self.assertNotIn("MOBILE_RESPONSIVE_POLISH_STATICALLY_IMPLEMENTED", self.authority)
+
+    def test_original_stale_current_implementation_claim_is_rejected(self) -> None:
+        for surface_name in ("current", "authority"):
+            mutated = dict(self.surfaces)
+            mutated[surface_name] = "Theme `0.1.16` is the current static implementation.\n" + mutated[surface_name]
+            errors = authority_boundary_errors(mutated)
+            self.assertTrue(any(error.startswith(f"{surface_name}:") for error in errors))
+
+    def test_version_specific_current_runtime_target_is_rejected(self) -> None:
+        injected = (
+            "Final Owner runtime qualification remains open for theme `9.9.9` + diagnostic `0.3.6`.\n"
         )
-        stale["authority"] = (
-            "Theme `0.1.14` statically implements the shared initial GPFUP icon/alignment destination.\n"
-            + stale["authority"]
+        for surface_name in ("current", "authority"):
+            mutated = dict(self.surfaces)
+            mutated[surface_name] = injected + mutated[surface_name]
+            errors = authority_boundary_errors(mutated)
+            self.assertTrue(any(error.startswith(f"{surface_name}:") for error in errors))
+
+    def test_explicit_historical_evidence_may_retain_versioned_batch_history(self) -> None:
+        historical_line = (
+            "Historical evidence: Theme `0.1.16` was the mobile responsive-polish implementation for that batch."
         )
-        errors = current_gpfup_provenance_errors(stale, self.current_version)
-        self.assertTrue(errors, "pre-repair 0.1.14 current attribution must fail provenance validation")
-        self.assertTrue(any("stale current-implementation attribution" in error for error in errors))
+        self.assertEqual([], authority_current_package_claims("fixture", historical_line))
+        for text in (self.current, self.authority):
+            self.assertIn("Historical evidence:", text)
+            self.assertIn("0.1.14", text)
+            self.assertIn("0.1.15", text)
+            self.assertIn("0.1.16", text)
 
     def test_historical_upload_evidence_and_current_runtime_qualification_stay_distinct(self) -> None:
         for text in (self.implementation_map, self.current, self.authority):
             self.assertIn("Owner runtime of theme `0.1.14`", text)
-            self.assertIn("historical evidence", text)
+            self.assertIn("historical evidence", text.lower())
             self.assertIn("glyphs rendered", text)
             self.assertIn("visually detached", text)
             self.assertIn("0.1.15", text)
@@ -203,7 +268,7 @@ class CurrentOwnerAuthorityTests(unittest.TestCase):
         self.assertIn("GeneratePress", self.implementation_map)
         self.assertIn("--gf-label-space-x-secondary", self.implementation_map)
         self.assertIn("OWNER_RUNTIME_REQUIRED", self.implementation_map)
-        self.assertIn(CURRENT_THEME_VERSION, self.src_readme)
+        self.assertIn(self.current_version, self.src_readme)
         self.assertIn(CURRENT_DIAGNOSTIC_VERSION, self.src_readme)
         self.assertIn("student-photo-upload.svg", self.src_readme)
         self.assertIn("960px", self.src_readme)
