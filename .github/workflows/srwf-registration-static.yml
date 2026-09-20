@@ -76,6 +76,7 @@ jobs:
           node themes/srwf-registration/tests/test_admission_diagnostic_v032.js
           node themes/srwf-registration/tests/test_qualification_v034.js
           node themes/srwf-registration/tests/test_diagnostic_download_v036.js
+          node themes/srwf-registration/tests/test_diagnostic_control_lifecycle_v036.js
           node themes/srwf-registration/tests/test_visual_repair_qualification_v036.js
           node themes/srwf-registration/tests/test_version_provenance_v036.js
 
