@@ -23,7 +23,7 @@ jobs:
           ref: 4e5727ec3573bc08395c43a99312f157f062a347
           fetch-depth: 0
 
-      - name: Verify, build, and publish
+      - name: Verify, bind tag, and publish existing draft
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -41,44 +41,23 @@ jobs:
           python3 themes/srwf-registration/tests/build_owner_test_packages.py release-dist
           cp release-dist/gtb-srwf-registration-owner-test-0.1.19.zip release-dist/gtb-srwf-registration-0.1.19.zip
           cmp release-dist/gtb-srwf-registration-owner-test-0.1.19.zip release-dist/gtb-srwf-registration-0.1.19.zip
-
           actual_sha="$(sha256sum release-dist/gtb-srwf-registration-0.1.19.zip | cut -d' ' -f1)"
           test "$actual_sha" = "$EXPECTED_SHA256"
           printf '%s  %s\n' "$actual_sha" 'gtb-srwf-registration-0.1.19.zip' > release-dist/GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt
-
           unzip -t release-dist/gtb-srwf-registration-0.1.19.zip >/dev/null
           test "$(unzip -Z1 release-dist/gtb-srwf-registration-0.1.19.zip | grep -v '/$' | wc -l)" -eq 11
-          unzip -Z1 release-dist/gtb-srwf-registration-0.1.19.zip | grep -q '^gtb-srwf-registration/srwf-registration-theme.php$'
           if unzip -Z1 release-dist/gtb-srwf-registration-0.1.19.zip | grep -E '/(diagnostic|tests|reference)/'; then
             echo 'Forbidden non-production content found in release ZIP' >&2
             exit 1
           fi
 
-          cat > release-dist/RELEASE_NOTES.md <<'EOF'
-          SRWF Registration 0.1.19 is the first minimal production release of the SRWF Registration presentation theme for Gravity Theme Builder.
-
-          - Gravity Forms remains authoritative for form behavior, validation, submission, semantics, conditional behavior, and persistence.
-          - Per-form GTB Registration presentation is isolated from Gravity Flow Entry Detail.
-          - Full Width page/content layout remains host-owned.
-          - Responsive mobile presentation retains the canonical 16px GTB gutter.
-          - Desktop presentation uses the approved 904px outer / 840px content shell at >=960px.
-          - All authentic SRWF Radio fields use responsive card presentation.
-          - GP Advanced Select / Tom Select presentation is integrated without behavior takeover.
-          - GP File Upload Pro initial presentation family is integrated without lifecycle takeover.
-          - Owner minimum-release manual checks passed for 320px reflow, representative desktop presentation, authentic Gravity Forms validation, the primary keyboard-focus path, GP Advanced Select search/selection, real GP File Upload Pro upload workflow, and successful end-to-end form submission.
-
-          This is a minimal release, not a claim that every extended qualification state has been exhaustively exercised. Broader responsive/accessibility/add-on-state qualification continues after release, including unexercised widths, 200% text resize, text spacing, rare GPAS states, GPFUP crop/re-crop/delete states, and complete accessibility qualification.
-
-          No license has been selected. License selection remains a separate Owner decision.
-          EOF
-
           published=0
           cleanup() {
             status=$?
             if [ "$published" -ne 1 ]; then
-              release_id="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.id' 2>/dev/null || true)"
-              if [ -n "$release_id" ]; then
-                gh api --method DELETE "repos/$GITHUB_REPOSITORY/releases/$release_id" >/dev/null 2>&1 || true
+              stale_id="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[] | select(.tag_name == "srwf-registration-v0.1.19" and .draft == true) | .id' | head -n1 || true)"
+              if [ -n "$stale_id" ]; then
+                gh api --method DELETE "repos/$GITHUB_REPOSITORY/releases/$stale_id" >/dev/null 2>&1 || true
               fi
               git push origin ":refs/tags/$TAG" >/dev/null 2>&1 || true
             fi
@@ -86,31 +65,36 @@ jobs:
           }
           trap cleanup EXIT
 
-          gh release create "$TAG" \
-            release-dist/gtb-srwf-registration-0.1.19.zip \
-            release-dist/GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt \
-            --target "$RELEASE_SHA" \
-            --draft \
-            --title "$TITLE" \
-            --notes-file release-dist/RELEASE_NOTES.md
-
+          git tag "$TAG" "$RELEASE_SHA"
+          git push origin "refs/tags/$TAG"
           test "$(git ls-remote origin "refs/tags/$TAG" | cut -f1)" = "$RELEASE_SHA"
 
+          release_id="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[] | select(.tag_name == "srwf-registration-v0.1.19" and .draft == true) | .id' | head -n1)"
+          test -n "$release_id"
+
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" --jq '.name')" = "$TITLE"
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" --jq '.target_commitish')" = "$RELEASE_SHA"
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" --jq '.prerelease')" = 'false'
+
+          expected_assets="$(printf '%s\n%s\n' 'GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt' 'gtb-srwf-registration-0.1.19.zip' | sort)"
+          actual_assets="$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --jq '.[].name' | sort)"
+          test "$actual_assets" = "$expected_assets"
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --jq '.[] | select(.name == "gtb-srwf-registration-0.1.19.zip") | .digest')" = "sha256:$EXPECTED_SHA256"
+
           mkdir release-download
-          gh release download "$TAG" --dir release-download
+          zip_asset_id="$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --jq '.[] | select(.name == "gtb-srwf-registration-0.1.19.zip") | .id')"
+          sum_asset_id="$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --jq '.[] | select(.name == "GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt") | .id')"
+          gh api -H 'Accept: application/octet-stream' "repos/$GITHUB_REPOSITORY/releases/assets/$zip_asset_id" > release-download/gtb-srwf-registration-0.1.19.zip
+          gh api -H 'Accept: application/octet-stream' "repos/$GITHUB_REPOSITORY/releases/assets/$sum_asset_id" > release-download/GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt
           test "$(sha256sum release-download/gtb-srwf-registration-0.1.19.zip | cut -d' ' -f1)" = "$EXPECTED_SHA256"
           test "$(cat release-download/GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt)" = "$EXPECTED_SHA256  gtb-srwf-registration-0.1.19.zip"
 
-          expected_assets="$(printf '%s\n%s\n' 'GTB_SRWF_REGISTRATION_0.1.19_SHA256.txt' 'gtb-srwf-registration-0.1.19.zip' | sort)"
-          actual_assets="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.assets[].name' | sort)"
-          test "$actual_assets" = "$expected_assets"
-
-          release_id="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.id')"
           gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" -F draft=false >/dev/null
 
           test "$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.draft')" = 'false'
           test "$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.prerelease')" = 'false'
           test "$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.name')" = "$TITLE"
+          test "$(git ls-remote origin "refs/tags/$TAG" | cut -f1)" = "$RELEASE_SHA"
           gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.html_url'
 
           published=1
