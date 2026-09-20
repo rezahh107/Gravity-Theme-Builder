@@ -33,31 +33,31 @@ def sha256(path: Path) -> str:
 
 def plugin_versions(plugin_file: Path) -> tuple[str, str]:
     source = plugin_file.read_text(encoding="utf-8")
-    header = re.search(r"^ \* Version: ([0-9]+\.[0-9]+\.[0-9]+)$", source, re.M)
+    header = re.search(r"^ \* Version:\s*([^\s]+)\s*$", source, re.M)
     constant = re.search(r"const SRWF_REGISTRATION_THEME_VERSION = '([^']+)';", source)
     if not header or not constant:
         raise RuntimeError(f"unable to read SRWF version from {plugin_file}")
     return header.group(1), constant.group(1)
 
 
-def validate_version(theme_root: Path, requested_version: str) -> str:
-    if not VERSION_RE.fullmatch(requested_version):
-        raise RuntimeError("requested version must use x.y.z numeric format")
-
+def resolve_version(theme_root: Path) -> str:
     plugin_file = theme_root / "src" / "srwf-registration-theme.php"
     header_version, constant_version = plugin_versions(plugin_file)
+    if not VERSION_RE.fullmatch(header_version) or not VERSION_RE.fullmatch(constant_version):
+        raise RuntimeError(
+            "source version must use x.y.z numeric format: "
+            f"header={header_version}, constant={constant_version}"
+        )
     if header_version != constant_version:
         raise RuntimeError(
             f"source version is internally inconsistent: header={header_version}, constant={constant_version}"
         )
-    if requested_version != header_version:
-        raise RuntimeError(
-            f"requested version {requested_version} does not match source version {header_version}"
-        )
     return header_version
 
 
-def validate_notes(notes_path: Path, requested_version: str) -> None:
+def validate_notes(notes_path: Path, source_version: str) -> None:
+    if not VERSION_RE.fullmatch(source_version):
+        raise RuntimeError("derived source version must use x.y.z numeric format")
     if not notes_path.is_file():
         raise RuntimeError(f"release notes are missing from exact source: {notes_path}")
 
@@ -65,9 +65,9 @@ def validate_notes(notes_path: Path, requested_version: str) -> None:
     match = NOTES_VERSION_RE.search(source)
     if not match:
         raise RuntimeError("release notes must contain an exact 'Release-Version: x.y.z' line")
-    if match.group(1) != requested_version:
+    if match.group(1) != source_version:
         raise RuntimeError(
-            f"release notes version {match.group(1)} does not match requested version {requested_version}"
+            f"release notes version {match.group(1)} does not match derived source version {source_version}"
         )
     if len(source.strip().splitlines()) < 4:
         raise RuntimeError("release notes are unexpectedly empty")
@@ -126,18 +126,17 @@ def prepare_release_assets(
     theme_root: Path,
     builder_output: Path,
     release_dir: Path,
-    requested_version: str,
 ) -> dict[str, str]:
-    validate_version(theme_root, requested_version)
+    version = resolve_version(theme_root)
     builder = load_source_builder(theme_root)
 
-    source_zip = builder_output / f"gtb-srwf-registration-owner-test-{requested_version}.zip"
+    source_zip = builder_output / f"gtb-srwf-registration-owner-test-{version}.zip"
     if not source_zip.is_file():
         raise RuntimeError(f"deterministic production package is missing: {source_zip}")
 
     release_dir.mkdir(parents=True, exist_ok=True)
-    public_zip = release_dir / f"gtb-srwf-registration-{requested_version}.zip"
-    checksum_file = release_dir / f"GTB_SRWF_REGISTRATION_{requested_version}_SHA256.txt"
+    public_zip = release_dir / f"gtb-srwf-registration-{version}.zip"
+    checksum_file = release_dir / f"GTB_SRWF_REGISTRATION_{version}_SHA256.txt"
 
     shutil.copyfile(source_zip, public_zip)
     source_hash = sha256(source_zip)
@@ -162,27 +161,26 @@ def prepare_release_assets(
     assert_no_forbidden_content(actual_files)
 
     header_version, constant_version = archive_plugin_versions(public_zip, install_root)
-    if header_version != requested_version or constant_version != requested_version:
+    if header_version != version or constant_version != version:
         raise RuntimeError(
-            "packaged version does not match requested release version: "
-            f"header={header_version}, constant={constant_version}, requested={requested_version}"
+            "packaged version does not match derived source version: "
+            f"header={header_version}, constant={constant_version}, source={version}"
         )
 
     checksum_file.write_text(f"{public_hash}  {public_zip.name}\n", encoding="utf-8")
 
     return {
-        "version": requested_version,
+        "version": version,
         "source_zip": str(source_zip),
         "public_zip": str(public_zip),
         "checksum_file": str(checksum_file),
         "sha256": public_hash,
-        "tag": f"srwf-registration-v{requested_version}",
+        "tag": f"srwf-registration-v{version}",
     }
 
 
-def command_validate_version(args: argparse.Namespace) -> int:
-    version = validate_version(args.theme_root.resolve(), args.version)
-    print(version)
+def command_resolve_version(args: argparse.Namespace) -> int:
+    print(resolve_version(args.theme_root.resolve()))
     return 0
 
 
@@ -197,7 +195,6 @@ def command_prepare_assets(args: argparse.Namespace) -> int:
         args.theme_root.resolve(),
         args.builder_output.resolve(),
         args.release_dir.resolve(),
-        args.version,
     )
     if args.summary_file:
         args.summary_file.parent.mkdir(parents=True, exist_ok=True)
@@ -210,10 +207,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="SRWF Registration release-local safety helper")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    version_parser = subparsers.add_parser("validate-version")
+    version_parser = subparsers.add_parser("resolve-version")
     version_parser.add_argument("--theme-root", type=Path, required=True)
-    version_parser.add_argument("--version", required=True)
-    version_parser.set_defaults(func=command_validate_version)
+    version_parser.set_defaults(func=command_resolve_version)
 
     notes_parser = subparsers.add_parser("validate-notes")
     notes_parser.add_argument("--notes", type=Path, required=True)
@@ -225,7 +221,6 @@ def build_parser() -> argparse.ArgumentParser:
     package_parser.add_argument("--builder-output", type=Path, required=True)
     package_parser.add_argument("--release-dir", type=Path, required=True)
     package_parser.add_argument("--summary-file", type=Path)
-    package_parser.add_argument("--version", required=True)
     package_parser.set_defaults(func=command_prepare_assets)
 
     return parser
