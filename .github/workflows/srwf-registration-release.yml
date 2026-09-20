@@ -3,10 +3,6 @@ name: SRWF Registration Release
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'SRWF Registration version already present in the requested source (example: 0.1.20)'
-        required: true
-        type: string
       source_sha:
         description: 'Exact full 40-character merged commit SHA to release'
         required: true
@@ -26,13 +22,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      version: ${{ steps.resolve_version.outputs.version }}
+      candidate_artifact: ${{ steps.resolve_version.outputs.candidate_artifact }}
     env:
-      VERSION: ${{ inputs.version }}
       SOURCE_SHA: ${{ inputs.source_sha }}
       PUBLISH: ${{ inputs.publish }}
       SOURCE_DIR: source
       AUTOMATION_DIR: release-system
-      CANDIDATE_ARTIFACT: gtb-srwf-registration-release-candidate-${{ inputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
       GH_TOKEN: ${{ github.token }}
 
     steps:
@@ -46,10 +43,6 @@ jobs:
           fi
           if [[ ! "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
             echo "::error::INVALID_SOURCE_SHA: source_sha must be a full 40-character lowercase Git commit SHA."
-            exit 1
-          fi
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::INVALID_VERSION: version must use x.y.z numeric format."
             exit 1
           fi
 
@@ -84,12 +77,23 @@ jobs:
             exit 1
           fi
 
-      - name: Verify requested version against exact source
+      - name: Resolve release version from exact source
+        id: resolve_version
+        shell: bash
         run: |
-          python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
-            validate-version \
-            --theme-root "$SOURCE_DIR/themes/srwf-registration" \
-            --version "$VERSION"
+          set -euo pipefail
+          version="$(python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            resolve-version \
+            --theme-root "$SOURCE_DIR/themes/srwf-registration")"
+          candidate_artifact="gtb-srwf-registration-release-candidate-${version}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          {
+            echo "version=$version"
+            echo "candidate_artifact=$candidate_artifact"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "VERSION=$version"
+            echo "CANDIDATE_ARTIFACT=$candidate_artifact"
+          } >> "$GITHUB_ENV"
 
       - name: Verify admitted visual reference
         working-directory: ${{ env.SOURCE_DIR }}
@@ -139,14 +143,20 @@ jobs:
           cat "$RUNNER_TEMP/gtb-owner-test-packages/GTB_SRWF_OWNER_TEST_PACKAGES_SHA256.txt"
 
       - name: Prepare canonical production release bytes and checksum
+        shell: bash
         run: |
+          set -euo pipefail
           python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
             prepare-assets \
             --theme-root "$SOURCE_DIR/themes/srwf-registration" \
             --builder-output "$RUNNER_TEMP/gtb-owner-test-packages" \
             --release-dir "$RUNNER_TEMP/gtb-srwf-release-assets" \
-            --summary-file "$RUNNER_TEMP/gtb-srwf-release-summary.json" \
-            --version "$VERSION"
+            --summary-file "$RUNNER_TEMP/gtb-srwf-release-summary.json"
+          summary_version="$(jq -r '.version' "$RUNNER_TEMP/gtb-srwf-release-summary.json")"
+          if [[ "$summary_version" != "$VERSION" ]]; then
+            echo "::error::RELEASE_SUMMARY_VERSION_MISMATCH: prepared assets resolved $summary_version instead of $VERSION."
+            exit 1
+          fi
           cat "$RUNNER_TEMP/gtb-srwf-release-summary.json"
           cat "$RUNNER_TEMP/gtb-srwf-release-assets/GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
 
@@ -254,10 +264,10 @@ jobs:
       - name: Upload verified production candidate artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: ${{ env.CANDIDATE_ARTIFACT }}
+          name: ${{ steps.resolve_version.outputs.candidate_artifact }}
           path: |
-            ${{ runner.temp }}/gtb-srwf-release-assets/gtb-srwf-registration-${{ inputs.version }}.zip
-            ${{ runner.temp }}/gtb-srwf-release-assets/GTB_SRWF_REGISTRATION_${{ inputs.version }}_SHA256.txt
+            ${{ runner.temp }}/gtb-srwf-release-assets/gtb-srwf-registration-${{ steps.resolve_version.outputs.version }}.zip
+            ${{ runner.temp }}/gtb-srwf-release-assets/GTB_SRWF_REGISTRATION_${{ steps.resolve_version.outputs.version }}_SHA256.txt
           if-no-files-found: error
           retention-days: 14
 
@@ -289,13 +299,22 @@ jobs:
     permissions:
       contents: write
     env:
-      VERSION: ${{ inputs.version }}
+      VERIFY_VERSION: ${{ needs['verify-and-build'].outputs.version }}
       SOURCE_SHA: ${{ inputs.source_sha }}
       SOURCE_DIR: source
-      CANDIDATE_ARTIFACT: gtb-srwf-registration-release-candidate-${{ inputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
+      AUTOMATION_DIR: release-system
+      CANDIDATE_ARTIFACT: ${{ needs['verify-and-build'].outputs.candidate_artifact }}
       GH_TOKEN: ${{ github.token }}
 
     steps:
+      - name: Checkout release-system code read-only
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: ${{ env.AUTOMATION_DIR }}
+          fetch-depth: 1
+          persist-credentials: false
+
       - name: Checkout exact requested source read-only
         uses: actions/checkout@v4
         with:
@@ -310,14 +329,10 @@ jobs:
           name: ${{ env.CANDIDATE_ARTIFACT }}
           path: ${{ runner.temp }}/gtb-srwf-release-assets
 
-      - name: Reconfirm exact source, notes and candidate checksum
+      - name: Reconfirm exact source, derived version, notes and candidate checksum
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$VERSION" == "0.1.19" ]]; then
-            echo "::error::PROTECTED_HISTORICAL_RELEASE: SRWF Registration 0.1.19 cannot be published by this workflow."
-            exit 1
-          fi
           actual_sha="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
           if [[ "$actual_sha" != "$SOURCE_SHA" ]]; then
             echo "::error::SOURCE_SHA_MISMATCH_BEFORE_PUBLISH: checkout resolved $actual_sha instead of $SOURCE_SHA."
@@ -328,11 +343,32 @@ jobs:
             echo "::error::SOURCE_NOT_MERGED_TO_MAIN_BEFORE_PUBLISH: $SOURCE_SHA is no longer reachable from current origin/main."
             exit 1
           fi
+
+          resolved_version="$(python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            resolve-version \
+            --theme-root "$SOURCE_DIR/themes/srwf-registration")"
+          if [[ "$resolved_version" != "$VERIFY_VERSION" ]]; then
+            echo "::error::VERIFY_PUBLISH_VERSION_HANDOFF_MISMATCH: verify resolved $VERIFY_VERSION but exact publish source resolved $resolved_version."
+            exit 1
+          fi
+          VERSION="$resolved_version"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+          if [[ "$VERSION" == "0.1.19" ]]; then
+            echo "::error::PROTECTED_HISTORICAL_RELEASE: SRWF Registration 0.1.19 cannot be published by this workflow."
+            exit 1
+          fi
+
           notes="$SOURCE_DIR/themes/srwf-registration/RELEASE_NOTES.md"
           if [[ ! -f "$notes" ]]; then
             echo "::error::RELEASE_NOTES_MISSING_BEFORE_PUBLISH: exact source no longer supplies release notes."
             exit 1
           fi
+          python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            validate-notes \
+            --notes "$notes" \
+            --version "$VERSION"
+
           cd "$RUNNER_TEMP/gtb-srwf-release-assets"
           sha256sum -c "GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt"
 
