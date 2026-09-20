@@ -236,6 +236,42 @@ jobs:
           echo "::error::RELEASE_NOTES_MISSING: exact source must contain themes/srwf-registration/RELEASE_NOTES.md."
           exit 1
 
+      - name: Prove GitHub-native Immutable Releases policy for readiness
+        shell: bash
+        env:
+          SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN: ${{ secrets.SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ "$TAG_EXISTS" == true || "$RELEASE_EXISTS" == true ]]; then
+            echo "Existing remote release identity is read-only/conflicting, so no new publication-readiness claim requires policy admission."
+            exit 0
+          fi
+          if [[ -z "${SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN:-}" ]]; then
+            echo "::error::IMMUTABLE_RELEASES_POLICY_CREDENTIAL_MISSING: configure a dedicated repository Administration: read credential before a new release can become READY TO PUBLISH."
+            exit 1
+          fi
+
+          policy_json="$RUNNER_TEMP/immutable-releases-policy.json"
+          set +e
+          http_status="$(curl --silent --show-error \
+            --output "$policy_json" \
+            --write-out '%{http_code}' \
+            --header 'Accept: application/vnd.github+json' \
+            --header "Authorization: Bearer ${SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN}" \
+            --header 'X-GitHub-Api-Version: 2026-03-10' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/immutable-releases")"
+          curl_status=$?
+          set -e
+          if [[ "$curl_status" -ne 0 ]]; then
+            echo "::error::IMMUTABLE_RELEASES_POLICY_UNAVAILABLE: GitHub policy-status API request failed before a trustworthy HTTP response was received."
+            exit 1
+          fi
+
+          python3 "$AUTOMATION_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            validate-immutable-policy \
+            --http-status "$http_status" \
+            --response "$policy_json"
+
       - name: Evaluate publication readiness
         shell: bash
         run: |
@@ -360,6 +396,38 @@ jobs:
           fi
           echo "TAG_NAME=$tag" >> "$GITHUB_ENV"
 
+      - name: Reprove GitHub-native Immutable Releases policy immediately before mutation
+        shell: bash
+        env:
+          SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN: ${{ secrets.SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN:-}" ]]; then
+            echo "::error::IMMUTABLE_RELEASES_POLICY_CREDENTIAL_MISSING: publication requires a dedicated repository Administration: read credential."
+            exit 1
+          fi
+
+          policy_json="$RUNNER_TEMP/immutable-releases-policy-before-publish.json"
+          set +e
+          http_status="$(curl --silent --show-error \
+            --output "$policy_json" \
+            --write-out '%{http_code}' \
+            --header 'Accept: application/vnd.github+json' \
+            --header "Authorization: Bearer ${SRWF_IMMUTABLE_RELEASES_POLICY_READ_TOKEN}" \
+            --header 'X-GitHub-Api-Version: 2026-03-10' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/immutable-releases")"
+          curl_status=$?
+          set -e
+          if [[ "$curl_status" -ne 0 ]]; then
+            echo "::error::IMMUTABLE_RELEASES_POLICY_UNAVAILABLE: GitHub policy-status API request failed immediately before publication."
+            exit 1
+          fi
+
+          python3 "$SOURCE_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            validate-immutable-policy \
+            --http-status "$http_status" \
+            --response "$policy_json"
+
       - name: Publish exact tag and GitHub Release
         shell: bash
         run: |
@@ -399,6 +467,12 @@ jobs:
             echo "::error::POST_PUBLISH_PRERELEASE: published release is unexpectedly a prerelease."
             exit 1
           fi
+          if ! python3 "$SOURCE_DIR/themes/srwf-registration/tests/release_srwf_registration.py" \
+            validate-published-immutability \
+            --release-json "$release_json"; then
+            echo "::error::POST_PUBLISH_NOT_IMMUTABLE: published release failed immutable-state verification."
+            exit 1
+          fi
 
           mapfile -t asset_names < <(jq -r '.assets[].name' "$release_json" | sort)
           expected_assets=("GTB_SRWF_REGISTRATION_${VERSION}_SHA256.txt" "gtb-srwf-registration-${VERSION}.zip")
@@ -428,5 +502,6 @@ jobs:
             echo "- Source SHA: \`$SOURCE_SHA\`"
             echo "- Tag: \`$TAG_NAME\`"
             echo "- Production ZIP SHA-256: \`$zip_sha\`"
+            echo "- GitHub Release immutable: \`true\`"
             echo "- Release assets: production ZIP + checksum only"
           } >> "$GITHUB_STEP_SUMMARY"
