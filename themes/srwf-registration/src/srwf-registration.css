@@ -167,7 +167,15 @@ head:has(#gravity_forms_theme_framework-css) + body .gform-theme--framework.gfor
  * no label text, numeric ID, DOM position, or semantic option text is consulted.
  * Gravity Forms remains the radio/checked/keyboard/validation owner.
  */
+/*
+ * Gravity Forms gives secondary inline labels (including Radio labels) a documented
+ * 12px horizontal spacer. SRWF moves the authentic radio input out of flow and draws
+ * the visible cue inside the associated label, so that input-to-label reserve is no
+ * longer needed. Neutralize only that documented spacer in SRWF Radio scope; the
+ * explicit 12px group gap remains the option-to-option spacing authority.
+ */
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gfield_radio {
+    --gf-label-space-x-secondary: 0;
     display: flex;
     flex-flow: row wrap;
     gap: 12px;
