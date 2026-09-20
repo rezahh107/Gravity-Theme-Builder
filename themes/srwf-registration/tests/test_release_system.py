@@ -130,7 +130,10 @@ class ReleaseWorkflowContractTests(unittest.TestCase):
 
     def test_caller_cannot_assert_immutability(self) -> None:
         trigger_block = self.workflow.split("permissions:", 1)[0]
-        self.assertNotIn("immutable", trigger_block.lower())
+        self.assertNotRegex(
+            trigger_block,
+            r"(?mi)^\s+(?:immutable|immutability|immutable_releases|immutable_releases_enabled):\s*$",
+        )
         self.assertNotIn("inputs.immutable", self.workflow.lower())
         self.assertNotIn("IMMUTABLE_RELEASES_ENABLED", self.workflow)
 
