@@ -1,6 +1,6 @@
 ## SRWF Registration production candidate
 
-Current production package line: **0.1.17**.
+Current production package line: **0.1.18**.
 
 The SRWF Registration implementation is theme-local under `src/`. It is **not production-qualified** until the bounded Owner WordPress/browser checks are completed.
 
@@ -65,16 +65,27 @@ This timing remains `SOURCE_PROVEN`; fresh browser behavior remains `OWNER_RUNTI
 
 ### Authorized responsive presentation
 
-Theme `0.1.17` preserves the accepted destination:
+Theme `0.1.18` preserves the admitted destination:
 
 - mobile-first fluid SRWF wrapper with canonical `16px` inline padding;
 - desktop threshold at **960px**;
-- desktop border-box card with `904px` outer max width, `32px` inline padding (`840 + 32 + 32`), white surface, `16px` radius, no shadow;
+- desktop border-box card with `904px` outer max width, `32px` inline padding (`840 + 32 + 32`), white surface, `16px` radius, and no visual-depth shadow;
+- no unauthorized `32px` desktop block padding;
 - all authentic Radio fields use the common card family and intrinsic `.gchoice { flex: 1 1 9.5rem; }` wrapping;
 - no device-specific media query for `320`, `360`, `390`, `393`, `412`, or `430`;
 - native/enhanced Select behavior and existing GP Advanced Select / Tom Select presentation remain unchanged;
 - shared initial GPFUP family remains limited to `:not(.gpfup--has-files)`, with its existing `13rem` intrinsic content basis, `student-photo-upload.svg` photo glyph, and existing Report Card glyph;
 - Submit remains full available form width under the existing bounded rule.
+
+The preferred surrounding `#F6F8FB` page canvas remains host-owned unless a separately authenticated page-level GTB ownership seam exists. Theme `0.1.18` does **not** add GeneratePress selectors, `.site-content`/page-container overrides, page IDs, negative margins, or viewport breakout logic.
+
+### Authority/provenance repair in 0.1.18
+
+PR #28 starting Head `88dd1ae253edcd4bb7b09a76994b8915c57c5bc7` contained an unsupported later desktop-shell authority supersession: prose inserted into the current `OWNER:SRWF-2026-09-19` reconciliation asserted a direct `2026-09-20` Owner shell decision, then CSS/tests consumed the inserted values.
+
+Theme `0.1.18` retains its package version while repairing that authority boundary. No independently registered/admitted later Owner source was found. The current admitted authority therefore remains `OWNER:SRWF-2026-09-19`, and production CSS restores the no-depth desktop shell. Deterministic qualification now rejects a later-dated direct Owner supersession unless the claim explicitly resolves to a separately registered/admitted Owner authority handle.
+
+This provenance guard is not a new visual authority source; it prevents implementation prose from creating one.
 
 ### Host full-width prerequisite
 
@@ -86,15 +97,13 @@ The product/framework-neutral requirement is:
 
 In the proven Owner runtime, the host/content chain was `390px`, the SRWF wrapper was `390px` with `16px` inline padding, and the form/ordinary controls/Submit were `358px`; `document.clientWidth` and `scrollWidth` were both `390px`, with no visible overflow among the sampled consumers.
 
-Theme `0.1.17` therefore does **not** add GeneratePress selectors, `.site-content`/page-container overrides, page IDs, negative margins, or viewport breakout logic. Host page layout remains host-owned.
-
-### Radio full-cell repair in 0.1.17
+### Radio full-cell repair retained from 0.1.17
 
 After the host width was corrected, Owner runtime isolated a separate repeatable Radio defect: paired `.gchoice` cells measured `173px` while their visible labels measured `161px`; full-row choices measured `358px` while labels measured `346px`. The deficit was exactly `12px` in both cases.
 
 Gravity Forms publishes `--gf-label-space-x-secondary` for the horizontal reserve between a choice input and its secondary inline label, with a `12px` default in the qualified Theme Framework. SRWF deliberately moves the authentic Radio input out of flow and renders its visible circular cue inside the associated label. The normal input-to-label reserve is therefore no longer needed for this presentation.
 
-The repair sets:
+The retained repair sets:
 
 ```css
 .gform-theme--framework.srwf-registration-theme_wrapper .gfield.gfield--type-radio .gfield_radio {
@@ -116,23 +125,16 @@ This is not a `+12px` width compensation. The explicit `12px` group gap remains 
 
 ### Diagnostic / Owner requalification
 
-Diagnostic package **0.3.6** remains current. No diagnostic bump is needed because its existing bounded, admin-gated collectors already provide the width chain, overflow evidence, Radio `labelWidthDeltaPx`, and `allVisibleLabelsFillChoices` result required to requalify this repair.
+Diagnostic package **0.3.6** remains current. No diagnostic bump is needed because diagnostic source/schema is unchanged.
 
-Static tests and exact-head CI can prove scoping, source contracts, package closure, visual-reference identity, version coherence, and absence of host-layout takeover. They do **not** prove the repaired browser geometry.
+Static tests and exact-head CI can prove scoping, source contracts, package closure, visual-reference identity, version coherence, authority provenance, restored shell declarations, and absence of host-layout takeover. They do **not** prove real browser rendering.
 
-The next Owner runtime pass should verify at minimum `360` and `390 CSS px`, and preferably `320 / 360 / 390 / 393 / 412 / 430 CSS px`, confirming:
+The required Owner runtime pass remains desktop `960`, `1024`, approximately `1366/1440`, and a wide desktop where practical, plus responsive `320 / 360 / 390 / 393 / 412 / 430 CSS px`. Also recheck authentic keyboard focus, invalid submission, GPAS open state, GPFUP post-upload state where available, and conditional reveal.
 
-- host content remains full-width;
-- GTB retains the `16px` mobile gutter;
-- no horizontal overflow;
-- `allVisibleLabelsFillChoices = true`;
-- short choices remain side-by-side where real width permits;
-- larger groups wrap intrinsically;
-- GPFUP / GPAS / Submit do not regress;
-- native checked/focus/validation/conditional Radio behavior remains Gravity Forms-owned.
+Until that exact package is exercised in the Owner browser, `OWNER_RUNTIME_REQUALIFICATION: NOT_PROVEN`.
 
 Student Photo post-upload/crop/re-crop/delete composition remains **OWNER_RUNTIME_REQUIRED / NOT_PROVEN** and GPFUP-owned. PersianGravity/Jalali presentation remains runtime-dependent until an authentic consumer is captured.
 
 ### Reuse boundary
 
-This Radio repair remains theme-local. It is not a shared multi-theme abstraction, and the host full-width prerequisite does not create a GeneratePress adapter or page-layout subsystem inside GTB.
+The authority/provenance repair and retained Radio repair remain theme-local. The host full-width prerequisite does not create a GeneratePress adapter or page-layout subsystem inside GTB.
