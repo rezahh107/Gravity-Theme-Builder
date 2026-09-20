@@ -300,10 +300,16 @@ class SrwfRegistrationStaticTests(unittest.TestCase):
         self.assertIsNotNone(desktop)
         body = desktop.group(1)
         self.assertIn("max-inline-size: 904px;", body)
+        self.assertIn("padding-block: 32px;", body)
         self.assertIn("padding-inline: 32px;", body)
         self.assertIn("background: #FFFFFF;", body)
         self.assertIn("border-radius: 16px;", body)
-        self.assertIn("box-shadow: none;", body)
+        self.assertNotRegex(body, r"(?m)^\s*border\s*:")
+        self.assertIn("0 0 0 1px #E4E7EC", body)
+        self.assertIn("0 1px 2px rgba(16, 24, 40, 0.04)", body)
+        self.assertIn("0 12px 32px rgba(16, 24, 40, 0.06)", body)
+        self.assertNotIn("overflow: hidden", body)
+        self.assertEqual(840, 904 - 32 - 32)
         self.assertNotIn("#F6F8FB", css, "page background remains host integration owned")
 
     def test_title_helper_error_rhythm_and_focus_match_authorized_values(self) -> None:

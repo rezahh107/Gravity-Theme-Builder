@@ -1,6 +1,6 @@
 # SRWF Registration — Implementation Map
 
-Status: **RADIO_FULL_CELL_REPAIR_STATICALLY_IMPLEMENTED / OWNER_RUNTIME_REQUALIFICATION_REQUIRED**
+Status: **DESKTOP_SHELL_MODERNIZATION_STATICALLY_IMPLEMENTED / OWNER_RUNTIME_REQUALIFICATION_REQUIRED**
 
 This map distinguishes current Owner authority, repository/static evidence, host ownership, and evidence that still requires the real Owner WordPress/browser runtime. CI/static success is not production visual qualification.
 
@@ -14,11 +14,11 @@ Registered immutable/exact IDs remain defined in `reference/VISUAL_AUTHORITY.md`
 - `VA:VC-1.0.0` — historical/base contract;
 - `VA:VC-1.0.1` — exact historical Drive-backed Owner revision, including §27.
 
-`OWNER:SRWF-2026-09-19`, recorded in `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md`, remains implementation-driving for the current destination. It supersedes only contradictory/unresolved historical states it explicitly resolves. The historical artifact and contract remain provenance and must not roll back a newer Owner decision.
+`OWNER:SRWF-2026-09-19`, recorded in `reference/SRWF_PUBLIC_REGISTRATION_OWNER_RECONCILIATION_2026-09-19.md`, remains implementation-driving for the current destination, including the direct 2026-09-20 Desktop Full Width shell refinement now recorded there. The historical artifact and contract remain provenance and must not roll back a newer Owner decision.
 
-Current static theme implementation: `0.1.17`.
+Current static theme implementation: `0.1.18`.
 
-Owner runtime of theme `0.1.14` is retained as historical evidence for the initial GPFUP repair: both admitted glyphs rendered, but the authentic direct content child remained visually detached from the icon. Theme `0.1.15` is the prior static icon/content-cluster repair. Theme `0.1.16` added bounded intrinsic Radio and initial GPFUP narrow/mobile reflow. Theme `0.1.17` retains those behaviors and closes the newly runtime-proven Radio full-cell defect by neutralizing the Gravity Forms secondary-label horizontal reserve only inside admitted SRWF Radio groups.
+Owner runtime of theme `0.1.14` is retained as historical evidence for the initial GPFUP repair: both admitted glyphs rendered, but the authentic direct content child remained visually detached from the icon. Theme `0.1.15` is the prior static icon/content-cluster repair. Theme `0.1.16` added bounded intrinsic Radio and initial GPFUP narrow/mobile reflow. Theme `0.1.17` closed the runtime-proven Radio full-cell defect by neutralizing the Gravity Forms secondary-label horizontal reserve only inside admitted SRWF Radio groups. Theme `0.1.18` preserves those component contracts and adds only the Owner-approved desktop primary-surface boundary/depth/block-padding refinement.
 
 ## Implementation traceability
 
@@ -29,36 +29,63 @@ Owner runtime of theme `0.1.14` is retained as historical evidence for the initi
 | Per-form setup | Gravity Forms → Form Settings → GTB Theme | supported Form Settings hooks; no top-level menu | `STATICALLY_PROVEN` |
 | Semantic mapping | explicit internal references project GTB-owned specialization tokens | no label/ID/order/DOM inference; semantic roles do not gate all-Radio cards | `STATICALLY_PROVEN` |
 | Production breakpoint | `960 CSS px` | one viewport media query; not a device-name preset | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime matrix `OWNER_RUNTIME_REQUIRED` |
-| Mobile shell | fluid; `16px` inline padding; hard acceptance `320 CSS px` | SRWF wrapper only; no mobile max-width | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; `390 CSS px` width chain `OWNER_RUNTIME_PROVEN` |
-| Desktop card | white; `840px` content + `32px` + `32px` = `904px` outer; radius `16px`; shadow none | `border-box`, `max-inline-size:904px`, `padding-inline:32px` at `min-width:960px` | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
+| Mobile shell | fluid; `16px` inline padding; hard acceptance `320 CSS px` | SRWF wrapper only; no mobile max-width or desktop depth | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; prior `390 CSS px` width chain `OWNER_RUNTIME_PROVEN`; exact-head regression pending |
+| Desktop card | white; `840px` content + `32px` + `32px` = `904px` outer; `32px` block padding; radius `16px`; `1px #E4E7EC` non-layout ring; shadows `0 1px 2px rgba(16,24,40,0.04)` + `0 12px 32px rgba(16,24,40,0.06)` | existing SRWF wrapper at `min-width:960px`; boundary is first `box-shadow` ring so it consumes no width; no `overflow:hidden` | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed/visual runtime pending |
 | Page / host width | page hosting Registration must provide the required full-width content area; GTB then owns only its canonical `16px` mobile inline gutter | host/page configuration; GeneratePress native Full Width is the currently proven Owner-site example, not a GTB dependency | `HOST_OWNED`; intended chain `OWNER_RUNTIME_PROVEN` at `390 CSS px`; no GTB host-layout override required or desired |
-| Page background | `#F6F8FB` only where an authenticated ownership seam exists | surrounding page integration | `HOST_INTEGRATION_REQUIRED`; GTB does not seize `html/body` |
+| Page background | preferred desktop canvas `#F6F8FB` | repository inspection found no safe authenticated GTB page-shell seam; surrounding page integration remains host-owned | `HOST_INTEGRATION_REQUIRED`; configure the Registration host/page canvas; GTB does not seize `html/body` or generic site containers |
 | Form title | mobile `24px`, desktop `26px`, `700 / 1.5` | bounded framework-sentinel selector | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
 | Section title | `18px / 700 / 1.5` | authentic Section Break title | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
 | Field label | `15px / 600 / 1.5` | Gravity Forms Theme Framework API | `DOCUMENTED / STATICALLY_IMPLEMENTED` |
 | Control value | `16px / 400 / 1.5`, min `52px` | Theme Framework `--gf-ctrl-*` tokens | `DOCUMENTED / STATICALLY_IMPLEMENTED` |
 | Helper | `14px / 400 / 1.5` | Gravity Forms description CSS API | `DOCUMENTED / STATICALLY_IMPLEMENTED` |
 | Field error | `14px / 600 / 1.5` | Gravity Forms error-description API | `DOCUMENTED / STATICALLY_IMPLEMENTED`; authentic invalid submission pending |
-| Primary action | `16px / 700 / 1.5`, full available width, min `56px` | Theme Framework tokens + bounded SRWF width enforcement | `STATICALLY_PROVEN`; `390 CSS px` full-width result historically observed; exact 0.1.17 recheck required |
+| Primary action | `16px / 700 / 1.5`, full available width, min `56px` | Theme Framework tokens + bounded SRWF width enforcement | `STATICALLY_PROVEN`; prior `390 CSS px` full-width result historically observed; exact 0.1.18 recheck required |
 | Field-internal spacing | no-helper label→control `8px`; label→helper/error `6px`; final helper/error→control `8px`; intermediate helper/error spacing remains content/host-driven | `--gf-label-space-primary:8px`, `--gf-desc-space:8px`, bounded `--gf-label-space-primary:6px` when authentic above-input helper/error consumers exist | `OWNER_AUTHORIZED / STATICALLY_PROVEN`; computed browser geometry `OWNER_RUNTIME_REQUIRED` |
+| Major section rhythm | `32px`, fluid hierarchy, no section cards | existing `--gf-form-gap-y:24px` + authentic Section Break `margin-block-start:8px`; independent of field/section count or order | `OWNER_AUTHORIZED / STATICALLY_PROVEN`; browser rhythm pending |
 | Visible focus | `2px solid #1D4ED8`, offset `2px`, no intended glow | GF focus API; hidden native Radio focus projects to visible card | `DOCUMENTED / STATICALLY_IMPLEMENTED`; authentic keyboard runtime pending |
 | Native single Select | shared control family + documented `--gf-ctrl-select-padding-x:24px 32px`; retained runtime-proven vertical optical compensation | bounded native-only selector excludes enhanced Tom Select source | historical runtime evidence exists; current exact-head browser recheck `OWNER_RUNTIME_REQUIRED` |
-| All Radio choices | every authentic admitted `.gfield--type-radio` uses cards; visible label fills assigned `.gchoice`; `12px` option gap; min `52px`; radius `10px`; unselected `1px #8690A1`; selected `2px #1D4ED8` + `#EDF1FC` + non-color dot cue | `.gfield_radio` keeps intrinsic Flex wrapping and explicit `12px` option gap; documented `--gf-label-space-x-secondary` is neutralized only in SRWF Radio because the authentic input is out of flow and the visible cue lives inside the label; `.gchoice` retains `flex:1 1 9.5rem`; native input/label/checked/focus semantics retained | root cause `RUNTIME_PROVEN`; repair `STATICALLY_IMPLEMENTED`; post-fix `allVisibleLabelsFillChoices=true` is `OWNER_RUNTIME_REQUIRED` |
+| All Radio choices | every authentic admitted `.gfield--type-radio` uses cards; visible label fills assigned `.gchoice`; `12px` option gap; min `52px`; radius `10px`; unselected `1px #8690A1`; selected `2px #1D4ED8` + `#EDF1FC` + non-color dot cue | `.gfield_radio` keeps intrinsic Flex wrapping and explicit `12px` option gap; documented `--gf-label-space-x-secondary` remains neutralized only in SRWF Radio; `.gchoice` retains `flex:1 1 9.5rem`; native input/label/checked/focus semantics retained | root cause `RUNTIME_PROVEN`; 0.1.17 repair preserved unchanged; exact 0.1.18 browser regression `OWNER_RUNTIME_REQUIRED` |
 | Conditional Radio fields | inherit same cards when Gravity Forms reveals them | same field-type rule; GTB does not control conditional visibility | selector coverage `STATICALLY_PROVEN`; authentic reveal runtime pending |
 | Section icon tiles | explicit mapped section roles only; `40×40`, radius `10`, icon `20`, tint `#EDF1FC`, heading gap `12px` | admitted local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
-| Shared initial GPFUP family | min `96px`; pad `16px`; radius `12px`; `1px` dashed `#8690A1`; `40×40` icon slot; `24px` glyph | authentic initial state only; direct content child uses intrinsic `13rem` basis + `max-inline-size:100%` so it wraps before being crushed | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; exact 0.1.17 runtime regression check required |
+| Shared initial GPFUP family | min `96px`; pad `16px`; radius `12px`; `1px` dashed `#8690A1`; `40×40` icon slot; `24px` glyph | authentic initial state only; direct content child uses intrinsic `13rem` basis + `max-inline-size:100%` so it wraps before being crushed | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; exact 0.1.18 runtime regression check required |
 | Report Card initial GPFUP | shared family + file/document glyph | explicit `srwf-role-report-card-upload`; `icons/report-card-file.svg`; only `:not(.gpfup--has-files)` | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime recheck pending |
 | Report Card `.gpfup--has-files` | do not force initial state over uploaded UI | all theme upload rules stop before authentic has-files state | `HOST_OWNED`; real transition `OWNER_RUNTIME_REQUIRED` |
 | Student Photo initial | shared initial family + photo/camera glyph | authentic `gpfup--images-only:not(.gpfup--has-files)`; `icons/student-photo-upload.svg` | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime recheck pending |
 | Student Photo post-upload | style only authentic exposed preview/replace/re-crop/delete states | no speculative post-upload/crop composition; crop config host-owned | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN`; `HOST_OWNED` |
-| GPAS / Tom Select | same select-family metric/focus, host owns behavior | proven `.ts-wrapper > .ts-control` consumer | behavior `HOST_OWNED`; exact 0.1.17 dynamic runtime regression check required |
+| GPAS / Tom Select | same select-family metric/focus, host owns behavior | proven `.ts-wrapper > .ts-control` consumer; production rules unchanged in 0.1.18 | behavior `HOST_OWNED`; exact 0.1.18 dynamic runtime regression check required |
 | PersianGravity / Jalali | style only authentic consumer if admitted | no selector/adapter invented | `OWNER_RUNTIME_REQUIRED / NOT_PROVEN` |
 | Desktop short-field pairings | Gravity Forms configuration remains authoritative | no GTB pair map | `HOST_OWNED / OWNER_CONFIGURABLE` |
 | Accessibility / reflow | `320px`, `200%` text resize, text spacing, contrast, target/focus acceptance | intrinsic wrapping + host responsive mechanics | `OWNER_RUNTIME_REQUIRED` |
 
-## Host-width runtime evidence and ownership boundary
+## Desktop Full Width shell implementation
 
-The earlier narrow whole-form observation is now explained operationally by the Owner-site page layout rather than by SRWF wrapper CSS. The Owner changed the dedicated SRWF Registration page to use its host theme's native full-width content configuration. GeneratePress is the currently proven host example; it is not a GTB dependency or selector contract.
+The Owner's current desktop problem is visual separation, not available form width. The prior real desktop baseline already established a centered `904px` border-box SRWF wrapper with `32px` inline padding and an authentic `840px` content area. Increasing width was therefore neither requested nor justified.
+
+Theme `0.1.18` refines only the existing desktop wrapper rule:
+
+```css
+@media (min-width: 960px) {
+    .gform-theme--framework.srwf-registration-theme_wrapper {
+        max-inline-size: 904px;
+        padding-block: 32px;
+        padding-inline: 32px;
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow:
+            0 0 0 1px #E4E7EC,
+            0 1px 2px rgba(16, 24, 40, 0.04),
+            0 12px 32px rgba(16, 24, 40, 0.06);
+    }
+}
+```
+
+The first shadow is a non-layout ring, not a literal border. Because the wrapper remains `border-box` and the ring does not participate in sizing, the authorized content geometry remains exactly `904 - 32 - 32 = 840px`. No `overflow:hidden` is added, so the shell does not deliberately clip focus outlines, Tom Select dropdowns, GPFUP UI, or validation consumers.
+
+The established major section rhythm is also left alone. `--gf-form-gap-y:24px` plus the authentic Section Break's `8px` start margin already produces the intended `32px` hierarchy without inventing section cards, field-count assumptions, or positional selectors.
+
+## Host-width and canvas ownership boundary
+
+The earlier narrow whole-form observation was explained operationally by the Owner-site page layout rather than by SRWF wrapper CSS. The Owner changed the dedicated SRWF Registration page to use its host theme's native full-width content configuration. GeneratePress is the currently proven host example; it is not a GTB dependency or selector contract.
 
 Fresh Owner runtime at `390 CSS px` established the intended chain:
 
@@ -69,11 +96,15 @@ Fresh Owner runtime at `390 CSS px` established the intended chain:
 - `document.clientWidth == document.scrollWidth == 390`;
 - no horizontal scrolling; `49` sampled visible consumers; `0` visible overflow consumers.
 
-This is the implementation-facing host prerequisite:
+This remains the implementation-facing host prerequisite:
 
 > The page hosting the SRWF Registration surface must provide the required full-width content area. GTB then owns its canonical `16px` mobile inline gutter.
 
-GTB does **not** remove host container padding, target `.site-content` or other theme-specific layout internals, depend on GeneratePress page classes, use body/page IDs, apply negative margins, or break out to viewport width for this requirement. No GTB host-layout repair is required or desired for the proven Owner site.
+For the desktop canvas, repository/source inspection found no existing truthful page-level GTB seam that identifies only the admitted Registration page while avoiding numeric page IDs, generic `html/body` or site-container ownership, and GeneratePress internals. Therefore GTB does **not** implement `#F6F8FB` in production CSS/PHP in this batch. The smallest host-side integration requirement is:
+
+> Configure the dedicated SRWF Registration host/page canvas to `#F6F8FB` at desktop widths while preserving the host's full-width content configuration.
+
+GTB does **not** remove host container padding, target `.site-content` or other theme-specific layout internals, depend on GeneratePress page classes, use body/page IDs, apply negative margins, or break out to viewport width.
 
 Diagnostic package v0.3.6 remains sufficient for requalification. It already records:
 
@@ -84,21 +115,19 @@ Diagnostic package v0.3.6 remains sufficient for requalification. It already rec
 - representative text input, Radio group, initial GPFUP droparea, and Submit widths;
 - visible-consumer overflow, typography, field rhythm, initial upload, Radio geometry, and `allVisibleLabelsFillChoices` qualification evidence.
 
-The diagnostic remains admin-gated and does not read field content/values. Admin-only download controls remain functional and are parked in normal flow by the final composer.
+The diagnostic remains admin-gated and does not read field content/values. No diagnostic source/schema changed in this batch, so the diagnostic version is not bumped.
 
-## Radio full-cell root cause and repair
+## Radio full-cell root cause and retained repair
 
-Owner runtime after the host-width correction proved the remaining Radio defect was independent of page width:
+Owner runtime after the host-width correction proved the Radio defect was independent of page width:
 
 - group width `358px`, option gap `12px`;
 - paired `.gchoice` cells `173px`, visible labels `161px`;
 - full-row `.gchoice` `358px`, visible label `346px`;
-- the repeatable deficit is exactly `12px` across authentic visible SRWF Radio fields;
+- the repeatable deficit was exactly `12px` across authentic visible SRWF Radio fields;
 - pre-repair diagnostic result: `allVisibleLabelsFillChoices: false`.
 
-Gravity Forms documents `--gf-label-space-x-secondary` as the secondary-label horizontal spacer with a `12px` default. SRWF intentionally moves the authentic Radio input out of flow and renders the visible non-color cue inside the associated label. The normal input-to-secondary-label reserve therefore becomes orphaned in this presentation and consumes exactly the measured `12px` of cell width.
-
-Theme `0.1.17` neutralizes that documented spacer with `--gf-label-space-x-secondary:0` only on the admitted SRWF Radio group. It does **not** add `12px` back to card width, use `calc()`, change the explicit `12px` option-to-option gap, change the `9.5rem` intrinsic basis, change selected/unselected visual values, or replace the native Radio input/label state relationship.
+Gravity Forms documents `--gf-label-space-x-secondary` as the secondary-label horizontal spacer with a `12px` default. SRWF intentionally moves the authentic Radio input out of flow and renders the visible non-color cue inside the associated label. Theme `0.1.17` therefore neutralized that documented spacer with `--gf-label-space-x-secondary:0` only on the admitted SRWF Radio group. Theme `0.1.18` does not alter that repair, the explicit `12px` option gap, the `9.5rem` intrinsic basis, selected/unselected visual values, or the native Radio input/label state relationship.
 
 ## Visual-role authority traceability
 
@@ -106,9 +135,9 @@ The exact historical v1.0.1/artifact path remains retrievable. The current Owner
 
 | Requirement | Authority path | Implementation | Current disposition |
 |---|---|---|---|
-| Gender historical binary role | `VA:VC-1.0.1` + `VA:ARTIFACT` + current Owner reconciliation | `srwf-role-binary-choice` may remain configured, but card presentation comes from authentic Radio field type | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; post-fix runtime pending |
-| Graduation Status historical binary role | current all-radio lock | semantic role no longer gates cards; conditional visibility stays host-owned | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; post-fix runtime pending |
-| Other authentic Radio groups | current Owner all-radio lock | same `.gfield--type-radio` card system automatically covers visible/conditional groups | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; post-fix runtime pending |
+| Gender historical binary role | `VA:VC-1.0.1` + `VA:ARTIFACT` + current Owner reconciliation | `srwf-role-binary-choice` may remain configured, but card presentation comes from authentic Radio field type | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime regression pending |
+| Graduation Status historical binary role | current all-radio lock | semantic role no longer gates cards; conditional visibility stays host-owned | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime regression pending |
+| Other authentic Radio groups | current Owner all-radio lock | same `.gfield--type-radio` card system automatically covers visible/conditional groups | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime regression pending |
 | Section iconography | `VA:VC-1.0.1` + `VA:ARTIFACT` + `section_heading_iconography` | explicit mapped Section Break tokens + local SVGs | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; computed runtime pending |
 | Report Card initial GPFUP | `VA:VC-1.0.1` + `VA:ARTIFACT` + `report_card_upload_initial` | shared initial family + `icons/report-card-file.svg` + intrinsic content wrapping | `OWNER_AUTHORIZED / STATICALLY_IMPLEMENTED`; runtime pending |
 | Report Card `.gpfup--has-files` | `VA:VC-1.0.1` + host-owned GPFUP lifecycle | initial rules stop before authentic has-files state | `HOST_OWNED`; real transition `OWNER_RUNTIME_REQUIRED` |
@@ -136,9 +165,9 @@ For `requiredIndicator=asterisk`, Gravity Forms' native required legend remains 
 
 ## Package / verification boundary
 
-Theme package: `0.1.17`.
+Theme package: `0.1.18`.
 Diagnostic package: `0.3.6`.
 
-The deterministic/static suite is expected to prove SRWF scoping, current package constants, the secondary-label-spacer repair, Radio/GPFUP intrinsic rules, no fixed card height, no device-specific mobile breakpoint, `.gpfup--has-files` isolation, canonical mobile `16px` padding, desktop `960px` / `904px` contract retention, no host-theme/page-layout takeover, Entry Detail/unrelated-form isolation, diagnostic privacy/width-chain structure, and package/version coherence.
+The deterministic/static suite is expected to prove SRWF scoping, current package constants, exact historical visual-reference hash, the desktop `960px` threshold, `904px` outer / `840px` content geometry, `32px` desktop block and inline padding, white surface, `16px` radius, non-layout `#E4E7EC` ring, restrained two-layer depth, no device-specific mobile breakpoint, canonical mobile `16px` padding, no host-theme/page-layout takeover, the retained Radio full-cell repair/native semantics, `.gpfup--has-files` isolation, unchanged GPAS/Tom Select presentation rules, full-width Submit, Entry Detail/unrelated-form isolation, diagnostic privacy/width-chain structure, and deterministic package/version coherence.
 
-It does **not** prove the repaired card geometry in the Owner browser. The next Owner runtime pass must establish `allVisibleLabelsFillChoices = true`, no horizontal overflow, preserved side-by-side short choices and clean wrapping of larger groups, and no GPFUP/GPAS/Submit regression. Verify at minimum `360` and `390 CSS px`, preferably the full `320/360/390/393/412/430 CSS px` matrix. Authentic checked/focus/invalid/conditional states, real upload/progress/preview/delete/crop lifecycle, `200%` text resize, text-spacing, contrast, and target-size acceptance remain `OWNER_RUNTIME_REQUIRED`.
+It does **not** prove the browser-rendered shadow/ring, the host `#F6F8FB` canvas, focus/dropdown/upload non-clipping under real composition, or final visual acceptance. Owner requalification should cover desktop `960`, `1024`, approximately `1366/1440`, and a wide desktop close to `~1859 CSS px` where practical, plus the responsive regression matrix `320/360/390/393/412/430 CSS px`. Authentic keyboard focus, invalid submission, GPAS open state, GPFUP post-upload state where available, conditional reveal, `200%` text resize, text-spacing, contrast, and target-size acceptance remain `OWNER_RUNTIME_REQUIRED`.

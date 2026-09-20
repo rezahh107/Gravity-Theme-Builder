@@ -6,13 +6,13 @@ The repository is intentionally **design-authority driven**: an approved visual 
 
 ## Status
 
-**First reference implementation active / SRWF mobile responsive polish implemented / Owner runtime requalification still open.**
+**First reference implementation active / SRWF Desktop Full Width shell modernization statically implemented / Owner runtime requalification still open.**
 
 The first reference implementation is:
 
 - `SRWF Registration` — a real-world RTL/Persian public registration form theme.
 
-SRWF is the first proving ground for the system, not a special case that defines every future theme. The current theme implementation is `0.1.17`; diagnostic `0.3.6` remains the bounded runtime-evidence package. Automated/static qualification is necessary evidence, but it does not by itself establish production-browser qualification.
+SRWF is the first proving ground for the system, not a special case that defines every future theme. The current theme implementation is `0.1.18`; diagnostic `0.3.6` remains the bounded runtime-evidence package. Automated/static qualification is necessary evidence, but it does not by itself establish production-browser qualification.
 
 ## Current first implementation target
 
@@ -42,11 +42,14 @@ The SRWF work currently includes:
 - the shared initial GPFUP icon/content-cluster presentation for Report Card and image-only Student Photo;
 - theme `0.1.16` intrinsic Radio and initial-GPFUP narrow-width reflow, without device-specific mobile breakpoints or post-upload behavior takeover;
 - theme `0.1.17` Radio full-cell repair, which neutralizes the Gravity Forms secondary-label horizontal reserve only inside admitted SRWF Radio groups while retaining the explicit `12px` option gap and native Radio semantics;
+- theme `0.1.18` Desktop Full Width primary-surface refinement: `904/840` geometry preserved, `32px` block padding, non-layout `#E4E7EC` boundary, and restrained Owner-approved depth at the existing `960px` threshold;
 - diagnostic `0.3.6` evidence for viewport/DPR, host/GF/GTB width chain, representative control widths, and Radio label-fill geometry.
 
 Owner runtime at `390 CSS px` proved the intended host-width chain after the dedicated Registration page was configured through the host's native full-width content option (GeneratePress is the currently proven example): the host supplies the full available content area, then GTB owns only its canonical `16px` mobile inline gutter. GTB therefore does not add a GeneratePress dependency, site-wide container override, page-ID rule, negative-margin breakout, or viewport-width hack.
 
-Remaining work is evidence-driven runtime requalification of exact theme `0.1.17` + diagnostic `0.3.6`. At minimum, recheck `360` and `390 CSS px`; preferably cover the full `320/360/390/393/412/430 CSS px` matrix, including Radio full-cell fill, intrinsic wrapping, no horizontal overflow, and unchanged GPFUP/GPAS/Submit behavior. Page-background ownership still requires an authenticated host seam; Student Photo post-upload/crop composition and PersianGravity presentation remain runtime-dependent and must not be guessed.
+For the preferred desktop `#F6F8FB` canvas, repository inspection found no existing safe GTB-owned page-level authentication seam. The page canvas therefore remains a host integration requirement rather than a reason to seize `html`, `body`, or generic site containers.
+
+Remaining work is evidence-driven runtime requalification of exact theme `0.1.18` + diagnostic `0.3.6`. Desktop checks should cover `960`, `1024`, approximately `1366/1440`, and a wide desktop close to the prior `~1859 CSS px` baseline where practical. Responsive regression should cover `320/360/390/393/412/430 CSS px`, including Radio full-cell fill, intrinsic wrapping, no horizontal overflow, and unchanged GPFUP/GPAS/Submit behavior. Student Photo post-upload/crop composition and PersianGravity presentation remain runtime-dependent and must not be guessed.
 
 ## Core approach
 
